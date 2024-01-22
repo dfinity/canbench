@@ -77,7 +77,7 @@ pub fn run_benchmarks(
         println!("---------------------------------------------------");
         println!();
 
-        let result = run_benchmark(canister_wasm_path, &bench_fn);
+        let result = run_benchmark(canister_wasm_path, bench_fn);
 
         // Compare result to previous result if that exists.
         if let Some(current_result) = current_results.get(&bench_fn.to_string()) {
@@ -214,7 +214,7 @@ query rwlgt-iiaaa-aaaaa-aaaaa-cai {}{} \"DIDL\x00\x00\"",
 
     // Decode the response.
     Decode!(
-        &hex::decode(&result_hex[2..]).expect(&format!(
+        &hex::decode(&result_hex[2..]).unwrap_or_else(|_| panic!(
             "error parsing result of benchmark {}. Result: {}",
             bench_fn, result_hex
         )),
