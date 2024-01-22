@@ -44,7 +44,7 @@ jobs:
         env:
           RUST_BACKTRACE: 1
 
-shell-checks:
+  shell-checks:
     name: ShellCheck
     runs-on: ubuntu-latest
     steps:
