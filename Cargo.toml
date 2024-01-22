@@ -1,5 +1,6 @@
 [workspace]
 members = ["canbench-bin", "canbench-rs", "canbench-rs-macros"]
+resolver = "2"
 
 [workspace.dependencies]
 candid = "0.9.11"
