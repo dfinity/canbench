@@ -38,7 +38,7 @@ impl BenchTest {
         if let Some(config) = self.config {
             // Write the canbench.yml file with the config provided.
             let config_path = dir_path.join("canbench.yml");
-            let mut config_file = File::create(&config_path).unwrap();
+            let mut config_file = File::create(config_path).unwrap();
             config_file.write_all(config.as_bytes()).unwrap()
         }
 

@@ -1,5 +1,4 @@
 mod utils;
-use tempdir::TempDir;
 use utils::BenchTest;
 
 #[test]
