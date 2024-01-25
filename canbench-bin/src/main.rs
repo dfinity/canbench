@@ -12,13 +12,13 @@ struct Args {
     // If provided, only benchmarks that match this pattern will be executed.
     pattern: Option<String>,
 
-    // A necessary flag to keep `cargo bench` happy.
-    #[clap(long)]
-    bench: bool,
-
     // Whether or not results should be persisted to disk.
     #[clap(long)]
     persist: bool,
+
+    // If true, only prints the benchmark results (and nothing else).
+    #[clap(long)]
+    less_verbose: bool,
 }
 
 fn main() {
@@ -67,5 +67,11 @@ fn main() {
     }
 
     // Run the benchmarks.
-    canbench_bin::run_benchmarks(&wasm_path, args.pattern, args.persist, &results_path);
+    canbench_bin::run_benchmarks(
+        &wasm_path,
+        args.pattern,
+        args.persist,
+        &results_path,
+        !args.less_verbose,
+    );
 }

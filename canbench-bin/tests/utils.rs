@@ -85,9 +85,16 @@ impl BenchTest {
             config_file.write_all(config.as_bytes()).unwrap()
         }
 
+        // Only output the benchmarks so that the output isn't polluted by other
+        // statements (e.g. downloading runtime).
+        let mut cmd_args = vec!["--less-verbose".to_string()];
+        if let Some(bench_name) = self.bench_name {
+            cmd_args.push(bench_name.clone());
+        }
+
         let output = Command::new(canbench)
             .current_dir(dir_path)
-            .args([self.bench_name.unwrap_or(String::from(""))])
+            .args(cmd_args)
             .output()
             .unwrap();
 

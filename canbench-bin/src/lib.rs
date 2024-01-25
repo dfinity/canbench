@@ -26,6 +26,7 @@ pub fn run_benchmarks(
     pattern: Option<String>,
     persist: bool,
     results_file: &PathBuf,
+    verbose: bool,
 ) {
     // Parse the Wasm to determine all the benchmarks to run.
     // All query endpoints are assumed to be benchmarks.
@@ -69,7 +70,7 @@ pub fn run_benchmarks(
         .flatten()
         .collect();
 
-    maybe_download_drun();
+    maybe_download_drun(verbose);
 
     let current_results = read_current_results(results_file);
 
@@ -137,7 +138,7 @@ fn drun_path() -> PathBuf {
 }
 
 // Downloads drun if it's not already downloaded.
-fn maybe_download_drun() {
+fn maybe_download_drun(verbose: bool) {
     const DRUN_LINUX_SHA: &str = "7bf08d5f1c1a7cd44f62c03f8554f07aa2430eb3ae81c7c0a143a68ff52dc7f7";
     const DRUN_MAC_SHA: &str = "57b506d05a6f42f7461198f79f648ad05434c72f3904834db2ced30853d01a62";
 
@@ -158,14 +159,16 @@ fn maybe_download_drun() {
     }
 
     // The expected version of drun isn't present. Download it.
-    download_drun();
+    download_drun(verbose);
 }
 
-fn download_drun() {
+fn download_drun(verbose: bool) {
     const DRUN_URL_PREFIX: &str =
         "https://github.com/dfinity/ic/releases/download/release-2023-09-27_23-01%2Bquic/drun-x86_64-";
 
-    println!("Downloading drun (will be cached for future uses)...");
+    if verbose {
+        println!("Downloading runtime (will be cached for future uses)...");
+    }
 
     // Create the canbench directory if it doesn't exist.
     std::fs::create_dir_all(canbench_dir()).unwrap();
