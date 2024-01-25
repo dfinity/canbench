@@ -247,6 +247,7 @@ fn print_measurement(measurement: &str, value: u64, old_value: Option<&u64>) {
     let old_value = match old_value {
         Some(old_value) => *old_value,
         None => {
+            // No old value exists. This is a new measurement.
             println!("  {measurement}: {value} (new)");
             return;
         }
@@ -254,6 +255,7 @@ fn print_measurement(measurement: &str, value: u64, old_value: Option<&u64>) {
 
     match old_value {
         0 => {
+            // The old value is zero, so changes cannot be reported as a percentage.
             if value == 0 {
                 println!("  {measurement}: {value} (no change)",);
             } else {
@@ -266,6 +268,7 @@ fn print_measurement(measurement: &str, value: u64, old_value: Option<&u64>) {
             }
         }
         _ => {
+            // The old value is > 0. Report changes as percentages.
             let diff = ((value as f64 - old_value as f64) / old_value as f64) * 100.0;
             if diff == 0.0 {
                 println!("  {measurement}: {value} (Δ {:.2}%) (no change)", diff);
