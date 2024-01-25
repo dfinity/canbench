@@ -1,6 +1,8 @@
 use std::{
+    env,
     fs::File,
     io::Write,
+    path::PathBuf,
     process::{Command, Output},
 };
 use tempdir::TempDir;
@@ -9,31 +11,72 @@ use tempdir::TempDir;
 macro_rules! assert_err {
     ($output:expr, $err_str:expr) => {
         assert_eq!($output.status.code(), Some(1));
-        assert_eq!($output.stderr, $err_str.as_bytes());
+        pretty_assertions::assert_eq!(&String::from_utf8($output.stderr).unwrap(), $err_str);
+    };
+}
+
+#[macro_export]
+macro_rules! assert_success {
+    ($output:expr, $out_str:expr) => {
+        assert_eq!($output.status.code(), Some(0));
+        pretty_assertions::assert_eq!(&String::from_utf8($output.stdout).unwrap(), $out_str);
     };
 }
 
 pub struct BenchTest {
     config: Option<String>,
+    bench_name: Option<String>,
+    base_dir: BaseDir,
 }
 
 impl BenchTest {
     pub fn no_config() -> Self {
-        Self { config: None }
+        Self {
+            config: None,
+            bench_name: None,
+            base_dir: BaseDir::Temp,
+        }
     }
 
     pub fn with_config(config: &str) -> Self {
         Self {
             config: Some(config.into()),
+            bench_name: None,
+            base_dir: BaseDir::Temp,
+        }
+    }
+
+    /// Creates a test that executes the benchmarks of a canister in the `tests` dir.
+    pub fn canister(canister_name: &str) -> Self {
+        Self {
+            config: None,
+            bench_name: None,
+            base_dir: BaseDir::Path(
+                PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap())
+                    .join("..")
+                    .join("tests")
+                    .join(canister_name),
+            ),
+        }
+    }
+
+    pub fn with_bench(self, bench_name: &str) -> Self {
+        Self {
+            bench_name: Some(bench_name.to_string()),
+            ..self
         }
     }
 
     pub fn run<R>(self, f: impl FnOnce(Output) -> R) {
         let canbench: &'static str = env!("CARGO_BIN_EXE_canbench");
 
-        // Create a temporary directory which will contain the config file, wasm file, etc.
+        // Create a temporary directory in case no specific directory is specified.
         let dir = TempDir::new("").unwrap();
-        let dir_path = dir.path();
+
+        let dir_path = match &self.base_dir {
+            BaseDir::Temp => dir.path(),
+            BaseDir::Path(path) => path,
+        };
 
         if let Some(config) = self.config {
             // Write the canbench.yml file with the config provided.
@@ -44,9 +87,19 @@ impl BenchTest {
 
         let output = Command::new(canbench)
             .current_dir(dir_path)
+            .args([self.bench_name.unwrap_or(String::from(""))])
             .output()
             .unwrap();
 
         f(output);
     }
+}
+
+// The base directory to use for running canbench.
+enum BaseDir {
+    // A temporary directory is created.
+    Temp,
+
+    // A specific path is specified.
+    Path(PathBuf),
 }

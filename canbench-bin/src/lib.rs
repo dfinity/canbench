@@ -17,6 +17,9 @@ use wasmparser::Parser as WasmParser;
 // Other queries exposed by the canister are ignored.
 const BENCH_PREFIX: &str = "__canbench__";
 
+// The threshold that determines whether or not a change is significant.
+const NOISE_THRESHOLD: f64 = 2.0;
+
 /// Runs the benchmarks on the canister available in the provided `canister_wasm_path`.
 pub fn run_benchmarks(
     canister_wasm_path: &PathBuf,
@@ -71,8 +74,8 @@ pub fn run_benchmarks(
     let current_results = read_current_results(results_file);
 
     let mut results = BTreeMap::new();
-
-    for bench_fn in benchmark_fns {
+    let mut num_executed_bench_fns = 0;
+    for bench_fn in &benchmark_fns {
         if let Some(pattern) = &pattern {
             if !bench_fn.contains(pattern) {
                 continue;
@@ -96,7 +99,17 @@ pub fn run_benchmarks(
         }
 
         results.insert(bench_fn, result);
+        num_executed_bench_fns += 1;
     }
+
+    println!();
+    println!("---------------------------------------------------");
+    println!();
+
+    println!(
+        "Executed {num_executed_bench_fns} of {} benchmarks.",
+        benchmark_fns.len()
+    );
 
     // Persist the result if requested.
     if persist {
@@ -230,42 +243,60 @@ query rwlgt-iiaaa-aaaaa-aaaaa-cai {}{} \"DIDL\x00\x00\"",
 }
 
 // Prints a measurement along with its percentage change relative to the old value.
-fn print_measurement(measurement: &str, value: u64, diff: f64) {
-    if diff == 0.0 {
-        println!("    {measurement}: {value} ({:.2}%) (no change)", diff);
-    } else if diff.abs() < 2.0 {
-        println!(
-            "    {measurement}: {value} ({:.2}%) (change within noise threshold)",
-            diff
-        );
-    } else if diff > 0.0 {
-        println!(
-            "    {}",
-            format!("{}: {value} (regressed by {:.2}%)", measurement, diff,)
-                .red()
-                .bold()
-        );
-    } else {
-        println!(
-            "    {}",
-            format!("{}: {value} (improved by {:.2}%)", measurement, diff.abs(),)
-                .green()
-                .bold()
-        );
+fn print_measurement(measurement: &str, value: u64, old_value: Option<&u64>) {
+    let old_value = match old_value {
+        Some(old_value) => *old_value,
+        None => {
+            println!("  {measurement}: {value} (new)");
+            return;
+        }
+    };
+
+    match old_value {
+        0 => {
+            if value == 0 {
+                println!("  {measurement}: {value} (no change)",);
+            } else {
+                println!(
+                    "  {}",
+                    format!("{measurement}: {value} (regressed from 0)")
+                        .red()
+                        .bold()
+                );
+            }
+        }
+        _ => {
+            let diff = ((value as f64 - old_value as f64) / old_value as f64) * 100.0;
+            if diff == 0.0 {
+                println!("  {measurement}: {value} (Δ {:.2}%) (no change)", diff);
+            } else if diff.abs() < NOISE_THRESHOLD {
+                println!(
+                    "  {measurement}: {value} ({:.2}%) (change within noise threshold)",
+                    diff
+                );
+            } else if diff > 0.0 {
+                println!(
+                    "  {}",
+                    format!("{}: {value} (regressed by {:.2}%)", measurement, diff,)
+                        .red()
+                        .bold()
+                );
+            } else {
+                println!(
+                    "  {}",
+                    format!("{}: {value} (improved by {:.2}%)", measurement, diff.abs(),)
+                        .green()
+                        .bold()
+                );
+            }
+        }
     }
 }
 
 // Prints out a measurement of the new value along with a comparison with the old value.
 fn compare(old: &BenchResult, new: &BenchResult) {
-    println!("  measurements:");
     for (measurement, value) in new.measurements.iter() {
-        match old.measurements.get(measurement) {
-            Some(old_value) => {
-                let diff = ((*value as f64 - *old_value as f64) / *old_value as f64) * 100.0;
-                print_measurement(measurement, *value, diff);
-            }
-            None => println!("    {measurement}: {value} (new)"),
-        }
+        print_measurement(measurement, *value, old.measurements.get(measurement));
     }
 }
 

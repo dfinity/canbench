@@ -22,3 +22,26 @@ wasm_path:
         );
     });
 }
+
+// Runs a benchmark whose measurements were persisted previously, and thus reports no changes.
+#[test]
+fn benchmark_reports_no_changes() {
+    BenchTest::canister("measurements_output")
+        .with_bench("nothing")
+        .run(|output| {
+            assert_success!(
+                output,
+                "
+---------------------------------------------------
+
+Benchmark: nothing
+  instructions: 304 (Δ 0.00%) (no change)
+  stable_memory_size: 0 (no change)
+
+---------------------------------------------------
+
+Executed 1 of 1 benchmarks.
+"
+            );
+        });
+}
