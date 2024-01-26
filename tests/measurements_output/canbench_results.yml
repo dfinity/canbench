@@ -1,23 +1,31 @@
+# The results in this file are artificial and are designed to trigger
+# certain scenarios.
+
+# A benchmark that is expected to return no changes.
 no_changes_test:
   measurements:
     instructions: 304
     stable_memory_size: 0
 
+# A benchmark that is expected to return a noisy change.
 noisy_change_test:
   measurements:
     instructions: 306
     stable_memory_size: 0
 
+# A benchmark that is expected to return a regression.
 regression_test:
   measurements:
     instructions: 10
     stable_memory_size: 0
 
+# A benchmark that is expected to return an improvement.
 improvement_test:
   measurements:
     instructions: 3040
     stable_memory_size: 0
 
+# A benchmark that is expected to return a regression from zero.
 stable_memory_increase:
   measurements:
     instructions: 0
