@@ -67,7 +67,6 @@ Executed 1 of 5 benchmarks.
         });
 }
 
-
 #[test]
 fn benchmark_reports_regression() {
     BenchTest::canister("measurements_output")

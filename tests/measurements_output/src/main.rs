@@ -37,9 +37,7 @@ fn improvement_test() -> BenchResult {
 // is reported.
 #[bench]
 fn stable_memory_increase() -> BenchResult {
-    benchmark(|| {
-        unsafe { stable64_grow(123) }
-    })
+    benchmark(|| unsafe { stable64_grow(123) })
 }
 
 fn main() {}
