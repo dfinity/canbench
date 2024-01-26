@@ -35,7 +35,7 @@ fn benchmark_reports_no_changes() {
 
 Benchmark: no_changes_test
   instructions: 304 (no change)
-  stable_memory_size: 0 (no change)
+  stable_memory_delta: 0 (no change)
 
 ---------------------------------------------------
 
@@ -57,11 +57,9 @@ fn benchmark_reports_noisy_change() {
 
 Benchmark: noisy_change_test
   instructions: 304 (-0.65%) (change within noise threshold)
-  stable_memory_size: 0 (no change)
+  stable_memory_delta: 0 (no change)
 
 ---------------------------------------------------
-
-Executed 1 of 5 benchmarks.
 "
             );
         });
@@ -79,11 +77,9 @@ fn benchmark_reports_regression() {
 
 Benchmark: regression_test
   instructions: 304 (regressed by 2940.00%)
-  stable_memory_size: 0 (no change)
+  stable_memory_delta: 0 (no change)
 
 ---------------------------------------------------
-
-Executed 1 of 5 benchmarks.
 "
             );
         });
@@ -101,11 +97,9 @@ fn benchmark_reports_improvement() {
 
 Benchmark: improvement_test
   instructions: 304 (improved by 90.00%)
-  stable_memory_size: 0 (no change)
+  stable_memory_delta: 0 (no change)
 
 ---------------------------------------------------
-
-Executed 1 of 5 benchmarks.
 "
             );
         });
@@ -123,11 +117,31 @@ fn benchmark_reports_regression_from_zero() {
 
 Benchmark: stable_memory_increase
   instructions: 404 (regressed from 0)
-  stable_memory_size: 123 (regressed from 0)
+  stable_memory_delta: 123 (regressed from 0)
 
 ---------------------------------------------------
+"
+            );
+        });
+}
 
-Executed 1 of 5 benchmarks.
+// Tests that only the stable memory delta is reported (as opposed to the entire
+// stable memory usage.
+#[test]
+fn benchmark_stable_memory_delta() {
+    BenchTest::canister("measurements_output")
+        .with_bench("stable_memory_delta")
+        .run(|output| {
+            assert_success!(
+                output,
+                "
+---------------------------------------------------
+
+Benchmark: stable_memory_delta (new)
+  instructions: 404
+  stable_memory_delta: 456
+
+---------------------------------------------------
 "
             );
         });

@@ -40,4 +40,15 @@ fn stable_memory_increase() -> BenchResult {
     benchmark(|| unsafe { stable64_grow(123) })
 }
 
+// A benchmark to check that only the _delta_ in stable memory is reported, not
+// the total stable memory.
+#[bench]
+fn stable_memory_delta() -> BenchResult {
+    unsafe { stable64_grow(123) };
+
+    // Since only the delta is reported, the benchmark should return a delta
+    // of 456 (and ignore the stable memory allocation above).
+    benchmark(|| unsafe { stable64_grow(456) })
+}
+
 fn main() {}
