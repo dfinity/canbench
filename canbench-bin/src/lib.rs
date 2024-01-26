@@ -96,7 +96,7 @@ pub fn run_benchmarks(
         } else {
             println!("Benchmark: {} {}", bench_fn.bold(), "(new)".blue().bold());
             let result = serde_yaml::to_string(&result.measurements).unwrap();
-            for line in yaml.lines() {
+            for line in result.lines() {
                 println!("  {}", line);
             }
         }

@@ -38,8 +38,6 @@ Benchmark: no_changes_test
   stable_memory_delta: 0 (no change)
 
 ---------------------------------------------------
-
-Executed 1 of 5 benchmarks.
 "
             );
         });
