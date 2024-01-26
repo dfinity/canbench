@@ -10,7 +10,7 @@ use tempdir::TempDir;
 #[macro_export]
 macro_rules! assert_err {
     ($output:expr, $err_str:expr) => {
-        assert_eq!($output.status.code(), Some(1));
+        assert_eq!($output.status.code(), Some(1), "output: {:?}", $output);
         pretty_assertions::assert_eq!(&String::from_utf8($output.stderr).unwrap(), $err_str);
     };
 }
@@ -18,7 +18,7 @@ macro_rules! assert_err {
 #[macro_export]
 macro_rules! assert_success {
     ($output:expr, $out_str:expr) => {
-        assert_eq!($output.status.code(), Some(0));
+        assert_eq!($output.status.code(), Some(0), "output: {:?}", $output);
         pretty_assertions::assert_eq!(&String::from_utf8($output.stdout).unwrap(), $out_str);
     };
 }
