@@ -51,4 +51,12 @@ fn stable_memory_delta() -> BenchResult {
     benchmark(|| unsafe { stable64_grow(456) })
 }
 
+// A benchmark where we allocate some memory on the heap to increase the heap delta.
+#[bench]
+fn increase_heap_delta() -> BenchResult {
+    benchmark(|| {
+        let x = vec![1; 1_000_000];
+    })
+}
+
 fn main() {}

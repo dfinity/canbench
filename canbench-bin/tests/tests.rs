@@ -34,7 +34,8 @@ fn benchmark_reports_no_changes() {
 ---------------------------------------------------
 
 Benchmark: no_changes_test
-  instructions: 304 (no change)
+  heap_delta: 0 (no change)
+  instructions: 310 (no change)
   stable_memory_delta: 0 (no change)
 
 ---------------------------------------------------
@@ -54,7 +55,8 @@ fn benchmark_reports_noisy_change() {
 ---------------------------------------------------
 
 Benchmark: noisy_change_test
-  instructions: 304 (-0.65%) (change within noise threshold)
+  heap_delta: 0 (no change)
+  instructions: 310 (1.31%) (change within noise threshold)
   stable_memory_delta: 0 (no change)
 
 ---------------------------------------------------
@@ -74,7 +76,8 @@ fn benchmark_reports_regression() {
 ---------------------------------------------------
 
 Benchmark: regression_test
-  instructions: 304 (regressed by 2940.00%)
+  heap_delta: 0 (no change)
+  instructions: 310 (regressed by 3000.00%)
   stable_memory_delta: 0 (no change)
 
 ---------------------------------------------------
@@ -94,7 +97,8 @@ fn benchmark_reports_improvement() {
 ---------------------------------------------------
 
 Benchmark: improvement_test
-  instructions: 304 (improved by 90.00%)
+  heap_delta: 0 (no change)
+  instructions: 310 (improved by 90.00%)
   stable_memory_delta: 0 (no change)
 
 ---------------------------------------------------
@@ -114,7 +118,8 @@ fn benchmark_reports_regression_from_zero() {
 ---------------------------------------------------
 
 Benchmark: stable_memory_increase
-  instructions: 404 (regressed from 0)
+  heap_delta: 0 (no change)
+  instructions: 410 (regressed from 0)
   stable_memory_delta: 123 (regressed from 0)
 
 ---------------------------------------------------
@@ -136,8 +141,30 @@ fn benchmark_stable_memory_delta() {
 ---------------------------------------------------
 
 Benchmark: stable_memory_delta (new)
-  instructions: 404
+  heap_delta: 0
+  instructions: 410
   stable_memory_delta: 456
+
+---------------------------------------------------
+"
+            );
+        });
+}
+
+#[test]
+fn benchmark_heap_delta() {
+    BenchTest::canister("measurements_output")
+        .with_bench("increase_heap_delta")
+        .run(|output| {
+            assert_success!(
+                output,
+                "
+---------------------------------------------------
+
+Benchmark: increase_heap_delta (new)
+  heap_delta: 62
+  instructions: 3385672
+  stable_memory_delta: 0
 
 ---------------------------------------------------
 "
