@@ -8,6 +8,13 @@ fn no_changes_test() -> BenchResult {
 }
 
 // A benchmark that does nothing.
+// The values of the benchmark are persisted such that a noisy change is reported.
+#[bench]
+fn noisy_change_test() -> BenchResult {
+    benchmark(|| {})
+}
+
+// A benchmark that does nothing.
 // The values of the benchmark are persisted such that regression is reported.
 #[bench]
 fn regression_test() -> BenchResult {

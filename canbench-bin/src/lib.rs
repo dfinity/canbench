@@ -274,7 +274,7 @@ fn print_measurement(measurement: &str, value: u64, old_value: Option<&u64>) {
             // The old value is > 0. Report changes as percentages.
             let diff = ((value as f64 - old_value as f64) / old_value as f64) * 100.0;
             if diff == 0.0 {
-                println!("  {measurement}: {value} (Δ {:.2}%) (no change)", diff);
+                println!("  {measurement}: {value} (no change)");
             } else if diff.abs() < NOISE_THRESHOLD {
                 println!(
                     "  {measurement}: {value} ({:.2}%) (change within noise threshold)",

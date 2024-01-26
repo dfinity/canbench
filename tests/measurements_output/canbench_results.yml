@@ -3,6 +3,11 @@ no_changes_test:
     instructions: 304
     stable_memory_size: 0
 
+noisy_change_test:
+  measurements:
+    instructions: 306
+    stable_memory_size: 0
+
 regression_test:
   measurements:
     instructions: 10

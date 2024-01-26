@@ -23,7 +23,6 @@ wasm_path:
     });
 }
 
-// Runs a benchmark whose measurements were persisted previously, and thus reports no changes.
 #[test]
 fn benchmark_reports_no_changes() {
     BenchTest::canister("measurements_output")
@@ -35,12 +34,34 @@ fn benchmark_reports_no_changes() {
 ---------------------------------------------------
 
 Benchmark: no_changes_test
-  instructions: 304 (Δ 0.00%) (no change)
+  instructions: 304 (no change)
   stable_memory_size: 0 (no change)
 
 ---------------------------------------------------
 
-Executed 1 of 3 benchmarks.
+Executed 1 of 4 benchmarks.
+"
+            );
+        });
+}
+
+#[test]
+fn benchmark_reports_noisy_change() {
+    BenchTest::canister("measurements_output")
+        .with_bench("noisy_change_test")
+        .run(|output| {
+            assert_success!(
+                output,
+                "
+---------------------------------------------------
+
+Benchmark: noisy_change_test
+  instructions: 304 (-0.65%) (change within noise threshold)
+  stable_memory_size: 0 (no change)
+
+---------------------------------------------------
+
+Executed 1 of 4 benchmarks.
 "
             );
         });
@@ -63,7 +84,7 @@ Benchmark: regression_test
 
 ---------------------------------------------------
 
-Executed 1 of 3 benchmarks.
+Executed 1 of 4 benchmarks.
 "
             );
         });
@@ -85,7 +106,7 @@ Benchmark: improvement_test
 
 ---------------------------------------------------
 
-Executed 1 of 3 benchmarks.
+Executed 1 of 4 benchmarks.
 "
             );
         });
