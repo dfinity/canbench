@@ -19,3 +19,6 @@ serde_yaml.workspace = true
 sha256.workspace = true
 tempfile.workspace = true
 wasmparser.workspace = true
+
+[dev-dependencies]
+tempdir = "0.3.7"

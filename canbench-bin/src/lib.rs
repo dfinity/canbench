@@ -26,7 +26,13 @@ pub fn run_benchmarks(
 ) {
     // Parse the Wasm to determine all the benchmarks to run.
     // All query endpoints are assumed to be benchmarks.
-    let benchmark_canister_wasm = std::fs::read(canister_wasm_path).unwrap();
+    let benchmark_canister_wasm = std::fs::read(canister_wasm_path).unwrap_or_else(|_| {
+        eprintln!(
+            "Couldn't read wasm file at {}. Are you sure the file exists?",
+            canister_wasm_path.display()
+        );
+        std::process::exit(1);
+    });
 
     let prefix = format!("canister_query {BENCH_PREFIX}");
 

@@ -30,7 +30,7 @@ fn main() {
         Err(err) => {
             match err.kind() {
                 std::io::ErrorKind::NotFound => {
-                    println!("{} not found in current directory.", CFG_FILE_NAME)
+                    eprintln!("{} not found in current directory.", CFG_FILE_NAME)
                 }
                 other => println!("Error while opening `{}`: {}", CFG_FILE_NAME, other),
             }
