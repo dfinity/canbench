@@ -55,7 +55,7 @@ fn stable_memory_delta() -> BenchResult {
 #[bench]
 fn increase_heap_delta() -> BenchResult {
     benchmark(|| {
-        let x = vec![1; 1_000_000];
+        let _ = vec![1; 1_000_000];
     })
 }
 
