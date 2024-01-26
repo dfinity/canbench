@@ -18,7 +18,7 @@ wasm_path:
     .run(|output| {
         assert_err!(
             output,
-            "Couldn't read wasm file at ./wasm.wasm. Are you sure the file exists?\n"
+            "Couldn't read file at ./wasm.wasm. Are you sure the file exists?\n"
         );
     });
 }
@@ -170,4 +170,30 @@ Benchmark: increase_heap_delta (new)
 "
             );
         });
+}
+
+#[test]
+fn supports_gzipped_wasm() {
+    BenchTest::canister("gzipped_wasm").run(|output| {
+        assert_success!(
+            output,
+            "
+---------------------------------------------------
+
+Benchmark: bench_1 (new)
+  heap_delta: 0
+  instructions: 310
+  stable_memory_delta: 0
+
+---------------------------------------------------
+
+Benchmark: bench_2 (new)
+  heap_delta: 0
+  instructions: 310
+  stable_memory_delta: 0
+
+---------------------------------------------------
+"
+        );
+    });
 }

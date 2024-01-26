@@ -9,6 +9,10 @@ edition = "2021"
 name = "measurements_output"
 path = "measurements_output/src/main.rs"
 
+[[bin]]
+name = "gzipped_wasm"
+path = "gzipped_wasm/src/main.rs"
+
 [dependencies]
 canbench = { path = "../canbench-rs" }
 candid.workspace = true
