@@ -174,11 +174,10 @@ Benchmark: increase_heap_delta (new)
 
 #[test]
 fn supports_gzipped_wasm() {
-    BenchTest::canister("gzipped_wasm")
-        .run(|output| {
-            assert_success!(
-                output,
-                "
+    BenchTest::canister("gzipped_wasm").run(|output| {
+        assert_success!(
+            output,
+            "
 ---------------------------------------------------
 
 Benchmark: bench_1 (new)
@@ -195,6 +194,6 @@ Benchmark: bench_2 (new)
 
 ---------------------------------------------------
 "
-            );
-        });
+        );
+    });
 }
