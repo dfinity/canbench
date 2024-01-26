@@ -28,54 +28,13 @@ pub fn run_benchmarks(
     results_file: &PathBuf,
     verbose: bool,
 ) {
-    // Parse the Wasm to determine all the benchmarks to run.
-    // All query endpoints are assumed to be benchmarks.
-    let benchmark_canister_wasm = std::fs::read(canister_wasm_path).unwrap_or_else(|_| {
-        eprintln!(
-            "Couldn't read wasm file at {}. Are you sure the file exists?",
-            canister_wasm_path.display()
-        );
-        std::process::exit(1);
-    });
-
-    let prefix = format!("canister_query {BENCH_PREFIX}");
-
-    let benchmark_fns: Vec<_> = WasmParser::new(0)
-        .parse_all(&benchmark_canister_wasm)
-        .filter_map(|section| match section {
-            Ok(wasmparser::Payload::ExportSection(export_section)) => {
-                let queries: Vec<_> = export_section
-                    .into_iter()
-                    .filter_map(|export| {
-                        if let Ok(export) = export {
-                            if export.name.starts_with(&prefix) {
-                                return Some(
-                                    export
-                                        .name
-                                        .split(&prefix)
-                                        .last()
-                                        .expect("query must have a name."),
-                                );
-                            }
-                        }
-
-                        None
-                    })
-                    .collect();
-
-                Some(queries)
-            }
-            _ => None,
-        })
-        .flatten()
-        .collect();
-
     maybe_download_drun(verbose);
 
     let current_results = read_current_results(results_file);
 
     let mut results = BTreeMap::new();
     let mut num_executed_bench_fns = 0;
+    let benchmark_fns = extract_benchmark_fns(canister_wasm_path);
     for bench_fn in &benchmark_fns {
         if let Some(pattern) = &pattern {
             if !bench_fn.contains(pattern) {
@@ -325,4 +284,61 @@ fn read_current_results(results_file: &PathBuf) -> BTreeMap<String, BenchResult>
     file.read_to_string(&mut results_str)
         .expect("error reading results file");
     serde_yaml::from_str(&results_str).unwrap()
+}
+
+// Extract the benchmarks that need to be run.
+fn extract_benchmark_fns(canister_wasm_path: &PathBuf) -> Vec<String> {
+    // Parse the canister's wasm.
+    let wasm = std::fs::read(canister_wasm_path).unwrap_or_else(|_| {
+        eprintln!(
+            "Couldn't read file at {}. Are you sure the file exists?",
+            canister_wasm_path.display()
+        );
+        std::process::exit(1);
+    });
+
+    // Decompress the wasm if it's gzipped.
+    let wasm = match canister_wasm_path.extension().unwrap().to_str() {
+        Some("gz") => {
+            // Decompress the wasm if it's gzipped.
+            let mut decoder = GzDecoder::new(&wasm[..]);
+            let mut decompressed_wasm = vec![];
+            decoder.read_to_end(&mut decompressed_wasm).unwrap();
+            decompressed_wasm
+        }
+        _ => wasm,
+    };
+
+    let prefix = format!("canister_query {BENCH_PREFIX}");
+
+    WasmParser::new(0)
+        .parse_all(&wasm)
+        .filter_map(|section| match section {
+            Ok(wasmparser::Payload::ExportSection(export_section)) => {
+                let queries: Vec<_> = export_section
+                    .into_iter()
+                    .filter_map(|export| {
+                        if let Ok(export) = export {
+                            if export.name.starts_with(&prefix) {
+                                return Some(
+                                    export
+                                        .name
+                                        .split(&prefix)
+                                        .last()
+                                        .expect("query must have a name.")
+                                        .to_string(),
+                                );
+                            }
+                        }
+
+                        None
+                    })
+                    .collect();
+
+                Some(queries)
+            }
+            _ => None,
+        })
+        .flatten()
+        .collect()
 }
