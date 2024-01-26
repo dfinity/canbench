@@ -1,4 +1,14 @@
-nothing:
+no_changes_test:
   measurements:
     instructions: 304
+    stable_memory_size: 0
+
+regression_test:
+  measurements:
+    instructions: 10
+    stable_memory_size: 0
+
+improvement_test:
+  measurements:
+    instructions: 3040
     stable_memory_size: 0

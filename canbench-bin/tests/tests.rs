@@ -27,20 +27,65 @@ wasm_path:
 #[test]
 fn benchmark_reports_no_changes() {
     BenchTest::canister("measurements_output")
-        .with_bench("nothing")
+        .with_bench("no_changes_test")
         .run(|output| {
             assert_success!(
                 output,
                 "
 ---------------------------------------------------
 
-Benchmark: nothing
+Benchmark: no_changes_test
   instructions: 304 (Δ 0.00%) (no change)
   stable_memory_size: 0 (no change)
 
 ---------------------------------------------------
 
-Executed 1 of 1 benchmarks.
+Executed 1 of 3 benchmarks.
+"
+            );
+        });
+}
+
+
+#[test]
+fn benchmark_reports_regression() {
+    BenchTest::canister("measurements_output")
+        .with_bench("regression_test")
+        .run(|output| {
+            assert_success!(
+                output,
+                "
+---------------------------------------------------
+
+Benchmark: regression_test
+  instructions: 304 (regressed by 2940.00%)
+  stable_memory_size: 0 (no change)
+
+---------------------------------------------------
+
+Executed 1 of 3 benchmarks.
+"
+            );
+        });
+}
+
+#[test]
+fn benchmark_reports_improvement() {
+    BenchTest::canister("measurements_output")
+        .with_bench("improvement_test")
+        .run(|output| {
+            assert_success!(
+                output,
+                "
+---------------------------------------------------
+
+Benchmark: improvement_test
+  instructions: 304 (improved by 90.00%)
+  stable_memory_size: 0 (no change)
+
+---------------------------------------------------
+
+Executed 1 of 3 benchmarks.
 "
             );
         });
