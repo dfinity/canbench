@@ -39,7 +39,7 @@ Benchmark: no_changes_test
 
 ---------------------------------------------------
 
-Executed 1 of 4 benchmarks.
+Executed 1 of 5 benchmarks.
 "
             );
         });
@@ -61,7 +61,7 @@ Benchmark: noisy_change_test
 
 ---------------------------------------------------
 
-Executed 1 of 4 benchmarks.
+Executed 1 of 5 benchmarks.
 "
             );
         });
@@ -84,7 +84,7 @@ Benchmark: regression_test
 
 ---------------------------------------------------
 
-Executed 1 of 4 benchmarks.
+Executed 1 of 5 benchmarks.
 "
             );
         });
@@ -106,7 +106,29 @@ Benchmark: improvement_test
 
 ---------------------------------------------------
 
-Executed 1 of 4 benchmarks.
+Executed 1 of 5 benchmarks.
+"
+            );
+        });
+}
+
+#[test]
+fn benchmark_reports_regression_from_zero() {
+    BenchTest::canister("measurements_output")
+        .with_bench("stable_memory_increase")
+        .run(|output| {
+            assert_success!(
+                output,
+                "
+---------------------------------------------------
+
+Benchmark: stable_memory_increase
+  instructions: 404 (regressed from 0)
+  stable_memory_size: 123 (regressed from 0)
+
+---------------------------------------------------
+
+Executed 1 of 5 benchmarks.
 "
             );
         });

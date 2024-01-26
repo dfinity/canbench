@@ -17,3 +17,8 @@ improvement_test:
   measurements:
     instructions: 3040
     stable_memory_size: 0
+
+stable_memory_increase:
+  measurements:
+    instructions: 0
+    stable_memory_size: 0
