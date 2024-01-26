@@ -81,7 +81,7 @@ pub fn benchmark<R>(f: impl FnOnce() -> R) -> BenchResult {
     reset();
     f();
     let total_instructions = ic_cdk::api::performance_counter(0) - start_instructions;
-    let stable_memory_delta = ic_cdk::api::stable::stable64_size()- start_stable_memory;
+    let stable_memory_delta = ic_cdk::api::stable::stable64_size() - start_stable_memory;
 
     let mut measurements = btreemap! {
         "instructions".to_string() => total_instructions,
