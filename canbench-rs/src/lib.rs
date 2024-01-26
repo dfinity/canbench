@@ -76,14 +76,16 @@ pub struct BenchResult {
 
 /// Benchmarks the given function.
 pub fn benchmark<R>(f: impl FnOnce() -> R) -> BenchResult {
-    let start = ic_cdk::api::performance_counter(0);
+    let start_stable_memory = ic_cdk::api::stable::stable64_size();
+    let start_instructions = ic_cdk::api::performance_counter(0);
     reset();
     f();
-    let total_instructions = ic_cdk::api::performance_counter(0) - start;
+    let total_instructions = ic_cdk::api::performance_counter(0) - start_instructions;
+    let stable_memory_delta = ic_cdk::api::stable::stable64_size() - start_stable_memory;
 
     let mut measurements = btreemap! {
         "instructions".to_string() => total_instructions,
-        "stable_memory_size".to_string() => ic_cdk::api::stable::stable64_size()
+        "stable_memory_delta".to_string() => stable_memory_delta,
     };
 
     let mut profiling_results: std::collections::BTreeMap<_, _> = get_results()

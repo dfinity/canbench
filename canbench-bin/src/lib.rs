@@ -95,8 +95,10 @@ pub fn run_benchmarks(
             compare(current_result, &result);
         } else {
             println!("Benchmark: {} {}", bench_fn.bold(), "(new)".blue().bold());
-            let yaml = serde_yaml::to_string(&result).unwrap();
-            println!("{}", yaml);
+            let result = serde_yaml::to_string(&result.measurements).unwrap();
+            for line in result.lines() {
+                println!("  {}", line);
+            }
         }
 
         results.insert(bench_fn, result);
@@ -105,12 +107,14 @@ pub fn run_benchmarks(
 
     println!();
     println!("---------------------------------------------------");
-    println!();
 
-    println!(
-        "Executed {num_executed_bench_fns} of {} benchmarks.",
-        benchmark_fns.len()
-    );
+    if verbose {
+        println!();
+        println!(
+            "Executed {num_executed_bench_fns} of {} benchmarks.",
+            benchmark_fns.len()
+        );
+    }
 
     // Persist the result if requested.
     if persist {
