@@ -17,12 +17,16 @@ use wasmparser::Parser as WasmParser;
 // Other queries exposed by the canister are ignored.
 const BENCH_PREFIX: &str = "__canbench__";
 
+// The threshold that determines whether or not a change is significant.
+const NOISE_THRESHOLD: f64 = 2.0;
+
 /// Runs the benchmarks on the canister available in the provided `canister_wasm_path`.
 pub fn run_benchmarks(
     canister_wasm_path: &PathBuf,
     pattern: Option<String>,
     persist: bool,
     results_file: &PathBuf,
+    verbose: bool,
 ) {
     // Parse the Wasm to determine all the benchmarks to run.
     // All query endpoints are assumed to be benchmarks.
@@ -66,13 +70,13 @@ pub fn run_benchmarks(
         .flatten()
         .collect();
 
-    maybe_download_drun();
+    maybe_download_drun(verbose);
 
     let current_results = read_current_results(results_file);
 
     let mut results = BTreeMap::new();
-
-    for bench_fn in benchmark_fns {
+    let mut num_executed_bench_fns = 0;
+    for bench_fn in &benchmark_fns {
         if let Some(pattern) = &pattern {
             if !bench_fn.contains(pattern) {
                 continue;
@@ -96,7 +100,17 @@ pub fn run_benchmarks(
         }
 
         results.insert(bench_fn, result);
+        num_executed_bench_fns += 1;
     }
+
+    println!();
+    println!("---------------------------------------------------");
+    println!();
+
+    println!(
+        "Executed {num_executed_bench_fns} of {} benchmarks.",
+        benchmark_fns.len()
+    );
 
     // Persist the result if requested.
     if persist {
@@ -124,7 +138,7 @@ fn drun_path() -> PathBuf {
 }
 
 // Downloads drun if it's not already downloaded.
-fn maybe_download_drun() {
+fn maybe_download_drun(verbose: bool) {
     const DRUN_LINUX_SHA: &str = "7bf08d5f1c1a7cd44f62c03f8554f07aa2430eb3ae81c7c0a143a68ff52dc7f7";
     const DRUN_MAC_SHA: &str = "57b506d05a6f42f7461198f79f648ad05434c72f3904834db2ced30853d01a62";
 
@@ -145,14 +159,16 @@ fn maybe_download_drun() {
     }
 
     // The expected version of drun isn't present. Download it.
-    download_drun();
+    download_drun(verbose);
 }
 
-fn download_drun() {
+fn download_drun(verbose: bool) {
     const DRUN_URL_PREFIX: &str =
         "https://github.com/dfinity/ic/releases/download/release-2023-09-27_23-01%2Bquic/drun-x86_64-";
 
-    println!("Downloading drun (will be cached for future uses)...");
+    if verbose {
+        println!("Downloading runtime (will be cached for future uses)...");
+    }
 
     // Create the canbench directory if it doesn't exist.
     std::fs::create_dir_all(canbench_dir()).unwrap();
@@ -230,42 +246,63 @@ query rwlgt-iiaaa-aaaaa-aaaaa-cai {}{} \"DIDL\x00\x00\"",
 }
 
 // Prints a measurement along with its percentage change relative to the old value.
-fn print_measurement(measurement: &str, value: u64, diff: f64) {
-    if diff == 0.0 {
-        println!("    {measurement}: {value} ({:.2}%) (no change)", diff);
-    } else if diff.abs() < 2.0 {
-        println!(
-            "    {measurement}: {value} ({:.2}%) (change within noise threshold)",
-            diff
-        );
-    } else if diff > 0.0 {
-        println!(
-            "    {}",
-            format!("{}: {value} (regressed by {:.2}%)", measurement, diff,)
-                .red()
-                .bold()
-        );
-    } else {
-        println!(
-            "    {}",
-            format!("{}: {value} (improved by {:.2}%)", measurement, diff.abs(),)
-                .green()
-                .bold()
-        );
+fn print_measurement(measurement: &str, value: u64, old_value: Option<&u64>) {
+    let old_value = match old_value {
+        Some(old_value) => *old_value,
+        None => {
+            // No old value exists. This is a new measurement.
+            println!("  {measurement}: {value} (new)");
+            return;
+        }
+    };
+
+    match old_value {
+        0 => {
+            // The old value is zero, so changes cannot be reported as a percentage.
+            if value == 0 {
+                println!("  {measurement}: {value} (no change)",);
+            } else {
+                println!(
+                    "  {}",
+                    format!("{measurement}: {value} (regressed from 0)")
+                        .red()
+                        .bold()
+                );
+            }
+        }
+        _ => {
+            // The old value is > 0. Report changes as percentages.
+            let diff = ((value as f64 - old_value as f64) / old_value as f64) * 100.0;
+            if diff == 0.0 {
+                println!("  {measurement}: {value} (no change)");
+            } else if diff.abs() < NOISE_THRESHOLD {
+                println!(
+                    "  {measurement}: {value} ({:.2}%) (change within noise threshold)",
+                    diff
+                );
+            } else if diff > 0.0 {
+                println!(
+                    "  {}",
+                    format!("{}: {value} (regressed by {:.2}%)", measurement, diff,)
+                        .red()
+                        .bold()
+                );
+            } else {
+                println!(
+                    "  {}",
+                    format!("{}: {value} (improved by {:.2}%)", measurement, diff.abs(),)
+                        .green()
+                        .bold()
+                );
+            }
+        }
     }
 }
 
 // Prints out a measurement of the new value along with a comparison with the old value.
 fn compare(old: &BenchResult, new: &BenchResult) {
-    println!("  measurements:");
     for (measurement, value) in new.measurements.iter() {
-        match old.measurements.get(measurement) {
-            Some(old_value) => {
-                let diff = ((*value as f64 - *old_value as f64) / *old_value as f64) * 100.0;
-                print_measurement(measurement, *value, diff);
-            }
-            None => println!("    {measurement}: {value} (new)"),
-        }
+        print_measurement(measurement, *value, old.measurements.get(measurement));
     }
 }
 

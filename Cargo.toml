@@ -1,5 +1,5 @@
 [workspace]
-members = ["canbench-bin", "canbench-rs", "canbench-rs-macros"]
+members = ["canbench-bin", "canbench-rs", "canbench-rs-macros", "tests"]
 resolver = "2"
 
 [workspace.dependencies]
