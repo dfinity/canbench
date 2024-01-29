@@ -54,8 +54,8 @@ pub fn run_benchmarks(
             compare(current_result, &result);
         } else {
             println!("Benchmark: {} {}", bench_fn.bold(), "(new)".blue().bold());
-            let result = serde_yaml::to_string(&result.measurements).unwrap();
-            for line in result.lines() {
+            let str_result = serde_yaml::to_string(&result.total).unwrap();
+            for line in str_result.lines() {
                 println!("  {}", line);
             }
         }
@@ -264,9 +264,24 @@ fn print_measurement(measurement: &str, value: u64, old_value: Option<&u64>) {
 
 // Prints out a measurement of the new value along with a comparison with the old value.
 fn compare(old: &BenchResult, new: &BenchResult) {
-    for (measurement, value) in new.measurements.iter() {
-        print_measurement(measurement, *value, old.measurements.get(measurement));
-    }
+    let old_total = &old.total;
+    let new_total = &new.total;
+
+    print_measurement(
+        "instructions",
+        new_total.instructions,
+        Some(&old_total.instructions),
+    );
+    print_measurement(
+        "heap_delta",
+        new_total.heap_delta,
+        Some(&old_total.heap_delta),
+    );
+    print_measurement(
+        "stable_memory_delta",
+        new_total.stable_memory_delta,
+        Some(&old_total.stable_memory_delta),
+    );
 }
 
 fn read_current_results(results_file: &PathBuf) -> BTreeMap<String, BenchResult> {

@@ -3,35 +3,35 @@
 
 # A benchmark that is expected to return no changes.
 no_changes_test:
-  measurements:
+  total:
     heap_delta: 0
-    instructions: 310
+    instructions: 298
     stable_memory_delta: 0
 
 # A benchmark that is expected to return a noisy change.
 noisy_change_test:
-  measurements:
+  total:
     heap_delta: 0
-    instructions: 306
+    instructions: 300
     stable_memory_delta: 0
 
 # A benchmark that is expected to return a regression.
 regression_test:
-  measurements:
+  total:
     heap_delta: 0
     instructions: 10
     stable_memory_delta: 0
 
 # A benchmark that is expected to return an improvement.
 improvement_test:
-  measurements:
+  total:
     heap_delta: 0
     instructions: 3100
     stable_memory_delta: 0
 
 # A benchmark that is expected to return a regression from zero.
 stable_memory_increase:
-  measurements:
+  total:
     heap_delta: 0
     instructions: 0
     stable_memory_delta: 0
