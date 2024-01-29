@@ -17,5 +17,4 @@ path = "gzipped_wasm/src/main.rs"
 canbench = { path = "../canbench-rs" }
 candid.workspace = true
 ic-cdk.workspace= true
-maplit.workspace = true
 serde.workspace = true

@@ -1,6 +1,5 @@
 //! A module for profiling canisters.
 use candid::CandidType;
-use maplit::btreemap;
 use serde::{Deserialize, Serialize};
 use std::cell::RefCell;
 use std::collections::BTreeMap;
@@ -83,7 +82,21 @@ fn heap_size() -> u64 {
 /// The results of a benchmark.
 #[derive(Debug, PartialEq, Serialize, Deserialize, CandidType)]
 pub struct BenchResult {
-    pub measurements: BTreeMap<String, u64>,
+    /// A measurement for the entire duration of the benchmark.
+    pub total: Measurement,
+}
+
+/// A benchmark measurement containing various stats.
+#[derive(Debug, PartialEq, Serialize, Deserialize, CandidType, Clone)]
+pub struct Measurement {
+    /// The number of instructions.
+    pub instructions: u64,
+
+    /// The increase in heap (measured in pages).
+    pub heap_delta: u64,
+
+    /// The increase in stable memory (measured in pages).
+    pub stable_memory_delta: u64,
 }
 
 /// Benchmarks the given function.
@@ -93,22 +106,23 @@ pub fn benchmark<R>(f: impl FnOnce() -> R) -> BenchResult {
     let start_instructions = instruction_count();
     reset();
     f();
-    let total_instructions = instruction_count() - start_instructions;
+    let instructions = instruction_count() - start_instructions;
     let stable_memory_delta = ic_cdk::api::stable::stable64_size() - start_stable_memory;
     let heap_delta = heap_size() - start_heap;
 
-    let mut measurements = btreemap! {
-        "instructions".to_string() => total_instructions,
-        "heap_delta".to_string() => heap_delta,
-        "stable_memory_delta".to_string() => stable_memory_delta,
+    let total = Measurement {
+        instructions,
+        heap_delta,
+        stable_memory_delta,
     };
 
-    let mut profiling_results: std::collections::BTreeMap<_, _> = get_results()
+    // TODO: re-enable profiling specific segments of the code.
+    /*let mut profiling_results: std::collections::BTreeMap<_, _> = get_results()
         .into_iter()
         .map(|(k, v)| (k.to_string(), v))
         .collect();
 
-    measurements.append(&mut profiling_results);
+    measurements.append(&mut profiling_results);*/
 
-    BenchResult { measurements }
+    BenchResult { total }
 }
