@@ -68,6 +68,18 @@ fn instruction_count() -> u64 {
     }
 }
 
+fn heap_size() -> u64 {
+    #[cfg(target_arch = "wasm32")]
+    {
+        core::arch::wasm32::memory_size(0) as u64
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        0
+    }
+}
+
 /// The results of a benchmark.
 #[derive(Debug, PartialEq, Serialize, Deserialize, CandidType)]
 pub struct BenchResult {
@@ -76,14 +88,19 @@ pub struct BenchResult {
 
 /// Benchmarks the given function.
 pub fn benchmark<R>(f: impl FnOnce() -> R) -> BenchResult {
-    let start = ic_cdk::api::performance_counter(0);
+    let start_heap = heap_size();
+    let start_stable_memory = ic_cdk::api::stable::stable64_size();
+    let start_instructions = instruction_count();
     reset();
     f();
-    let total_instructions = ic_cdk::api::performance_counter(0) - start;
+    let total_instructions = instruction_count() - start_instructions;
+    let stable_memory_delta = ic_cdk::api::stable::stable64_size() - start_stable_memory;
+    let heap_delta = heap_size() - start_heap;
 
     let mut measurements = btreemap! {
         "instructions".to_string() => total_instructions,
-        "stable_memory_size".to_string() => ic_cdk::api::stable::stable64_size()
+        "heap_delta".to_string() => heap_delta,
+        "stable_memory_delta".to_string() => stable_memory_delta,
     };
 
     let mut profiling_results: std::collections::BTreeMap<_, _> = get_results()

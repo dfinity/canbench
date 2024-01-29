@@ -21,4 +21,5 @@ tempfile.workspace = true
 wasmparser.workspace = true
 
 [dev-dependencies]
+pretty_assertions = "1.4.0"
 tempdir = "0.3.7"
