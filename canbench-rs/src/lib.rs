@@ -7,7 +7,7 @@ use std::collections::BTreeMap;
 pub use canbench_macros as macros;
 
 thread_local! {
-    static PROFILING: RefCell<BTreeMap<&'static str, u64>> = RefCell::new(BTreeMap::new());
+    static PROFILING: RefCell<BTreeMap<&'static str, Measurement>> = RefCell::new(BTreeMap::new());
 }
 
 /// Starts profiling the instructions consumed.
@@ -24,32 +24,54 @@ pub fn reset() {
 }
 
 /// Returns the number of instructions used for each of the profile names.
-pub fn get_results() -> std::collections::BTreeMap<&'static str, u64> {
+pub fn get_results() -> std::collections::BTreeMap<&'static str, Measurement> {
     PROFILING.with(|p| p.borrow().clone())
 }
 
 pub struct Profile {
     name: &'static str,
     start_instructions: u64,
+    start_stable_memory: u64,
+    start_heap: u64,
 }
 
 impl Profile {
     fn new(name: &'static str) -> Self {
+        let start_heap = heap_size();
+        let start_stable_memory = ic_cdk::api::stable::stable64_size();
+        let start_instructions = instruction_count();
+
         Self {
             name,
-            start_instructions: instruction_count(),
+            start_instructions,
+            start_stable_memory,
+            start_heap,
         }
     }
 }
 
 impl Drop for Profile {
     fn drop(&mut self) {
-        let instructions_count = instruction_count() - self.start_instructions;
+        let instructions = instruction_count() - self.start_instructions;
+        let stable_memory_delta = ic_cdk::api::stable::stable64_size() - self.start_stable_memory;
+        let heap_delta = heap_size() - self.start_heap;
 
         PROFILING.with(|p| {
             let mut p = p.borrow_mut();
-            let entry = p.entry(self.name).or_insert(0);
-            *entry += instructions_count;
+            let prev_profile = p.insert(
+                self.name,
+                Measurement {
+                    instructions,
+                    heap_delta,
+                    stable_memory_delta,
+                },
+            );
+
+            assert!(
+                prev_profile.is_none(),
+                "profile {} cannot be specified multiple times.",
+                self.name
+            );
         });
     }
 }
@@ -84,18 +106,24 @@ fn heap_size() -> u64 {
 pub struct BenchResult {
     /// A measurement for the entire duration of the benchmark.
     pub total: Measurement,
+
+    #[serde(default)]
+    pub profiling: BTreeMap<String, Measurement>,
 }
 
 /// A benchmark measurement containing various stats.
 #[derive(Debug, PartialEq, Serialize, Deserialize, CandidType, Clone)]
 pub struct Measurement {
     /// The number of instructions.
+    #[serde(default)]
     pub instructions: u64,
 
     /// The increase in heap (measured in pages).
+    #[serde(default)]
     pub heap_delta: u64,
 
     /// The increase in stable memory (measured in pages).
+    #[serde(default)]
     pub stable_memory_delta: u64,
 }
 
@@ -116,13 +144,10 @@ pub fn benchmark<R>(f: impl FnOnce() -> R) -> BenchResult {
         stable_memory_delta,
     };
 
-    // TODO: re-enable profiling specific segments of the code.
-    /*let mut profiling_results: std::collections::BTreeMap<_, _> = get_results()
+    let profiling: std::collections::BTreeMap<_, _> = get_results()
         .into_iter()
         .map(|(k, v)| (k.to_string(), v))
         .collect();
 
-    measurements.append(&mut profiling_results);*/
-
-    BenchResult { total }
+    BenchResult { total, profiling }
 }

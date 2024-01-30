@@ -34,9 +34,10 @@ fn benchmark_reports_no_changes() {
 ---------------------------------------------------
 
 Benchmark: no_changes_test
-  instructions: 298 (no change)
-  heap_delta: 0 (no change)
-  stable_memory_delta: 0 (no change)
+  total:
+    instructions: 310 (no change)
+    heap_delta: 0 (no change)
+    stable_memory_delta: 0 (no change)
 
 ---------------------------------------------------
 "
@@ -55,9 +56,10 @@ fn benchmark_reports_noisy_change() {
 ---------------------------------------------------
 
 Benchmark: noisy_change_test
-  instructions: 298 (-0.67%) (change within noise threshold)
-  heap_delta: 0 (no change)
-  stable_memory_delta: 0 (no change)
+  total:
+    instructions: 310 (1.64%) (change within noise threshold)
+    heap_delta: 0 (no change)
+    stable_memory_delta: 0 (no change)
 
 ---------------------------------------------------
 "
@@ -76,9 +78,10 @@ fn benchmark_reports_regression() {
 ---------------------------------------------------
 
 Benchmark: regression_test
-  instructions: 298 (regressed by 2880.00%)
-  heap_delta: 0 (no change)
-  stable_memory_delta: 0 (no change)
+  total:
+    instructions: 310 (regressed by 3000.00%)
+    heap_delta: 0 (no change)
+    stable_memory_delta: 0 (no change)
 
 ---------------------------------------------------
 "
@@ -97,9 +100,10 @@ fn benchmark_reports_improvement() {
 ---------------------------------------------------
 
 Benchmark: improvement_test
-  instructions: 298 (improved by 90.39%)
-  heap_delta: 0 (no change)
-  stable_memory_delta: 0 (no change)
+  total:
+    instructions: 310 (improved by 90.00%)
+    heap_delta: 0 (no change)
+    stable_memory_delta: 0 (no change)
 
 ---------------------------------------------------
 "
@@ -118,9 +122,10 @@ fn benchmark_reports_regression_from_zero() {
 ---------------------------------------------------
 
 Benchmark: stable_memory_increase
-  instructions: 398 (regressed from 0)
-  heap_delta: 0 (no change)
-  stable_memory_delta: 123 (regressed from 0)
+  total:
+    instructions: 410 (regressed from 0)
+    heap_delta: 0 (no change)
+    stable_memory_delta: 123 (regressed from 0)
 
 ---------------------------------------------------
 "
@@ -141,9 +146,10 @@ fn benchmark_stable_memory_delta() {
 ---------------------------------------------------
 
 Benchmark: stable_memory_delta (new)
-  instructions: 398
-  heap_delta: 0
-  stable_memory_delta: 456
+  total:
+    instructions: 410 (new)
+    heap_delta: 0 (new)
+    stable_memory_delta: 456 (new)
 
 ---------------------------------------------------
 "
@@ -162,9 +168,10 @@ fn benchmark_heap_delta() {
 ---------------------------------------------------
 
 Benchmark: increase_heap_delta (new)
-  instructions: 3385656
-  heap_delta: 62
-  stable_memory_delta: 0
+  total:
+    instructions: 3385716 (new)
+    heap_delta: 62 (new)
+    stable_memory_delta: 0 (new)
 
 ---------------------------------------------------
 "
@@ -181,19 +188,85 @@ fn supports_gzipped_wasm() {
 ---------------------------------------------------
 
 Benchmark: bench_1 (new)
-  instructions: 298
-  heap_delta: 0
-  stable_memory_delta: 0
+  total:
+    instructions: 310 (new)
+    heap_delta: 0 (new)
+    stable_memory_delta: 0 (new)
 
 ---------------------------------------------------
 
 Benchmark: bench_2 (new)
-  instructions: 298
-  heap_delta: 0
-  stable_memory_delta: 0
+  total:
+    instructions: 310 (new)
+    heap_delta: 0 (new)
+    stable_memory_delta: 0 (new)
 
 ---------------------------------------------------
 "
         );
     });
+}
+
+#[test]
+fn reports_profiling_in_new_benchmark() {
+    BenchTest::canister("measurements_output")
+        .with_bench("profiling_new")
+        .run(|output| {
+            assert_success!(
+                output,
+                "
+---------------------------------------------------
+
+Benchmark: profiling_new (new)
+  total:
+    instructions: 3510 (new)
+    heap_delta: 0 (new)
+    stable_memory_delta: 0 (new)
+
+  step_1 (profiling):
+    instructions: 288 (new)
+    heap_delta: 0 (new)
+    stable_memory_delta: 0 (new)
+
+  step_2 (profiling):
+    instructions: 288 (new)
+    heap_delta: 0 (new)
+    stable_memory_delta: 0 (new)
+
+---------------------------------------------------
+"
+            );
+        });
+}
+
+#[test]
+fn reports_profiling_in_existing_benchmark() {
+    BenchTest::canister("measurements_output")
+        .with_bench("profiling_exists")
+        .run(|output| {
+            assert_success!(
+                output,
+                "
+---------------------------------------------------
+
+Benchmark: profiling_exists
+  total:
+    instructions: 3510 (regressed from 0)
+    heap_delta: 0 (no change)
+    stable_memory_delta: 0 (no change)
+
+  step_1 (profiling):
+    instructions: 288 (improved by 64.00%)
+    heap_delta: 0 (improved by 100.00%)
+    stable_memory_delta: 0 (no change)
+
+  step_2 (profiling):
+    instructions: 288 (new)
+    heap_delta: 0 (new)
+    stable_memory_delta: 0 (new)
+
+---------------------------------------------------
+"
+            );
+        });
 }

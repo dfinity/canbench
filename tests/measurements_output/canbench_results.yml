@@ -5,14 +5,14 @@
 no_changes_test:
   total:
     heap_delta: 0
-    instructions: 298
+    instructions: 310
     stable_memory_delta: 0
 
 # A benchmark that is expected to return a noisy change.
 noisy_change_test:
   total:
     heap_delta: 0
-    instructions: 300
+    instructions: 305
     stable_memory_delta: 0
 
 # A benchmark that is expected to return a regression.
@@ -35,3 +35,15 @@ stable_memory_increase:
     heap_delta: 0
     instructions: 0
     stable_memory_delta: 0
+
+# A benchmark that is expected to return a delta of new profiling steps.
+profiling_exists:
+  total:
+    heap_delta: 0
+    instructions: 0
+    stable_memory_delta: 0
+
+  profiling:
+    step_1:
+      heap_delta: 12
+      instructions: 800
