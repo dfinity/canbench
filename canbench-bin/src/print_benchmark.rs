@@ -19,10 +19,10 @@ pub(crate) fn print_benchmark(name: &str, new: &BenchResult, old: Option<&BenchR
 
     // Print custom profiles.
     for (profile, measurement) in &new.profiling {
-        println!("");
+        println!();
         println!("  {} (profiling):", profile);
         print_measurement(
-            &measurement,
+            measurement,
             old.map(|m| &m.profiling).and_then(|m| m.get(profile)),
         );
     }
