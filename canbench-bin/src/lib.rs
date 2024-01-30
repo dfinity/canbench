@@ -1,7 +1,6 @@
 //! A module for running benchmarks.
 use canbench::BenchResult;
 use candid::Decode;
-use colored::Colorize;
 use flate2::read::GzDecoder;
 use std::{
     collections::BTreeMap,
@@ -11,14 +10,13 @@ use std::{
     path::{Path, PathBuf},
     process::Command,
 };
+mod print_benchmark;
+use print_benchmark::print_benchmark;
 use wasmparser::Parser as WasmParser;
 
 // The prefix benchmarks are expected to have in their name.
 // Other queries exposed by the canister are ignored.
 const BENCH_PREFIX: &str = "__canbench__";
-
-// The threshold that determines whether or not a change is significant.
-const NOISE_THRESHOLD: f64 = 2.0;
 
 /// Runs the benchmarks on the canister available in the provided `canister_wasm_path`.
 pub fn run_benchmarks(
@@ -47,18 +45,7 @@ pub fn run_benchmarks(
         println!();
 
         let result = run_benchmark(canister_wasm_path, bench_fn);
-
-        // Compare result to previous result if that exists.
-        if let Some(current_result) = current_results.get(&bench_fn.to_string()) {
-            println!("Benchmark: {}", bench_fn.bold());
-            compare(current_result, &result);
-        } else {
-            println!("Benchmark: {} {}", bench_fn.bold(), "(new)".blue().bold());
-            let str_result = serde_yaml::to_string(&result.total).unwrap();
-            for line in str_result.lines() {
-                println!("  {}", line);
-            }
-        }
+        print_benchmark(bench_fn, &result, current_results.get(bench_fn));
 
         results.insert(bench_fn, result);
         num_executed_bench_fns += 1;
@@ -206,82 +193,6 @@ query rwlgt-iiaaa-aaaaa-aaaaa-cai {}{} \"DIDL\x00\x00\"",
         BenchResult
     )
     .expect("error decoding benchmark result {:?}")
-}
-
-// Prints a measurement along with its percentage change relative to the old value.
-fn print_measurement(measurement: &str, value: u64, old_value: Option<&u64>) {
-    let old_value = match old_value {
-        Some(old_value) => *old_value,
-        None => {
-            // No old value exists. This is a new measurement.
-            println!("  {measurement}: {value} (new)");
-            return;
-        }
-    };
-
-    match old_value {
-        0 => {
-            // The old value is zero, so changes cannot be reported as a percentage.
-            if value == 0 {
-                println!("  {measurement}: {value} (no change)",);
-            } else {
-                println!(
-                    "  {}",
-                    format!("{measurement}: {value} (regressed from 0)")
-                        .red()
-                        .bold()
-                );
-            }
-        }
-        _ => {
-            // The old value is > 0. Report changes as percentages.
-            let diff = ((value as f64 - old_value as f64) / old_value as f64) * 100.0;
-            if diff == 0.0 {
-                println!("  {measurement}: {value} (no change)");
-            } else if diff.abs() < NOISE_THRESHOLD {
-                println!(
-                    "  {measurement}: {value} ({:.2}%) (change within noise threshold)",
-                    diff
-                );
-            } else if diff > 0.0 {
-                println!(
-                    "  {}",
-                    format!("{}: {value} (regressed by {:.2}%)", measurement, diff,)
-                        .red()
-                        .bold()
-                );
-            } else {
-                println!(
-                    "  {}",
-                    format!("{}: {value} (improved by {:.2}%)", measurement, diff.abs(),)
-                        .green()
-                        .bold()
-                );
-            }
-        }
-    }
-}
-
-// Prints out a measurement of the new value along with a comparison with the old value.
-fn compare(old: &BenchResult, new: &BenchResult) {
-    let old_total = &old.total;
-    let new_total = &new.total;
-
-    print_measurement(
-        "instructions",
-        new_total.instructions,
-        Some(&old_total.instructions),
-    );
-    print_measurement(
-        "heap_delta",
-        new_total.heap_delta,
-        Some(&old_total.heap_delta),
-    );
-    print_measurement(
-        "stable_memory_delta",
-        new_total.stable_memory_delta,
-        Some(&old_total.stable_memory_delta),
-    );
 }
 
 fn read_current_results(results_file: &PathBuf) -> BTreeMap<String, BenchResult> {

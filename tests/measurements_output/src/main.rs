@@ -1,4 +1,4 @@
-use canbench::{benchmark, macros::bench, BenchResult};
+use canbench::{benchmark, macros::bench, profile, BenchResult};
 
 #[link(wasm_import_module = "ic0")]
 extern "C" {
@@ -47,6 +47,34 @@ fn stable_memory_delta() -> BenchResult {
 #[bench]
 fn increase_heap_delta() {
     let _ = vec![1; 1_000_000];
+}
+
+// A benchmark that includes some profiling, but isn't persisted in the results.
+#[bench]
+fn profiling_new() {
+    {
+        profile("step_1");
+        println!("do something");
+    }
+
+    {
+        profile("step_2");
+        println!("do something else");
+    }
+}
+
+// A benchmark that includes some profiling and is persisted in the results.
+#[bench]
+fn profiling_exists() {
+    {
+        profile("step_1");
+        println!("do something");
+    }
+
+    {
+        profile("step_2");
+        println!("do something else");
+    }
 }
 
 fn main() {}
