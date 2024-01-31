@@ -33,9 +33,11 @@ pub fn bench(arg_tokens: TokenStream, item: TokenStream) -> TokenStream {
     // Validate the argument and generate code accordingly
     let expanded = match args.as_slice() {
         [NestedMeta::Meta(meta)] if meta.path().is_ident("raw") => {
-            // If the argument is "some", validate that the function returns BenchResult
+            // If the argument is "raw", validate that the function returns BenchResult
             if let ReturnType::Type(_, ty) = output {
-                if ty.to_token_stream().to_string() != quote!(BenchResult).to_string() {
+                if ty.to_token_stream().to_string() != quote!(BenchResult).to_string()
+                    && ty.to_token_stream().to_string() != quote!(canbench::BenchResult).to_string()
+                {
                     // If the return type is not BenchResult, generate a compile-time error
                     return syn::Error::new_spanned(ty, "Raw benchmark should return BenchResult.")
                         .to_compile_error()

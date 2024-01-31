@@ -7,7 +7,12 @@ edition = "2021"
 name = "fibonacci"
 path = "fibonacci/src/main.rs"
 
+[[bin]]
+name = "btreemap_vs_hashmap"
+path = "btreemap_vs_hashmap/src/main.rs"
+
 [dependencies]
 canbench = { path = "../canbench-rs" }
 candid.workspace = true
 ic-cdk.workspace= true
+ic-cdk-macros = "0.8.4"

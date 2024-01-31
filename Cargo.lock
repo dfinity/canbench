@@ -425,6 +425,7 @@ dependencies = [
  "canbench",
  "candid",
  "ic-cdk",
+ "ic-cdk-macros",
 ]
 
 [[package]]

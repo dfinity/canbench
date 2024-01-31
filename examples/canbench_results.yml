@@ -1,6 +1,0 @@
-fib_20:
-  total:
-    instructions: 337954
-    heap_delta: 0
-    stable_memory_delta: 0
-  profiling: {}
