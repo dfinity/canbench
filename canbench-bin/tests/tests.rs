@@ -36,8 +36,8 @@ fn benchmark_reports_no_changes() {
 Benchmark: no_changes_test
   total:
     instructions: 310 (no change)
-    heap_delta: 0 (no change)
-    stable_memory_delta: 0 (no change)
+    heap_delta: 0 pages (no change)
+    stable_memory_delta: 0 pages (no change)
 
 ---------------------------------------------------
 "
@@ -58,8 +58,8 @@ fn benchmark_reports_noisy_change() {
 Benchmark: noisy_change_test
   total:
     instructions: 310 (1.64%) (change within noise threshold)
-    heap_delta: 0 (no change)
-    stable_memory_delta: 0 (no change)
+    heap_delta: 0 pages (no change)
+    stable_memory_delta: 0 pages (no change)
 
 ---------------------------------------------------
 "
@@ -80,8 +80,8 @@ fn benchmark_reports_regression() {
 Benchmark: regression_test
   total:
     instructions: 310 (regressed by 3000.00%)
-    heap_delta: 0 (no change)
-    stable_memory_delta: 0 (no change)
+    heap_delta: 0 pages (no change)
+    stable_memory_delta: 0 pages (no change)
 
 ---------------------------------------------------
 "
@@ -102,8 +102,8 @@ fn benchmark_reports_improvement() {
 Benchmark: improvement_test
   total:
     instructions: 310 (improved by 90.00%)
-    heap_delta: 0 (no change)
-    stable_memory_delta: 0 (no change)
+    heap_delta: 0 pages (no change)
+    stable_memory_delta: 0 pages (no change)
 
 ---------------------------------------------------
 "
@@ -124,8 +124,8 @@ fn benchmark_reports_regression_from_zero() {
 Benchmark: stable_memory_increase
   total:
     instructions: 410 (regressed from 0)
-    heap_delta: 0 (no change)
-    stable_memory_delta: 123 (regressed from 0)
+    heap_delta: 0 pages (no change)
+    stable_memory_delta: 123 pages (regressed from 0)
 
 ---------------------------------------------------
 "
@@ -148,8 +148,8 @@ fn benchmark_stable_memory_delta() {
 Benchmark: stable_memory_delta (new)
   total:
     instructions: 410 (new)
-    heap_delta: 0 (new)
-    stable_memory_delta: 456 (new)
+    heap_delta: 0 pages (new)
+    stable_memory_delta: 456 pages (new)
 
 ---------------------------------------------------
 "
@@ -169,9 +169,9 @@ fn benchmark_heap_delta() {
 
 Benchmark: increase_heap_delta (new)
   total:
-    instructions: 3385716 (new)
-    heap_delta: 62 (new)
-    stable_memory_delta: 0 (new)
+    instructions: 3.39 M (new)
+    heap_delta: 62 pages (new)
+    stable_memory_delta: 0 pages (new)
 
 ---------------------------------------------------
 "
@@ -190,16 +190,16 @@ fn supports_gzipped_wasm() {
 Benchmark: bench_1 (new)
   total:
     instructions: 310 (new)
-    heap_delta: 0 (new)
-    stable_memory_delta: 0 (new)
+    heap_delta: 0 pages (new)
+    stable_memory_delta: 0 pages (new)
 
 ---------------------------------------------------
 
 Benchmark: bench_2 (new)
   total:
     instructions: 310 (new)
-    heap_delta: 0 (new)
-    stable_memory_delta: 0 (new)
+    heap_delta: 0 pages (new)
+    stable_memory_delta: 0 pages (new)
 
 ---------------------------------------------------
 "
@@ -220,18 +220,18 @@ fn reports_profiling_in_new_benchmark() {
 Benchmark: profiling_new (new)
   total:
     instructions: 3510 (new)
-    heap_delta: 0 (new)
-    stable_memory_delta: 0 (new)
+    heap_delta: 0 pages (new)
+    stable_memory_delta: 0 pages (new)
 
   step_1 (profiling):
     instructions: 288 (new)
-    heap_delta: 0 (new)
-    stable_memory_delta: 0 (new)
+    heap_delta: 0 pages (new)
+    stable_memory_delta: 0 pages (new)
 
   step_2 (profiling):
     instructions: 288 (new)
-    heap_delta: 0 (new)
-    stable_memory_delta: 0 (new)
+    heap_delta: 0 pages (new)
+    stable_memory_delta: 0 pages (new)
 
 ---------------------------------------------------
 "
@@ -252,18 +252,18 @@ fn reports_profiling_in_existing_benchmark() {
 Benchmark: profiling_exists
   total:
     instructions: 3510 (regressed from 0)
-    heap_delta: 0 (no change)
-    stable_memory_delta: 0 (no change)
+    heap_delta: 0 pages (no change)
+    stable_memory_delta: 0 pages (no change)
 
   step_1 (profiling):
     instructions: 288 (improved by 64.00%)
-    heap_delta: 0 (improved by 100.00%)
-    stable_memory_delta: 0 (no change)
+    heap_delta: 0 pages (improved by 100.00%)
+    stable_memory_delta: 0 pages (no change)
 
   step_2 (profiling):
     instructions: 288 (new)
-    heap_delta: 0 (new)
-    stable_memory_delta: 0 (new)
+    heap_delta: 0 pages (new)
+    stable_memory_delta: 0 pages (new)
 
 ---------------------------------------------------
 "
