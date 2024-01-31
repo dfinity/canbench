@@ -4,17 +4,3 @@ fibonacci_20:
     heap_delta: 0
     stable_memory_delta: 0
   profiling: {}
-insert_users:
-  total:
-    instructions: 4624165768
-    heap_delta: 871
-    stable_memory_delta: 0
-  profiling:
-    insertion:
-      instructions: 2564620791
-      heap_delta: 871
-      stable_memory_delta: 0
-    removal:
-      instructions: 2059543311
-      heap_delta: 0
-      stable_memory_delta: 0
