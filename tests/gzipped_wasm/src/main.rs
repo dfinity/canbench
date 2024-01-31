@@ -1,4 +1,4 @@
-use canbench::{macros::bench, BenchResult};
+use canbench::bench;
 
 #[bench]
 fn bench_1() {}

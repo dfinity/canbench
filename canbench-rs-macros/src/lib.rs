@@ -53,7 +53,7 @@ pub fn bench(arg_tokens: TokenStream, item: TokenStream) -> TokenStream {
 
                 #[ic_cdk::query]
                 #[allow(non_snake_case)]
-                fn #renamed_func_name() -> BenchResult {
+                fn #renamed_func_name() -> canbench::BenchResult {
                     #func_name()
                 }
             }
@@ -72,7 +72,7 @@ pub fn bench(arg_tokens: TokenStream, item: TokenStream) -> TokenStream {
 
                 #[ic_cdk::query]
                 #[allow(non_snake_case)]
-                fn #renamed_func_name() -> BenchResult {
+                fn #renamed_func_name() -> canbench::BenchResult {
                     canbench::benchmark(|| {
                         #func_name();
                     })
