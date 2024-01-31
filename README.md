@@ -39,7 +39,7 @@ A single message execution must stay within the allowed bounds, otherwise it's t
 
 * __Generous instruction limit__
 
-  While messages on the Internet Computer are bound to a few billion instructions, `canbench` can run benchmarks that are upto 10 trillion instructions, giving you the freedom to write resource-intensive benchmarks as needed.
+  While messages on the Internet Computer are bound to a few billion instructions, `canbench` can run benchmarks that are up to 10 trillion instructions, giving you the freedom to write resource-intensive benchmarks as needed.
 
 * __Language Agnostic__
 
