@@ -69,7 +69,7 @@ fn remove_users() -> canbench::BenchResult {
 fn pre_upgrade_bench() -> canbench::BenchResult {
     insert_users();
 
-    canbench::benchmark(|| pre_upgrade())
+    canbench::benchmark(pre_upgrade)
 }
 
 fn main() {}
