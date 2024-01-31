@@ -1,9 +1,9 @@
 //! A module for profiling canisters.
+pub use canbench_macros::bench;
 use candid::CandidType;
 use serde::{Deserialize, Serialize};
 use std::cell::RefCell;
 use std::collections::BTreeMap;
-pub use canbench_macros::bench;
 
 thread_local! {
     static PROFILING: RefCell<BTreeMap<&'static str, Measurement>> = RefCell::new(BTreeMap::new());
