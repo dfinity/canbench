@@ -10,6 +10,8 @@ struct User {
 
 #[derive(Default, CandidType)]
 struct State {
+    // TIP: try replace the `BTreeMap` below with a `HashMap` and run `canbench`.
+    // Notice how the performance changes.
     users: std::collections::BTreeMap<u64, User>,
 }
 
