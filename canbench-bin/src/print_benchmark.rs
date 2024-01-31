@@ -63,7 +63,7 @@ fn print_metric(metric: &str, value: u64, old_value: Option<u64>) {
         "instructions" => {
             // Don't include a unit with instructions since it's clear from the metric name.
             value_str
-        },
+        }
         "heap_delta" => format!("{value_str} pages"),
         "stable_memory_delta" => format!("{value_str} pages"),
         other => panic!("unknown metric {}", other),
