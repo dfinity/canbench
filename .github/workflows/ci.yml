@@ -28,9 +28,9 @@ jobs:
         run: |
           cargo install --path ./canbench-bin
           cd examples/fibonacci
-          echo "```" > /tmp/output.txt
+          echo "\`\`\`" > /tmp/output.txt
           canbench --less-verbose >> /tmp/output.txt
-          echo "```" >> /tmp/output.txt
+          echo "\`\`\`" >> /tmp/output.txt
           cat /tmp/output.txt
 
       - name: Post comment
