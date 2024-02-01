@@ -34,5 +34,5 @@ jobs:
         uses: thollander/actions-comment-pull-request@v2
         with:
           message: |
-            ${ cat output.txt }
+            $(cat output.txt)
           comment_tag: canbench
