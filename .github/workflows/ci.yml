@@ -8,8 +8,9 @@ jobs:
   comment:
     runs-on: ubuntu-latest
     steps:
-      uses: thollander/actions-comment-pull-request@v2
-      with:
-        message: |
-          '👋 Thanks for reporting again and again!'
-        comment_tag: canbench
+      - name: Post comment
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            '👋 Thanks for reporting again and again!'
+          comment_tag: canbench
