@@ -438,7 +438,7 @@ Note you'll need to copy the scripts in the `scripts` directory to your own repo
         uses: thollander/actions-comment-pull-request@v2
         with:
           filePath: /tmp/canbench_comment_message.txt
-          comment_tag: canbench_fibonacci
+          comment_tag: canbench    <-- make sure this tag is unique if you're benchmarking multiple canisters.
 
       - name: Pass or fail
         run: |
