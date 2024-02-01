@@ -26,6 +26,7 @@ jobs:
       - name: Benchmark
         id: run-canbench
         run: |
+          cargo install --path ./canbench-bin
           cd examples/fibonacci
           canbench
 
