@@ -16,11 +16,14 @@ cargo install --path ./canbench-bin
 cd "$CANISTER_PATH"
 
 canbench --less-verbose >> $CANBENCH_OUTPUT
+
+echo "\`canbench\` (directory: $PATH)\n" > $COMMENT_MESSAGE_PATH
+
 if grep -q "(regressed by \|(improved by" "${CANBENCH_OUTPUT}"; then
   echo "Significant performance change detected! ⚠️
-  If the change is expected, run \`canbench --persist\` to save the updated benchmark results." > $COMMENT_MESSAGE_PATH
+  If the change is expected, run \`canbench --persist\` to save the updated benchmark results." >> $COMMENT_MESSAGE_PATH
 else
-  echo "No significant performance changes detected ✅" > $COMMENT_MESSAGE_PATH
+  echo "No significant performance changes detected ✅" >> $COMMENT_MESSAGE_PATH
 fi
 
 ## Add the output of canbench to the file.
