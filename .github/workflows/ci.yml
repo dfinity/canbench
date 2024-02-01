@@ -36,8 +36,4 @@ jobs:
 
       - name: Pass or fail
         run: |
-          set -Eexuo pipefail
-
-          if grep -q "(regressed by \|(improved by" "/tmp/canbench_output.txt"; then
-            exit 1
-          fi
+          bash ./scripts/ci_post_run_benchmark.sh

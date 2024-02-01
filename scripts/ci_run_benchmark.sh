@@ -17,7 +17,7 @@ cd "$CANISTER_PATH"
 
 canbench --less-verbose >> $CANBENCH_OUTPUT
 
-echo "\`canbench\` (directory: $PATH)\n" > $COMMENT_MESSAGE_PATH
+echo "\`canbench\` (directory: $CANISTER_PATH)\n" > $COMMENT_MESSAGE_PATH
 
 if grep -q "(regressed by \|(improved by" "${CANBENCH_OUTPUT}"; then
   echo "Significant performance change detected! ⚠️
@@ -30,7 +30,7 @@ fi
 {
   echo ""
   echo "\`\`\`"
-  echo "$CANBENCH_OUTPUT"
+  cat "$CANBENCH_OUTPUT"
   echo "\`\`\`"
 } >> $COMMENT_MESSAGE_PATH
 
