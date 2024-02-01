@@ -8,9 +8,15 @@ jobs:
   comment:
     runs-on: ubuntu-latest
     steps:
+      - name: Run Command
+        id: run-canbench
+        run: |
+          cd examples/fibonacci
+          canbench
+
       - name: Post comment
         uses: thollander/actions-comment-pull-request@v2
         with:
           message: |
-            '👋 Thanks for reporting again and again and again!! just updated'
+            ${{ steps.run-canbench.outputs.out }}
           comment_tag: canbench
