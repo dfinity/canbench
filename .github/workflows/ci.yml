@@ -35,5 +35,5 @@ jobs:
         uses: thollander/actions-comment-pull-request@v2
         with:
           message: |
-            hi
+            hi ${{ FOO }}
           comment_tag: canbench
