@@ -63,7 +63,7 @@ Therefore, we include `canbench` only as an optional dependency so that it's onl
 For more information about optional dependencies, you can read more about them [here](https://doc.rust-lang.org/cargo/reference/features.html#optional-dependencies).
 
 ```toml
-canbench = { version = "x.y.z", optional = true };
+canbench = { version = "x.y.z", optional = true }
 ```
 
 ### 2. Add a configuration to `canbench.yml`
@@ -130,11 +130,10 @@ mod benches {
 }
 ```
 
-Run `canbench`. Output:
+Run `canbench`. You'll see an output that looks similar to this:
 
 ```txt
 $ canbench
-    Finished release [optimized] target(s) in 0.32s
 
 ---------------------------------------------------
 
@@ -159,8 +158,9 @@ Executed 2 of 2 benchmarks.
 
 ### 4. Track performance regressions
 
-`canbench` allows you to persist the results of benchmarks.
-Once the results of a benchmark are persisted, `canbench` reports the performance relative to the last persisted run.
+Notice that `canbench` reported the above benchmarks as "new".
+`canbench` allows you to persist the results of these benchmarks.
+In subsequent runs, `canbench` reports the performance relative to the last persisted run.
 
 Let's first persist the results above by running `canbench` again, but with the `persist` flag:
 
@@ -240,7 +240,7 @@ Benchmark: fibonacci_45
 Executed 2 of 2 benchmarks.
 ```
 
-Apparently, the recursive implementation can be many orders of magniture more expensive than the iterative implementation 😱
+Apparently, the recursive implementation is many orders of magniture more expensive than the iterative implementation 😱
 Good thing we found out before deploying this implementation to production.
 
 | :memo:        | Notice that the `fibonacci_45` took > 50B instructions, which is substantially more than the instruction limit given for a single message execution on the Internet Computer. `canbench` runs benchmarks in an environment that gives them up to 10T instructions |
