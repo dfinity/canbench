@@ -55,7 +55,7 @@ cargo install canbench
 
 | :memo: NOTE          |
 |:---------------------------|
-| `canbench` currently supports Rust canisters, but support for more languages can be introduced in the future. |
+| This example is also available to tinker with in the examples directory. See the [fibonacci example](./examples/fibonacci). |
 
 ### 1. Add optional dependency to `Cargo.toml`
 
@@ -202,7 +202,7 @@ Executed 2 of 2 benchmarks.
 ```
 
 Let's try swapping out our implementation of `fibonacci` with an implementation that's miserably inefficient.
-Replace the `fibonacci` method defined previously with the following:
+Replace the `fibonacci` function defined previously with the following:
 
 ```rust
 #[ic_cdk::query]
@@ -241,9 +241,165 @@ Benchmark: fibonacci_45
 Executed 2 of 2 benchmarks.
 ```
 
-Apparently, the recursive implementation is many orders of magniture more expensive than the iterative implementation 😱
+Apparently, the recursive implementation is many orders of magnitude more expensive than the iterative implementation 😱
 Good thing we found out before deploying this implementation to production.
 
 | :memo: NOTE          |
 |:---------------------------|
 | Notice that `fibonacci_45` took > 50B instructions, which is substantially more than the instruction limit given for a single message execution on the Internet Computer. `canbench` runs benchmarks in an environment that gives them up to 10T instructions |
+
+## Additional Examples
+
+For the following examples, we'll be using the following canister code, which you can also find in the [examples](./examples/btreemap_vs_hashmap) directory.
+This canister defines a simple state as well as a `pre_upgrade` function that stores that state into stable memory.
+
+```rust
+use candid::{CandidType, Encode};
+use ic_cdk_macros::pre_upgrade;
+use std::cell::RefCell;
+
+#[derive(CandidType)]
+struct User {
+    name: String,
+}
+
+#[derive(Default, CandidType)]
+struct State {
+    users: std::collections::BTreeMap<u64, User>,
+}
+
+thread_local! {
+    static STATE: RefCell<State> = RefCell::new(State::default());
+}
+
+#[pre_upgrade]
+fn pre_upgrade() {
+    // Serialize state.
+    let bytes = STATE.with(|s| Encode!(s).unwrap());
+
+    // Write to stable memory.
+    ic_cdk::api::stable::StableWriter::default()
+        .write(&bytes)
+        .unwrap();
+}
+```
+
+### Excluding setup code
+
+Let's say we want to benchmark how long it takes to run the `pre_upgrade` function. We can define the following benchmark:
+
+```rust
+#[cfg(feature = "canbench")]
+mod benches {
+    use super::*;
+    use canbench::bench;
+
+    #[bench]
+    fn pre_upgrade_bench() {
+        // Some function that fills the state with lots of data.
+        initialize_state();
+
+        pre_upgrade();
+    }
+}
+```
+
+The problem with the above benchmark is that it's benchmarking both the `pre_upgrade` call _and_ the initialization of the state.
+What if we're only interested in benchmarking the `pre_upgrade` call?
+To address this, we can use the `#[bench(raw)]` macro to specify exactly which code we'd like to benchmark.
+
+```rust
+#[cfg(feature = "canbench")]
+mod benches {
+    use super::*;
+    use canbench::bench;
+
+    #[bench(raw)]
+    fn pre_upgrade_bench() -> canbench::BenchResult {
+        // Some function that fills the state with lots of data.
+        initialize_state();
+
+        // Only benchmark the pre_upgrade. Initializing the state isn't
+        // included in the results of our benchmark.
+        canbench::benchmark(pre_upgrade)
+    }
+}
+```
+
+Running `canbench` on the example above will benchmark only the code wrapped in `canbench::benchmark`, which in this case is the call to `pre_upgrade`.
+
+```txt
+$ canbench pre_upgrade_bench
+
+---------------------------------------------------
+
+Benchmark: pre_upgrade_bench (new)
+  total:
+    instructions: 717.10 M (new)
+    heap_delta: 519 pages (new)
+    stable_memory_delta: 184 pages (new)
+
+---------------------------------------------------
+
+Executed 1 of 1 benchmarks.
+```
+
+### Granular Benchmarking
+
+Building on the example above, the `pre_upgrade` function does two steps:
+
+1. Serialize the state
+2. Write to stable memory
+
+Suppose we're interested in understanding, within `pre_upgrade`, how much resources are spent in each of these steps.
+`canbench` allows you to do more granular benchmarking using the `canbench::profile` function.
+Here's how we can modify our `pre_upgrade` function:
+
+
+```rust
+#[pre_upgrade]
+fn pre_upgrade() {
+    // Serialize state.
+    let bytes = {
+        #[cfg(feature = "canbench")]
+        let _p = canbench::profile("serialize_state");
+        STATE.with(|s| Encode!(s).unwrap())
+    };
+
+    // Write to stable memory.
+    #[cfg(feature = "canbench")]
+    let _p = canbench::profile("writing_to_stable_memory");
+    ic_cdk::api::stable::StableWriter::default()
+        .write(&bytes)
+        .unwrap();
+}
+```
+
+In the code above, we've asked `canbench` to profile each of these steps separately.
+Running `canbench` now, each of these steps are reported.
+
+```txt
+$ canbench pre_upgrade_bench
+
+---------------------------------------------------
+
+Benchmark: pre_upgrade_bench (new)
+  total:
+    instructions: 717.11 M (new)
+    heap_delta: 519 pages (new)
+    stable_memory_delta: 184 pages (new)
+
+  serialize_state (profiling):
+    instructions: 717.10 M (new)
+    heap_delta: 519 pages (new)
+    stable_memory_delta: 0 pages (new)
+
+  writing_to_stable_memory (profiling):
+    instructions: 502 (new)
+    heap_delta: 0 pages (new)
+    stable_memory_delta: 184 pages (new)
+
+---------------------------------------------------
+
+Executed 1 of 1 benchmarks.
+```
