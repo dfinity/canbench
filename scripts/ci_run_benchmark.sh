@@ -17,9 +17,7 @@ cd "$CANISTER_PATH"
 
 canbench --less-verbose >> $CANBENCH_OUTPUT
 
-echo "# \`canbench\`
-
-Directory: $CANISTER_PATH
+echo "# \`canbench\` (dir: $CANISTER_PATH)
 " > $COMMENT_MESSAGE_PATH
 
 if grep -q "(regressed by \|(improved by" "${CANBENCH_OUTPUT}"; then
