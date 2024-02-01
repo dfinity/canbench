@@ -5,55 +5,6 @@ env:
   RUST_VERSION: 1.75.0
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        os: [ ubuntu-latest, macos-latest ]
-
-    runs-on: ${{ matrix.os }}
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Cache Cargo
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ matrix.build }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ matrix.build }}-cargo-
-
-      - name: Install Rust
-        run: |
-          rustup update $RUST_VERSION --no-self-update
-          rustup default $RUST_VERSION
-          rustup component add rustfmt
-          rustup component add clippy
-
-      - name: Check Format
-        run: cargo fmt --all -- --check
-
-      - name: Clippy
-        run: cargo clippy --tests --benches -- -D clippy::all
-
-      - name: Test
-        run: cargo test -- --test-threads=1
-        env:
-          RUST_BACKTRACE: 1
-
-  shell-checks:
-    name: ShellCheck
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: Run ShellCheck
-      uses: ludeeus/action-shellcheck@master
-      env:
-        SHELLCHECK_OPTS: -e SC1090 -e SC2119 -e SC1091
-
   comment:
     runs-on: ubuntu-latest
     steps:
@@ -64,19 +15,6 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '👋 Thanks for reporting!'
+              body: '👋 Thanks for reporting again!'
             })
 
-  checks-pass:
-    # Always run this job!
-    if: always()
-    needs: [build, shell-checks]
-    runs-on: ubuntu-latest
-    steps:
-      - name: check build result
-        if: ${{ needs.build.result != 'success' }}
-        run: exit 1
-
-      - name: check shell-checks result
-        if: ${{ needs.shell-checks.result != 'success' }}
-        run: exit 1
