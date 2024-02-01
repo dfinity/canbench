@@ -51,5 +51,5 @@ jobs:
       - name: Post comment
         uses: thollander/actions-comment-pull-request@v2
         with:
-          filePath: /tmp/output.txt
+          filePath: /tmp/canbench_output.txt
           comment_tag: canbench
