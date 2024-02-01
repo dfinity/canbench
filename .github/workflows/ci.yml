@@ -28,7 +28,9 @@ jobs:
         run: |
           cargo install --path ./canbench-bin
           cd examples/fibonacci
-          canbench > /tmp/output.txt
+          echo "```" > /tmp/output.txt
+          canbench --less-verbose >> /tmp/output.txt
+          echo "```" > /tmp/output.txt
 
       - name: Post comment
         uses: thollander/actions-comment-pull-request@v2
