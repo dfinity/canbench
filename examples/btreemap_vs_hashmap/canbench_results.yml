@@ -6,12 +6,12 @@ insert_users:
   profiling: {}
 pre_upgrade_bench:
   total:
-    instructions: 717106393
+    instructions: 717106404
     heap_delta: 519
     stable_memory_delta: 184
   profiling:
     serialize_state:
-      instructions: 717103799
+      instructions: 717103810
       heap_delta: 519
       stable_memory_delta: 0
     writing_to_stable_memory:
@@ -20,7 +20,7 @@ pre_upgrade_bench:
       stable_memory_delta: 184
 remove_users:
   total:
-    instructions: 2059543425
+    instructions: 2057543383
     heap_delta: 0
     stable_memory_delta: 0
   profiling: {}
