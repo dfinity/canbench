@@ -5,7 +5,7 @@ env:
   RUST_VERSION: 1.75.0
 
 jobs:
-  comment:
+  benchmark:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -32,7 +32,7 @@ jobs:
           cd examples/fibonacci
 
           canbench --less-verbose >> $canbench_output
-          if grep -q "\(regressed by \|improved by" "${canbench_output}"; then
+          if grep -q "(regressed by \|(improved by" "${canbench_output}"; then
             echo "Significant performance change detected! ⚠️
             If the change is expected, run \`canbench --persist\` to save the updated benchmark results." > $canbench_output
           else
@@ -53,3 +53,9 @@ jobs:
         with:
           filePath: /tmp/canbench_output.txt
           comment_tag: canbench
+
+      - name: Pass or fail
+        run: |
+          if grep -q "(regressed by \|(improved by" "${canbench_output}"; then
+            exit 1
+          fi
