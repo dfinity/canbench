@@ -28,10 +28,10 @@ jobs:
         run: |
           cargo install --path ./canbench-bin
           cd examples/fibonacci
-          canbench > output.txt
+          canbench > /tmp/output.txt
 
       - name: Post comment
         uses: thollander/actions-comment-pull-request@v2
         with:
-          filePath: output.txt
+          filePath: /tmp/output.txt
           comment_tag: canbench
