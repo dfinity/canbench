@@ -1,4 +1,4 @@
-use canbench::{benchmark, macros::bench, profile, BenchResult};
+use canbench::{bench, benchmark, profile, BenchResult};
 
 #[link(wasm_import_module = "ic0")]
 extern "C" {

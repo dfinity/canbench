@@ -1,0 +1,6 @@
+fibonacci_20:
+  total:
+    instructions: 1748
+    heap_delta: 0
+    stable_memory_delta: 0
+  profiling: {}

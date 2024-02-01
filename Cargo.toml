@@ -1,14 +1,20 @@
 [workspace]
-members = ["canbench-bin", "canbench-rs", "canbench-rs-macros", "tests"]
+members = [
+  "canbench-bin",
+  "canbench-rs",
+  "canbench-rs-macros",
+  "examples",
+  "tests"
+]
 resolver = "2"
 
 [workspace.dependencies]
-candid = "0.9.11"
+candid = "0.10.3"
 clap = { version = "4.0.11", features = ["derive"] }
 colored = "2.0.4"
 flate2 = "1.0.28"
 hex = "0.4.3"
-ic-cdk = "0.10.0"
+ic-cdk = "0.12.1"
 ic-cdk-macros = "0.7.1"
 proc-macro2 = "1.0"
 quote = "1.0"
