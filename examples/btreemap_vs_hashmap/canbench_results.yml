@@ -1,0 +1,26 @@
+insert_users:
+  total:
+    instructions: 2564620912
+    heap_delta: 871
+    stable_memory_delta: 0
+  profiling: {}
+pre_upgrade_bench:
+  total:
+    instructions: 717106393
+    heap_delta: 519
+    stable_memory_delta: 184
+  profiling:
+    serialize_state:
+      instructions: 717103799
+      heap_delta: 519
+      stable_memory_delta: 0
+    writing_to_stable_memory:
+      instructions: 502
+      heap_delta: 0
+      stable_memory_delta: 184
+remove_users:
+  total:
+    instructions: 2059543425
+    heap_delta: 0
+    stable_memory_delta: 0
+  profiling: {}
