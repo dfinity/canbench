@@ -31,7 +31,7 @@ jobs:
       - name: Post comment
         uses: thollander/actions-comment-pull-request@v2
         with:
-          filePath: /tmp/canbench_output.txt
+          filePath: /tmp/canbench_comment_message.txt
           comment_tag: canbench
 
       - name: Pass or fail
