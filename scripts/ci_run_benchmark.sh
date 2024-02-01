@@ -21,10 +21,10 @@ echo "# \`canbench\` (dir: $CANISTER_PATH)
 " > $COMMENT_MESSAGE_PATH
 
 if grep -q "(regressed by \|(improved by" "${CANBENCH_OUTPUT}"; then
-  echo "Significant performance change detected! ⚠️
+  echo "**Significant performance change detected! ⚠️**
   If the change is expected, run \`canbench --persist\` to save the updated benchmark results." >> $COMMENT_MESSAGE_PATH
 else
-  echo "No significant performance changes detected ✅" >> $COMMENT_MESSAGE_PATH
+  echo "**No significant performance changes detected ✅**" >> $COMMENT_MESSAGE_PATH
 fi
 
 ## Add the output of canbench to the file.
