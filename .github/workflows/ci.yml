@@ -31,6 +31,7 @@ jobs:
           echo "```" > /tmp/output.txt
           canbench --less-verbose >> /tmp/output.txt
           echo "```" >> /tmp/output.txt
+          cat /tmp/output.txt
 
       - name: Post comment
         uses: thollander/actions-comment-pull-request@v2
