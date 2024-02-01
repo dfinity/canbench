@@ -26,7 +26,7 @@ jobs:
       - name: Benchmark
         id: run-canbench
         run: |
-          ./scripts/ci_run_benchmark.sh examples/fibonacci
+          bash ./scripts/ci_run_benchmark.sh examples/fibonacci
 
       - name: Post comment
         uses: thollander/actions-comment-pull-request@v2
