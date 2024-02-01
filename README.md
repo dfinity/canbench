@@ -246,4 +246,4 @@ Good thing we found out before deploying this implementation to production.
 
 | :memo: NOTE          |
 |:---------------------------|
-| Notice that the `fibonacci_45` took > 50B instructions, which is substantially more than the instruction limit given for a single message execution on the Internet Computer. `canbench` runs benchmarks in an environment that gives them up to 10T instructions |
+| Notice that `fibonacci_45` took > 50B instructions, which is substantially more than the instruction limit given for a single message execution on the Internet Computer. `canbench` runs benchmarks in an environment that gives them up to 10T instructions |
