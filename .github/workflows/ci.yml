@@ -26,6 +26,8 @@ jobs:
       - name: Benchmark
         id: run-canbench
         run: |
+          set -Eexuo pipefail
+
           canbench_output=/tmp/canbench_output.txt
 
           cargo install --path ./canbench-bin
@@ -56,6 +58,8 @@ jobs:
 
       - name: Pass or fail
         run: |
-          if grep -q "(regressed by \|(improved by" "${canbench_output}"; then
+          set -Eexuo pipefail
+
+          if grep -q "(regressed by \|(improved by" "/tmp/canbench_output.txt"; then
             exit 1
           fi
