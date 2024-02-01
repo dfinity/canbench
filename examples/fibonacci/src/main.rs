@@ -1,4 +1,5 @@
 // A version of fibonacci that's efficient.
+#[ic_cdk::query]
 fn fibonacci(n: u32) -> u32 {
     if n == 0 {
         return 0;
@@ -21,7 +22,9 @@ fn fibonacci(n: u32) -> u32 {
 
 // Try this inefficient version instead and run `canbench`.
 // `canbench` will detect and report the regression.
-/* fn fibonacci(n: u32) -> u32 {
+/*
+#[ic_cdk::query]
+fn fibonacci(n: u32) -> u32 {
     match n {
         0 => 1,
         1 => 1,

@@ -22,11 +22,13 @@ thread_local! {
 fn pre_upgrade() {
     // Serialize state.
     let bytes = {
+        #[cfg(feature = "canbench")]
         let _p = canbench::profile("serialize_state"); // for profiling.
         STATE.with(|s| Encode!(s).unwrap())
     };
 
     // Write to stable memory.
+    #[cfg(feature = "canbench")]
     let _p = canbench::profile("writing_to_stable_memory"); // for profiling.
     ic_cdk::api::stable::StableWriter::default()
         .write(&bytes)
