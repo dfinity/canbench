@@ -26,21 +26,27 @@ jobs:
       - name: Benchmark
         id: run-canbench
         run: |
+          canbench_output=/tmp/canbench_output.txt
+
           cargo install --path ./canbench-bin
           cd examples/fibonacci
-          canbench --less-verbose >> /tmp/canbench_output.txt
-          if grep -q "\(regressed by \|improved by" "$filename"; then
+
+          canbench --less-verbose >> $canbench_output
+          if grep -q "\(regressed by \|improved by" "${canbench_output}"; then
             echo "Significant performance change detected! ⚠️
-            If the change is expected, run \`canbench --persist\` to save the updated benchmark results." > /tmp/output.txt
+            If the change is expected, run \`canbench --persist\` to save the updated benchmark results." > $canbench_output
           else
-            echo "No significant performance changes detected ✅" > /tmp/output.txt
+            echo "No significant performance changes detected ✅" > $canbench_output
           fi
 
-          echo "" >> /tmp/output.txt
-          echo "\`\`\`" >> /tmp/output.txt
-          canbench --less-verbose >> /tmp/output.txt
-          echo "\`\`\`" >> /tmp/output.txt
-          cat /tmp/output.txt
+          ## Add the output of canbench to the file.
+          echo "" >> $canbench_output
+          echo "\`\`\`" >> $canbench_output
+          canbench --less-verbose >> $canbench_output
+          echo "\`\`\`" >> $canbench_output
+
+          # Output the file's contents to stdout.
+          cat $canbench_output
 
       - name: Post comment
         uses: thollander/actions-comment-pull-request@v2
