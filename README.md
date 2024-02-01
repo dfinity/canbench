@@ -53,8 +53,9 @@ cargo install canbench
 
 ## Quickstart
 
-| :memo:        | `canbench` currently supports Rust canisters, but support for more languages can be introduced in the future. |
-|---------------|:------------------------|
+| :memo: NOTE          |
+|:---------------------------|
+| `canbench` currently supports Rust canisters, but support for more languages can be introduced in the future. |
 
 ### 1. Add optional dependency to `Cargo.toml`
 
@@ -243,5 +244,6 @@ Executed 2 of 2 benchmarks.
 Apparently, the recursive implementation is many orders of magniture more expensive than the iterative implementation 😱
 Good thing we found out before deploying this implementation to production.
 
-| :memo:        | Notice that the `fibonacci_45` took > 50B instructions, which is substantially more than the instruction limit given for a single message execution on the Internet Computer. `canbench` runs benchmarks in an environment that gives them up to 10T instructions |
-|---------------|:------------------------|
+| :memo: NOTE          |
+|:---------------------------|
+| Notice that the `fibonacci_45` took > 50B instructions, which is substantially more than the instruction limit given for a single message execution on the Internet Computer. `canbench` runs benchmarks in an environment that gives them up to 10T instructions |
