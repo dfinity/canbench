@@ -45,11 +45,35 @@ fn print_measurement(new: &Measurement, old: Option<&Measurement>) {
 
 // Prints a metric along with its percentage change relative to the old value.
 fn print_metric(metric: &str, value: u64, old_value: Option<u64>) {
+    // Convert value to a more readable representation.
+    let value_str = if value < 10_000 {
+        format!("{}", value)
+    } else if value < 1_000_000 {
+        format!("{:.2} K", value as f64 / 1_000.0)
+    } else if value < 1_000_000_000 {
+        format!("{:.2} M", value as f64 / 1_000_000.0)
+    } else if value < 1_000_000_000_000 {
+        format!("{:.2} B", value as f64 / 1_000_000_000.0)
+    } else {
+        format!("{:.2} T", value as f64 / 1_000_000_000_000.0)
+    };
+
+    // Add unit to value depending on the metric.
+    let value_str = match metric {
+        "instructions" => {
+            // Don't include a unit with instructions since it's clear from the metric name.
+            value_str
+        }
+        "heap_delta" => format!("{value_str} pages"),
+        "stable_memory_delta" => format!("{value_str} pages"),
+        other => panic!("unknown metric {}", other),
+    };
+
     let old_value = match old_value {
         Some(old_value) => old_value,
         None => {
             // No old value exists. This is a new metric.
-            println!("    {metric}: {value} (new)");
+            println!("    {metric}: {value_str} (new)");
             return;
         }
     };
@@ -58,11 +82,13 @@ fn print_metric(metric: &str, value: u64, old_value: Option<u64>) {
         0 => {
             // The old value is zero, so changes cannot be reported as a percentage.
             if value == 0 {
-                println!("    {metric}: {value} (no change)",);
+                println!("    {metric}: {value_str} (no change)",);
             } else {
                 println!(
                     "    {}",
-                    format!("{metric}: {value} (regressed from 0)").red().bold()
+                    format!("{metric}: {value_str} (regressed from 0)")
+                        .red()
+                        .bold()
                 );
             }
         }
@@ -70,23 +96,23 @@ fn print_metric(metric: &str, value: u64, old_value: Option<u64>) {
             // The old value is > 0. Report changes as percentages.
             let diff = ((value as f64 - old_value as f64) / old_value as f64) * 100.0;
             if diff == 0.0 {
-                println!("    {metric}: {value} (no change)");
+                println!("    {metric}: {value_str} (no change)");
             } else if diff.abs() < NOISE_THRESHOLD {
                 println!(
-                    "    {metric}: {value} ({:.2}%) (change within noise threshold)",
+                    "    {metric}: {value_str} ({:.2}%) (change within noise threshold)",
                     diff
                 );
             } else if diff > 0.0 {
                 println!(
                     "    {}",
-                    format!("{}: {value} (regressed by {:.2}%)", metric, diff,)
+                    format!("{}: {value_str} (regressed by {:.2}%)", metric, diff,)
                         .red()
                         .bold()
                 );
             } else {
                 println!(
                     "    {}",
-                    format!("{}: {value} (improved by {:.2}%)", metric, diff.abs(),)
+                    format!("{}: {value_str} (improved by {:.2}%)", metric, diff.abs(),)
                         .green()
                         .bold()
                 );
