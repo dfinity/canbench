@@ -28,7 +28,16 @@ jobs:
         run: |
           cargo install --path ./canbench-bin
           cd examples/fibonacci
-          echo "\`\`\`" > /tmp/output.txt
+          canbench --less-verbose >> /tmp/canbench_output.txt
+          if grep -q "\(regressed by \|improved by" "$filename"; then
+            echo "Significant performance change detected! ⚠️
+            If the change is expected, run \`canbench --persist\` to save the updated benchmark results." > /tmp/output.txt
+          else
+            echo "No significant performance changes detected ✅" > /tmp/output.txt
+          fi
+
+          echo "" >> /tmp/output.txt
+          echo "\`\`\`" >> /tmp/output.txt
           canbench --less-verbose >> /tmp/output.txt
           echo "\`\`\`" >> /tmp/output.txt
           cat /tmp/output.txt
