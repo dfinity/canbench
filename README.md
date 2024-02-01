@@ -351,7 +351,7 @@ Building on the example above, the `pre_upgrade` function does two steps:
 1. Serialize the state
 2. Write to stable memory
 
-Suppose we're interested in understanding, within `pre_upgrade`, how much resources are spent in each of these steps.
+Suppose we're interested in understanding, within `pre_upgrade`, the resources spent in each of these steps.
 `canbench` allows you to do more granular benchmarking using the `canbench::profile` function.
 Here's how we can modify our `pre_upgrade` function:
 
