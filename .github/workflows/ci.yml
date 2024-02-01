@@ -44,6 +44,70 @@ jobs:
         env:
           RUST_BACKTRACE: 1
 
+  benchmark-fibonacci-example:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
+
+      - name: Install Rust
+        run: |
+          rustup update ${{ matrix.rust }} --no-self-update
+          rustup default ${{ matrix.rust }}
+          rustup target add wasm32-unknown-unknown
+
+      - name: Benchmark
+        run: |
+          bash ./scripts/ci_run_benchmark.sh examples/fibonacci
+
+      - name: Post comment
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          filePath: /tmp/canbench_comment_message.txt
+          comment_tag: canbench_fibonacci
+
+      - name: Pass or fail
+        run: |
+          bash ./scripts/ci_post_run_benchmark.sh
+
+  benchmark-btreemap-vs-hashmap-example:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
+
+      - name: Install Rust
+        run: |
+          rustup update ${{ matrix.rust }} --no-self-update
+          rustup default ${{ matrix.rust }}
+          rustup target add wasm32-unknown-unknown
+
+      - name: Benchmark
+        run: |
+          bash ./scripts/ci_run_benchmark.sh examples/btreemap_vs_hashmap
+
+      - name: Post comment
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          filePath: /tmp/canbench_comment_message.txt
+          comment_tag: canbench_btreemap_vs_hashmap
+
+      - name: Pass or fail
+        run: |
+          bash ./scripts/ci_post_run_benchmark.sh
+
   shell-checks:
     name: ShellCheck
     runs-on: ubuntu-latest
