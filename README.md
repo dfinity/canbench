@@ -445,5 +445,5 @@ Note you'll need to copy the scripts in the `scripts` directory to your own repo
           bash ./scripts/ci_post_run_benchmark.sh
 ```
 
-Once you have the CI job above set up, the job will pass if there are no significant performance changes detect and fail otherwise.
+Once you have the CI job above set up, the job will pass if there are no significant performance changes detected and fail otherwise.
 A comment is added to the PR to show the results. See [this PR](https://github.com/dfinity/bench/pull/18) for an example.
