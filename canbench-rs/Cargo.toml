@@ -14,3 +14,9 @@ canbench-macros = { path = "../canbench-rs-macros" }
 candid.workspace = true
 ic-cdk.workspace= true
 serde.workspace = true
+
+[dev-dependencies]
+ic-cdk-macros.workspace= true
+
+[features]
+canbench = [] # required for doc tests

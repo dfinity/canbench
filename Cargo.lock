@@ -184,6 +184,7 @@ dependencies = [
  "canbench-macros",
  "candid",
  "ic-cdk",
+ "ic-cdk-macros",
  "serde",
 ]
 
