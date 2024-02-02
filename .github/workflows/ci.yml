@@ -46,6 +46,7 @@ jobs:
 
   benchmark-fibonacci-example:
     runs-on: ubuntu-latest
+    needs: [build]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/cache@v3
@@ -78,6 +79,7 @@ jobs:
 
   benchmark-btreemap-vs-hashmap-example:
     runs-on: ubuntu-latest
+    needs: [build]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/cache@v3
