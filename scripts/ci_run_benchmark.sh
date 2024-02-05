@@ -43,23 +43,29 @@ fi
 
 cd "$CANISTER_PATH"
 
-canbench --less-verbose >> $CANBENCH_OUTPUT
+canbench --less-verbose --persist >> $CANBENCH_WRT_MAIN_BRANCH
 
 echo "# \`canbench\` 🏋 (dir: $CANISTER_PATH)
 " > $COMMENT_MESSAGE_PATH
 
-if grep -q "(regressed by \|(improved by" "${CANBENCH_OUTPUT}"; then
-  echo "**Significant performance change detected! ⚠️**
-  If the change is expected, run \`canbench --persist\` to save the updated benchmark results." >> $COMMENT_MESSAGE_PATH
+if grep -q "(regressed by \|(improved by" "${CANBENCH_WRT_MAIN_BRANCH}"; then
+  echo "**Significant performance change detected! ⚠️**"; >> $COMMENT_MESSAGE_PATH;
 else
   echo "**No significant performance changes detected ✅**" >> $COMMENT_MESSAGE_PATH
+fi
+
+if cmp -s "$CANISTER_PATH/${CANBENCH_RESULTS_FILE}.current" "$MAIN_BRANCH_DIR/$CANISTER_PATH/$CANBENCH_RESULTS_FILE"; then
+  echo "**$CANISTER_PATH/CANBENCH_RESULTS_FILE is up to date ✅**" >> $COMMENT_MESSAGE_PATH;
+else
+  echo "**$CANISTER_PATH/CANBENCH_RESULTS_FILE is not up to date ❌**
+  If the performance change is expected, run \`canbench --persist\` to save the updated benchmark results." >> $COMMENT_MESSAGE_PATH
 fi
 
 ## Add the output of canbench to the file.
 {
   echo ""
   echo "\`\`\`"
-  cat "$CANBENCH_OUTPUT"
+  cat "$CANBENCH_WRT_MAIN_BRANCH"
   echo "\`\`\`"
 } >> $COMMENT_MESSAGE_PATH
 
