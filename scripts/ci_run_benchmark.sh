@@ -43,12 +43,12 @@ fi
 
 cd "$CANISTER_PATH"
 
-canbench --less-verbose --persist >> $CANBENCH_WRT_MAIN_BRANCH
+canbench --less-verbose --persist >> $CANBENCH_OUTPUT
 
 echo "# \`canbench\` 🏋 (dir: $CANISTER_PATH)
 " > $COMMENT_MESSAGE_PATH
 
-if grep -q "(regressed by \|(improved by" "${CANBENCH_WRT_MAIN_BRANCH}"; then
+if grep -q "(regressed by \|(improved by" "${CANBENCH_OUTPUT}"; then
   echo "**Significant performance change detected! ⚠️**"; >> $COMMENT_MESSAGE_PATH;
 else
   echo "**No significant performance changes detected ✅**" >> $COMMENT_MESSAGE_PATH
@@ -65,7 +65,7 @@ fi
 {
   echo ""
   echo "\`\`\`"
-  cat "$CANBENCH_WRT_MAIN_BRANCH"
+  cat "$CANBENCH_OUTPUT"
   echo "\`\`\`"
 } >> $COMMENT_MESSAGE_PATH
 
