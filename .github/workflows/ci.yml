@@ -81,16 +81,14 @@ jobs:
     runs-on: ubuntu-latest
       #needs: [build]
     steps:
+      - name: Checkout current PR
+        uses: actions/checkout@v4
+
       - name: Checkout Main branch
         uses: actions/checkout@v4
         with:
           ref: main
           path: main_branch
-
-      - name: Checkout current PR
-        uses: actions/checkout@v4
-        with:
-          path: tip
 
       - name: Install Rust
         run: |
