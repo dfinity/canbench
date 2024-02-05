@@ -113,7 +113,7 @@ jobs:
       - name: Update canbench results file (if needed)
         uses: test-room-7/action-update-file@v1
         with:
-          file-path: $PROJECT_DIR/canbench_results.yml
+          file-path: examples/btreemap_vs_hashmap/canbench_results.yml
           commit-msg: Update canbench_results.yml
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
