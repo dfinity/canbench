@@ -40,12 +40,13 @@ jobs:
         run: cargo clippy --tests --benches -- -D clippy::all
 
       - name: Test
-        run: cargo test -- --test-threads=1
+        run: cargo test --all-features -- --test-threads=1
         env:
           RUST_BACKTRACE: 1
 
   benchmark-fibonacci-example:
     runs-on: ubuntu-latest
+    needs: [build]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/cache@v3
@@ -78,6 +79,7 @@ jobs:
 
   benchmark-btreemap-vs-hashmap-example:
     runs-on: ubuntu-latest
+    needs: [build]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/cache@v3

@@ -1,4 +1,4 @@
-use canbench::{bench, benchmark, profile, BenchResult};
+use canbench::{bench, bench_fn, bench_scope, BenchResult};
 
 #[link(wasm_import_module = "ic0")]
 extern "C" {
@@ -40,7 +40,7 @@ fn stable_memory_delta() -> BenchResult {
 
     // Since only the delta is reported, the benchmark should return a delta
     // of 456 (and ignore the stable memory allocation above).
-    benchmark(|| unsafe { stable64_grow(456) })
+    bench_fn(|| unsafe { stable64_grow(456) })
 }
 
 // A benchmark where we allocate some memory on the heap to increase the heap delta.
@@ -51,28 +51,28 @@ fn increase_heap_delta() {
 
 // A benchmark that includes some profiling, but isn't persisted in the results.
 #[bench]
-fn profiling_new() {
+fn bench_scope_new() {
     {
-        profile("step_1");
+        let _p = bench_scope("scope_1");
         println!("do something");
     }
 
     {
-        profile("step_2");
+        let _p = bench_scope("scope_2");
         println!("do something else");
     }
 }
 
 // A benchmark that includes some profiling and is persisted in the results.
 #[bench]
-fn profiling_exists() {
+fn bench_scope_exists() {
     {
-        profile("step_1");
+        let _p = bench_scope("scope_1");
         println!("do something");
     }
 
     {
-        profile("step_2");
+        let _p = bench_scope("scope_2");
         println!("do something else");
     }
 }

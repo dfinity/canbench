@@ -17,13 +17,13 @@ pub(crate) fn print_benchmark(name: &str, new: &BenchResult, old: Option<&BenchR
     println!("  total:");
     print_measurement(&new.total, old.map(|m| &m.total));
 
-    // Print custom profiles.
-    for (profile, measurement) in &new.profiling {
+    // Print scopes
+    for (scope, measurement) in &new.scopes {
         println!();
-        println!("  {} (profiling):", profile);
+        println!("  {} (scope):", scope);
         print_measurement(
             measurement,
-            old.map(|m| &m.profiling).and_then(|m| m.get(profile)),
+            old.map(|m| &m.scopes).and_then(|m| m.get(scope)),
         );
     }
 }
