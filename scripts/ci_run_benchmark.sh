@@ -36,7 +36,7 @@ fi
 
 # If the main branch has a results file, compare the PR with the current result.
 if [ -f "$MAIN_BRANCH_DIR/$CANBENCH_RESULTS_FILE" ]; then
-    mv "$CANBENCH_RESULTS_FILE" "$CANBENCH_RESULTS_FILE}.current"
+    mv "$CANBENCH_RESULTS_FILE" "${CANBENCH_RESULTS_FILE}.current"
 
     cp "$MAIN_BRANCH_DIR/$CANBENCH_RESULTS_FILE" "$CANBENCH_RESULTS_FILE"
 fi
