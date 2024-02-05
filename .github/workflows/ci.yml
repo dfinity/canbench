@@ -89,6 +89,7 @@ jobs:
 
       - name: Checkout current PR
         uses: actions/checkout@v4
+        with:
           path: tip
 
       - name: Install Rust
