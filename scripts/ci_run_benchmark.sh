@@ -47,23 +47,22 @@ canbench --less-verbose --persist >> $CANBENCH_OUTPUT
 
 echo "# \`canbench\` 🏋 (dir: $CANISTER_PATH)" > $COMMENT_MESSAGE_PATH
 
-if grep -q "(regressed by \|(improved by" "${CANBENCH_OUTPUT}" ; then
-  echo "**Significant performance change detected! ⚠️**
-If the performance change is expected, run \`canbench --persist\` to save the updated benchmark results." >> $COMMENT_MESSAGE_PATH
+if grep -q "(regressed by \|(improved by" "${CANBENCH_OUTPUT}"; then
+  echo "**Significant performance change detected! ⚠️**" >> $COMMENT_MESSAGE_PATH;
 else
   echo "**No significant performance changes detected ✅**" >> $COMMENT_MESSAGE_PATH
 
   # There are no significant performance changes, but there can be changes that
   # are within the noise threshold. To keep the benchmark results accurate, CI
   # manually updates the results file.
-  if ! cmp -s "${CANBENCH_RESULTS_FILE}.current" "$CANBENCH_RESULTS_FILE"; then
-    echo "$CANBENCH_RESULTS_FILE has been updated automatically ✅**" >> $COMMENT_MESSAGE_PATH;
-  fi
 fi
 
-#else
-#  echo "**$CANBENCH_RESULTS_FILE is not up to date ❌**
-#  If the performance change is expected, run \`canbench --persist\` to save the updated benchmark results." >> $COMMENT_MESSAGE_PATH
+if cmp -s "${CANBENCH_RESULTS_FILE}.current" "$CANBENCH_RESULTS_FILE"; then
+  echo "**$CANBENCH_RESULTS_FILE is up to date ✅**" >> $COMMENT_MESSAGE_PATH;
+else
+  echo "**$CANBENCH_RESULTS_FILE is not up to date ❌**
+  If the performance change is expected, run \`canbench --persist\` to save the updated benchmark results." >> $COMMENT_MESSAGE_PATH
+fi
 
 ## Add the output of canbench to the file.
 {
