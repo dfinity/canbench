@@ -83,8 +83,8 @@ jobs:
     steps:
       - name: Checkout Main branch
         uses: actions/checkout@v4
-        ref: main
         with:
+          ref: main
           path: main_branch
 
       - uses: actions/checkout@v3
