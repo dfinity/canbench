@@ -110,18 +110,11 @@ jobs:
         run: |
           bash ./scripts/ci_run_benchmark.sh $PROJECT_DIR
 
-      - name: Update canbench results file (if needed)
-        uses: test-room-7/action-update-file@v1
-        with:
-          file-path: examples/btreemap_vs_hashmap/canbench_results.yml
-          commit-msg: Update canbench_results.yml
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Post comment
         uses: thollander/actions-comment-pull-request@v2
         with:
           filePath: /tmp/canbench_comment_message.txt
-          comment_tag: canbench_btreemap_vs_hashmap
+          comment_tag: ${{ PROJECT_DIR }}
 
       - name: Pass or fail
         run: |

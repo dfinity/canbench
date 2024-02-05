@@ -51,10 +51,6 @@ if grep -q "(regressed by \|(improved by" "${CANBENCH_OUTPUT}"; then
   echo "**Significant performance change detected! ⚠️**" >> $COMMENT_MESSAGE_PATH;
 else
   echo "**No significant performance changes detected ✅**" >> $COMMENT_MESSAGE_PATH
-
-  # There are no significant performance changes, but there can be changes that
-  # are within the noise threshold. To keep the benchmark results accurate, CI
-  # manually updates the results file.
 fi
 
 if cmp -s "${CANBENCH_RESULTS_FILE}.current" "$CANBENCH_RESULTS_FILE"; then
