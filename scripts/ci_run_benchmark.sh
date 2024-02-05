@@ -43,7 +43,7 @@ fi
 
 cd "$CANISTER_PATH"
 
-canbench --less-verbose --persist >> $CANBENCH_OUTPUT
+canbench --less-verbose >> $CANBENCH_OUTPUT
 
 echo "# \`canbench\` 🏋 (dir: $CANISTER_PATH)" > $COMMENT_MESSAGE_PATH
 
@@ -53,7 +53,7 @@ else
   echo "**No significant performance changes detected ✅**" >> $COMMENT_MESSAGE_PATH
 fi
 
-if cmp -s "${CANBENCH_RESULTS_FILE}.current" "$CANBENCH_RESULTS_FILE"; then
+if cmp -s "${CANBENCH_RESULTS_FILE}.current" "$MAIN_BRANCH_DIR/$CANBENCH_RESULTS_FILE"; then
   echo "**$CANBENCH_RESULTS_FILE is up to date ✅**" >> $COMMENT_MESSAGE_PATH;
 else
   echo "**$CANBENCH_RESULTS_FILE is not up to date ❌**

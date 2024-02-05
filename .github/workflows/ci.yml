@@ -114,7 +114,7 @@ jobs:
         uses: thollander/actions-comment-pull-request@v2
         with:
           filePath: /tmp/canbench_comment_message.txt
-          comment_tag: ${{ PROJECT_DIR }}
+          comment_tag: canbench_btreemap_vs_hashmap
 
       - name: Pass or fail
         run: |
