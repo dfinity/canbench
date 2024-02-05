@@ -18,7 +18,7 @@ COMMENT_MESSAGE_PATH=/tmp/canbench_comment_message.txt
 # Github CI is expected to have the main branch checked out in this folder.
 MAIN_BRANCH_DIR=_canbench_main_branch
 
-CANBENCH_RESULTS_FILE=canbench_results.yml
+CANBENCH_RESULTS_FILE="$CANISTER_PATH/canbench_results.yml"
 
 # Install canbench
 cargo install --path ./canbench-bin
@@ -29,24 +29,23 @@ cargo install --path ./canbench-bin
 ls -al $MAIN_BRANCH_DIR
 ls -al $MAIN_BRANCH_DIR/"$CANISTER_PATH"
 
-if [ ! -f "$CANISTER_PATH/$CANBENCH_RESULTS_FILE" ]; then
-    echo "$CANISTER_PATH/$CANBENCH_RESULTS_FILE not found. Did you forget to run \`canbench --persist\`?";
+if [ ! -f "$CANBENCH_RESULTS_FILE" ]; then
+    echo "$CANBENCH_RESULTS_FILE not found. Did you forget to run \`canbench --persist\`?";
     exit 1
 fi
 
 # If the main branch has a results file, compare the PR with the current result.
-if [ -f "$MAIN_BRANCH_DIR/$CANISTER_PATH/$CANBENCH_RESULTS_FILE" ]; then
-    mv "$CANISTER_PATH/$CANBENCH_RESULTS_FILE" "$CANISTER_PATH/${CANBENCH_RESULTS_FILE}.current"
+if [ -f "$MAIN_BRANCH_DIR/$CANBENCH_RESULTS_FILE" ]; then
+    mv "$CANBENCH_RESULTS_FILE" "$CANBENCH_RESULTS_FILE}.current"
 
-    cp "$MAIN_BRANCH_DIR/$CANISTER_PATH/$CANBENCH_RESULTS_FILE" "$CANISTER_PATH/$CANBENCH_RESULTS_FILE"
+    cp "$MAIN_BRANCH_DIR/$CANBENCH_RESULTS_FILE" "$CANBENCH_RESULTS_FILE"
 fi
 
 cd "$CANISTER_PATH"
 
 canbench --less-verbose --persist >> $CANBENCH_OUTPUT
 
-echo "# \`canbench\` 🏋 (dir: $CANISTER_PATH)
-" > $COMMENT_MESSAGE_PATH
+echo "# \`canbench\` 🏋 (dir: $CANISTER_PATH)" > $COMMENT_MESSAGE_PATH
 
 if grep -q "(regressed by \|(improved by" "${CANBENCH_OUTPUT}"; then
   echo "**Significant performance change detected! ⚠️**"; >> $COMMENT_MESSAGE_PATH;
@@ -54,10 +53,10 @@ else
   echo "**No significant performance changes detected ✅**" >> $COMMENT_MESSAGE_PATH
 fi
 
-if cmp -s "$CANISTER_PATH/${CANBENCH_RESULTS_FILE}.current" "$MAIN_BRANCH_DIR/$CANISTER_PATH/$CANBENCH_RESULTS_FILE"; then
-  echo "**$CANISTER_PATH/CANBENCH_RESULTS_FILE is up to date ✅**" >> $COMMENT_MESSAGE_PATH;
+if cmp -s "${CANBENCH_RESULTS_FILE}.current" "$CANBENCH_RESULTS_FILE"; then
+  echo "**$CANBENCH_RESULTS_FILE is up to date ✅**" >> $COMMENT_MESSAGE_PATH;
 else
-  echo "**$CANISTER_PATH/CANBENCH_RESULTS_FILE is not up to date ❌**
+  echo "**$CANBENCH_RESULTS_FILE is not up to date ❌**
   If the performance change is expected, run \`canbench --persist\` to save the updated benchmark results." >> $COMMENT_MESSAGE_PATH
 fi
 
