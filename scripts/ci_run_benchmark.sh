@@ -7,6 +7,7 @@ set -Eexuo pipefail
 # Path to run `canbench` from.
 CANISTER_PATH=$1
 
+pwd
 ls -al
 
 CANBENCH_OUTPUT=/tmp/canbench_output.txt
