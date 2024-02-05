@@ -15,7 +15,23 @@ CANBENCH_OUTPUT=/tmp/canbench_output.txt
 # If changed, then other scripts need to be updated as well.
 COMMENT_MESSAGE_PATH=/tmp/canbench_comment_message.txt
 
+# Github CI is expected to have the main branch checked out in this folder.
+MAIN_BRANCH_DIR=_canbench_main_branch
+
+# Install canbench
 cargo install --path ./canbench-bin
+
+# Detect if there are performance changes relative to the main branch.
+# Github CI is setup such that the main branch is available in the directory.
+
+ls -al $MAIN_BRANCH_DIR
+ls -al $MAIN_BRANCH_DIR/"$CANISTER_PATH"
+
+# Is there
+if [ -f "$MAIN_BRANCH_DIR/$CANISTER_PATH/canbench_results.yml" ]; then
+    echo "canbench results found!";
+fi
+
 cd "$CANISTER_PATH"
 
 canbench --less-verbose >> $CANBENCH_OUTPUT
