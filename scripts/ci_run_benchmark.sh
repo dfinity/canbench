@@ -37,7 +37,7 @@ if [ ! -f "$CANBENCH_RESULTS_FILE" ]; then
     exit 1
 fi
 
-# If the main branch has a results file, compare the PR with the rcurrent result.
+# If the main branch has a results file, compare the PR with the current result.
 if [ -f "$MAIN_BRANCH_RESULTS_FILE" ]; then
     mv "$CANBENCH_RESULTS_FILE" "$CANBENCH_RESULTS_FILE_TEMP"
 
