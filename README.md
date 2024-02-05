@@ -403,3 +403,47 @@ Benchmark: pre_upgrade_bench (new)
 
 Executed 1 of 1 benchmarks.
 ```
+
+### Github CI Support
+
+`canbench` can be included in Github CI to automatically detect performance changes.
+Have a look at the workflows in this repository for working examples.
+A github CI action looks like the following.
+Note you'll need to copy the scripts in the `scripts` directory to your own repository and update `<PATH/TO/YOUR/CANISTER>`.
+
+```
+  benchmark-my-canister:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
+
+      - name: Install Rust
+        run: |
+          rustup update ${{ matrix.rust }} --no-self-update
+          rustup default ${{ matrix.rust }}
+          rustup target add wasm32-unknown-unknown
+
+      - name: Benchmark
+        run: |
+          bash ./scripts/ci_run_benchmark.sh <PATH/TO/YOUR/CANISTER>
+
+      - name: Post comment
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          filePath: /tmp/canbench_comment_message.txt
+          comment_tag: canbench    <-- make sure this tag is unique if you're benchmarking multiple canisters.
+
+      - name: Pass or fail
+        run: |
+          bash ./scripts/ci_post_run_benchmark.sh
+```
+
+Once you have the CI job above set up, the job will pass if there are no significant performance changes detected and fail otherwise.
+A comment is added to the PR to show the results. See [this PR](https://github.com/dfinity/bench/pull/18) for an example.
