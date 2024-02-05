@@ -19,7 +19,7 @@ COMMENT_MESSAGE_PATH=/tmp/canbench_comment_message.txt
 MAIN_BRANCH_DIR=_canbench_main_branch
 
 CANBENCH_RESULTS_FILE="$CANISTER_PATH/canbench_results.yml"
-CANBENCH_RESULTS_FILE_TEMP="${CANBENCH_RESULTS_FILE.current}"
+CANBENCH_RESULTS_FILE_TEMP="${CANBENCH_RESULTS_FILE}.current"
 
 MAIN_BRANCH_RESULTS_FILE="$MAIN_BRANCH_DIR/$CANBENCH_RESULTS_FILE"
 
@@ -37,7 +37,7 @@ if [ ! -f "$CANBENCH_RESULTS_FILE" ]; then
     exit 1
 fi
 
-# If the main branch has a results file, compare the PR with the current result.
+# If the main branch has a results file, compare the PR with the rcurrent result.
 if [ -f "$MAIN_BRANCH_RESULTS_FILE" ]; then
     mv "$CANBENCH_RESULTS_FILE" "$CANBENCH_RESULTS_FILE_TEMP"
 
