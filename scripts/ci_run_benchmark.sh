@@ -18,6 +18,8 @@ COMMENT_MESSAGE_PATH=/tmp/canbench_comment_message.txt
 # Github CI is expected to have the main branch checked out in this folder.
 MAIN_BRANCH_DIR=_canbench_main_branch
 
+CANBENCH_RESULTS_FILE=canbench_results.yml
+
 # Install canbench
 cargo install --path ./canbench-bin
 
@@ -27,9 +29,16 @@ cargo install --path ./canbench-bin
 ls -al $MAIN_BRANCH_DIR
 ls -al $MAIN_BRANCH_DIR/"$CANISTER_PATH"
 
-# Is there
-if [ -f "$MAIN_BRANCH_DIR/$CANISTER_PATH/canbench_results.yml" ]; then
-    echo "canbench results found!";
+if [ ! -f "$CANISTER_PATH/$CANBENCH_RESULTS_FILE" ]; then
+    echo "$CANISTER_PATH/$CANBENCH_RESULTS_FILE not found. Did you forget to run \`canbench --persist\`?";
+    exit 1
+fi
+
+# If the main branch has a results file, compare the PR with the current result.
+if [ -f "$MAIN_BRANCH_DIR/$CANISTER_PATH/$CANBENCH_RESULTS_FILE" ]; then
+    mv "$CANISTER_PATH/$CANBENCH_RESULTS_FILE" "$CANISTER_PATH/${CANBENCH_RESULTS_FILE}.current"
+
+    cp "$MAIN_BRANCH_DIR/$CANISTER_PATH/$CANBENCH_RESULTS_FILE" "$CANISTER_PATH/$CANBENCH_RESULTS_FILE"
 fi
 
 cd "$CANISTER_PATH"
