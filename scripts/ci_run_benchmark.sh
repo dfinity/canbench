@@ -19,6 +19,9 @@ COMMENT_MESSAGE_PATH=/tmp/canbench_comment_message.txt
 MAIN_BRANCH_DIR=_canbench_main_branch
 
 CANBENCH_RESULTS_FILE="$CANISTER_PATH/canbench_results.yml"
+CANBENCH_RESULTS_FILE_TEMP="${CANBENCH_RESULTS_FILE.current}"
+
+MAIN_BRANCH_RESULTS_FILE="$MAIN_BRANCH_DIR/$CANBENCH_RESULTS_FILE"
 
 # Install canbench
 cargo install --path ./canbench-bin
@@ -35,10 +38,10 @@ if [ ! -f "$CANBENCH_RESULTS_FILE" ]; then
 fi
 
 # If the main branch has a results file, compare the PR with the current result.
-if [ -f "$MAIN_BRANCH_DIR/$CANBENCH_RESULTS_FILE" ]; then
-    mv "$CANBENCH_RESULTS_FILE" "${CANBENCH_RESULTS_FILE}.current"
+if [ -f "$MAIN_BRANCH_RESULTS_FILE" ]; then
+    mv "$CANBENCH_RESULTS_FILE" "$CANBENCH_RESULTS_FILE_TEMP"
 
-    cp "$MAIN_BRANCH_DIR/$CANBENCH_RESULTS_FILE" "$CANBENCH_RESULTS_FILE"
+    cp "$MAIN_BRANCH_RESULTS_FILE" "$CANBENCH_RESULTS_FILE"
 fi
 
 cd "$CANISTER_PATH"
@@ -53,7 +56,12 @@ else
   echo "**No significant performance changes detected ✅**" >> $COMMENT_MESSAGE_PATH
 fi
 
-if cmp -s "${CANBENCH_RESULTS_FILE}.current" "$MAIN_BRANCH_DIR/$CANBENCH_RESULTS_FILE"; then
+echo "$CANBENCH_RESULTS_FILE_TEMP"
+cat "$CANBENCH_RESULTS_FILE_TEMP"
+echo "$MAIN_BRANCH_RESULTS_FILE"
+cat "$MAIN_BRANCH_RESULTS_FILE"
+
+if cmp -s "$CANBENCH_RESULTS_FILE_TEMP" "$MAIN_BRANCH_RESULTS_FILE"; then
   echo "**$CANBENCH_RESULTS_FILE is up to date ✅**" >> $COMMENT_MESSAGE_PATH;
 else
   echo "**$CANBENCH_RESULTS_FILE is not up to date ❌**
