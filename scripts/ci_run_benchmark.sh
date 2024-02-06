@@ -47,20 +47,30 @@ popd
 echo "# \`canbench\` 🏋 (dir: $CANISTER_PATH)" > $COMMENT_MESSAGE_PATH
 
 if grep -q "(regressed by \|(improved by" "${CANBENCH_OUTPUT}"; then
-  echo "**Significant performance change detected! ⚠️**" >> $COMMENT_MESSAGE_PATH;
+  echo "**Significant performance change detected! ⚠️**
+" >> $COMMENT_MESSAGE_PATH;
 else
-  echo "**No significant performance changes detected ✅**" >> $COMMENT_MESSAGE_PATH
+  echo "**No significant performance changes detected ✅**
+" >> $COMMENT_MESSAGE_PATH
 fi
 
 echo "$CANBENCH_RESULTS_FILE_BACKUP"
 cat "$CANBENCH_RESULTS_FILE_BACKUP"
+echo "
+===========
+";
 echo "$MAIN_BRANCH_RESULTS_FILE"
 cat "$MAIN_BRANCH_RESULTS_FILE"
+echo "
+-----------
+";
+sha256sum $CANBENCH_RESULTS_FILE_BACKUP
+sha256sum $MAIN_BRANCH_RESULTS_FILE
 
 if cmp -s "$CANBENCH_RESULTS_FILE_BACKUP" "$MAIN_BRANCH_RESULTS_FILE"; then
   echo "**$CANBENCH_RESULTS_FILE is up to date ✅**" >> $COMMENT_MESSAGE_PATH;
 else
-  echo "**$CANBENCH_RESULTS_FILE is not up to date ❌**
+  echo "**\`$CANBENCH_RESULTS_FILE\` is not up to date ❌**
   If the performance change is expected, run \`canbench --persist\` to save the updated benchmark results." >> $COMMENT_MESSAGE_PATH
 fi
 
