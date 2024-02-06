@@ -7,7 +7,7 @@ set -Eexuo pipefail
 # Path to run `canbench` from.
 CANISTER_PATH=$1
 
-# If changed, then other scripts need to be updated as well.
+# Must match the file specified in the github action.
 COMMENT_MESSAGE_PATH=/tmp/canbench_comment_message.txt
 
 # Github CI is expected to have the main branch checked out in this folder.
@@ -33,31 +33,37 @@ canbench --less-verbose > $CANBENCH_OUTPUT
 if grep -q "(regressed by \|(improved by \|(new)" "$CANBENCH_OUTPUT"; then
   UPDATED_MSG="**\`$CANBENCH_RESULTS_FILE\` is not up to date ❌**
   If the performance change is expected, run \`canbench --persist\` to save the updated benchmark results.";
+
+  # canbench results file not up to date. Fail the job.
+  echo "EXIT_STATUS=1" >> "$GITHUB_ENV"
 else
   UPDATED_MSG="**\`$CANBENCH_RESULTS_FILE\` is up to date ✅**";
+
+  # canbench results file is up to date. The job succeeds.
+  echo "EXIT_STATUS=1" >> "$GITHUB_ENV"
 fi
 popd
-
-# Detect if there are performance changes relative to the main branch.
-if [ -f "$MAIN_BRANCH_RESULTS_FILE" ]; then
-    # Copy the results of the main branch into the current branch.
-    mv "$MAIN_BRANCH_RESULTS_FILE" "$CANBENCH_RESULTS_FILE"
-
-    # Run canbench to compare result to main branch.
-    pushd "$CANISTER_PATH"
-    canbench --less-verbose > $CANBENCH_OUTPUT
-    popd
-fi
 
 
 echo "# \`canbench\` 🏋 (dir: $CANISTER_PATH)" > $COMMENT_MESSAGE_PATH
 
-if grep -q "(regressed by \|(improved by" "${CANBENCH_OUTPUT}"; then
-  echo "**Significant performance change detected! ⚠️**
-" >> $COMMENT_MESSAGE_PATH;
-else
-  echo "**No significant performance changes detected ✅**
-" >> $COMMENT_MESSAGE_PATH
+# Detect if there are performance changes relative to the main branch.
+if [ -f "$MAIN_BRANCH_RESULTS_FILE" ]; then
+  # Move the results of the main branch into the current branch.
+  mv "$MAIN_BRANCH_RESULTS_FILE" "$CANBENCH_RESULTS_FILE"
+
+  # Run canbench to compare result to main branch.
+  pushd "$CANISTER_PATH"
+  canbench --less-verbose > $CANBENCH_OUTPUT
+  popd
+
+  if grep -q "(regressed by \|(improved by" "${CANBENCH_OUTPUT}"; then
+    echo "**Significant performance change detected! ⚠️**
+    " >> $COMMENT_MESSAGE_PATH;
+  else
+    echo "**No significant performance changes detected ✅**
+    " >> $COMMENT_MESSAGE_PATH
+  fi
 fi
 
 ## Add the output of canbench to the file.
@@ -71,5 +77,3 @@ fi
 
 # Output the comment to stdout.
 cat $COMMENT_MESSAGE_PATH
-
-echo "EXIT_STATUS=148" >> "$GITHUB_ENV"
