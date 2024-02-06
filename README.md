@@ -65,8 +65,19 @@ Note you'll need to copy the scripts in the `scripts` directory to your own repo
 ```
   benchmark-my-canister:
     runs-on: ubuntu-latest
+    needs: [build]
+    env:
+      PROJECT_DIR: <PATH/TO/YOUR/CANISTER>
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout current PR
+        uses: actions/checkout@v4
+
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: _canbench_main_branch
+
       - uses: actions/cache@v3
         with:
           path: |
@@ -77,19 +88,19 @@ Note you'll need to copy the scripts in the `scripts` directory to your own repo
 
       - name: Install Rust
         run: |
-          rustup update ${{ matrix.rust }} --no-self-update
-          rustup default ${{ matrix.rust }}
+          rustup update $RUST_VERSION --no-self-update
+          rustup default $RUST_VERSION
           rustup target add wasm32-unknown-unknown
 
       - name: Benchmark
         run: |
-          bash ./scripts/ci_run_benchmark.sh <PATH/TO/YOUR/CANISTER>
+          bash ./scripts/ci_run_benchmark.sh $PROJECT_DIR
 
       - name: Post comment
         uses: thollander/actions-comment-pull-request@v2
         with:
           filePath: /tmp/canbench_comment_message.txt
-          comment_tag: canbench    <-- make sure this tag is unique if you're benchmarking multiple canisters.
+          comment_tag: ${{ env.PROJECT_DIR }}
 
       - name: Pass or fail
         run: |
