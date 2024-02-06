@@ -40,7 +40,7 @@ else
   UPDATED_MSG="**\`$CANBENCH_RESULTS_FILE\` is up to date ✅**";
 
   # canbench results file is up to date. The job succeeds.
-  echo "EXIT_STATUS=1" >> "$GITHUB_ENV"
+  echo "EXIT_STATUS=0" >> "$GITHUB_ENV"
 fi
 popd
 
