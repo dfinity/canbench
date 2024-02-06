@@ -35,7 +35,7 @@ fn benchmark_reports_no_changes() {
 
 Benchmark: no_changes_test
   total:
-    instructions: 206 (no change)
+    instructions: 207 (no change)
     heap_delta: 0 pages (no change)
     stable_memory_delta: 0 pages (no change)
 
@@ -57,7 +57,7 @@ fn benchmark_reports_noisy_change() {
 
 Benchmark: noisy_change_test
   total:
-    instructions: 206 (-1.90%) (change within noise threshold)
+    instructions: 207 (-1.43%) (change within noise threshold)
     heap_delta: 0 pages (no change)
     stable_memory_delta: 0 pages (no change)
 
@@ -79,7 +79,7 @@ fn benchmark_reports_regression() {
 
 Benchmark: regression_test
   total:
-    instructions: 206 (regressed by 1960.00%)
+    instructions: 207 (regressed by 1970.00%)
     heap_delta: 0 pages (no change)
     stable_memory_delta: 0 pages (no change)
 
@@ -101,7 +101,7 @@ fn benchmark_reports_improvement() {
 
 Benchmark: improvement_test
   total:
-    instructions: 206 (improved by 93.35%)
+    instructions: 207 (improved by 93.32%)
     heap_delta: 0 pages (no change)
     stable_memory_delta: 0 pages (no change)
 
@@ -123,7 +123,7 @@ fn benchmark_reports_regression_from_zero() {
 
 Benchmark: stable_memory_increase
   total:
-    instructions: 306 (regressed from 0)
+    instructions: 307 (regressed from 0)
     heap_delta: 0 pages (no change)
     stable_memory_delta: 123 pages (regressed from 0)
 
@@ -147,7 +147,7 @@ fn benchmark_stable_memory_delta() {
 
 Benchmark: stable_memory_delta (new)
   total:
-    instructions: 306 (new)
+    instructions: 307 (new)
     heap_delta: 0 pages (new)
     stable_memory_delta: 456 pages (new)
 
@@ -189,7 +189,7 @@ fn supports_gzipped_wasm() {
 
 Benchmark: bench_1 (new)
   total:
-    instructions: 206 (new)
+    instructions: 207 (new)
     heap_delta: 0 pages (new)
     stable_memory_delta: 0 pages (new)
 
@@ -197,7 +197,7 @@ Benchmark: bench_1 (new)
 
 Benchmark: bench_2 (new)
   total:
-    instructions: 206 (new)
+    instructions: 207 (new)
     heap_delta: 0 pages (new)
     stable_memory_delta: 0 pages (new)
 
@@ -219,17 +219,17 @@ fn reports_scopes_in_new_benchmark() {
 
 Benchmark: bench_scope_new (new)
   total:
-    instructions: 3367 (new)
+    instructions: 3411 (new)
     heap_delta: 0 pages (new)
     stable_memory_delta: 0 pages (new)
 
   scope_1 (scope):
-    instructions: 987 (new)
+    instructions: 1002 (new)
     heap_delta: 0 pages (new)
     stable_memory_delta: 0 pages (new)
 
   scope_2 (scope):
-    instructions: 777 (new)
+    instructions: 787 (new)
     heap_delta: 0 pages (new)
     stable_memory_delta: 0 pages (new)
 
@@ -251,17 +251,17 @@ fn reports_scopes_in_existing_benchmark() {
 
 Benchmark: bench_scope_exists
   total:
-    instructions: 3367 (regressed from 0)
+    instructions: 3411 (regressed from 0)
     heap_delta: 0 pages (no change)
     stable_memory_delta: 0 pages (no change)
 
   scope_1 (scope):
-    instructions: 987 (regressed by 23.38%)
+    instructions: 1002 (regressed by 25.25%)
     heap_delta: 0 pages (improved by 100.00%)
     stable_memory_delta: 0 pages (no change)
 
   scope_2 (scope):
-    instructions: 777 (new)
+    instructions: 787 (new)
     heap_delta: 0 pages (new)
     stable_memory_delta: 0 pages (new)
 
