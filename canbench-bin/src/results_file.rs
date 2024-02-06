@@ -9,7 +9,7 @@ use std::{
     path::PathBuf,
 };
 
-const VERSION: &'static str = env!("CARGO_PKG_VERSION");
+const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 /// An error returned if the current version if canbench is older than the
 /// version used to created the results file.
