@@ -40,7 +40,7 @@ fi
 
 pushd "$CANISTER_PATH"
 
-canbench --less-verbose >> $CANBENCH_OUTPUT
+canbench --less-verbose --persist >> $CANBENCH_OUTPUT
 
 popd
 
@@ -67,7 +67,7 @@ echo "
 sha256sum $CANBENCH_RESULTS_FILE_BACKUP
 sha256sum $MAIN_BRANCH_RESULTS_FILE
 
-if cmp -s "$CANBENCH_RESULTS_FILE_BACKUP" "$MAIN_BRANCH_RESULTS_FILE"; then
+if cmp -s "$CANBENCH_RESULTS_FILE_BACKUP" "$CANBENCH_RESULTS_FILE"; then
   echo "**$CANBENCH_RESULTS_FILE is up to date ✅**" >> $COMMENT_MESSAGE_PATH;
 else
   echo "**\`$CANBENCH_RESULTS_FILE\` is not up to date ❌**
