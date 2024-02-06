@@ -1,49 +1,50 @@
 # The results in this file are artificial and are designed to trigger
 # certain scenarios.
+benches:
+  # A benchmark that is expected to return no changes.
+  no_changes_test:
+    total:
+      heap_delta: 0
+      instructions: 206
+      stable_memory_delta: 0
 
-# A benchmark that is expected to return no changes.
-no_changes_test:
-  total:
-    heap_delta: 0
-    instructions: 206
-    stable_memory_delta: 0
+  # A benchmark that is expected to return a noisy change.
+  noisy_change_test:
+    total:
+      heap_delta: 0
+      instructions: 210
+      stable_memory_delta: 0
 
-# A benchmark that is expected to return a noisy change.
-noisy_change_test:
-  total:
-    heap_delta: 0
-    instructions: 210
-    stable_memory_delta: 0
+  # A benchmark that is expected to return a regression.
+  regression_test:
+    total:
+      heap_delta: 0
+      instructions: 10
+      stable_memory_delta: 0
 
-# A benchmark that is expected to return a regression.
-regression_test:
-  total:
-    heap_delta: 0
-    instructions: 10
-    stable_memory_delta: 0
+  # A benchmark that is expected to return an improvement.
+  improvement_test:
+    total:
+      heap_delta: 0
+      instructions: 3100
+      stable_memory_delta: 0
 
-# A benchmark that is expected to return an improvement.
-improvement_test:
-  total:
-    heap_delta: 0
-    instructions: 3100
-    stable_memory_delta: 0
+  # A benchmark that is expected to return a regression from zero.
+  stable_memory_increase:
+    total:
+      heap_delta: 0
+      instructions: 0
+      stable_memory_delta: 0
 
-# A benchmark that is expected to return a regression from zero.
-stable_memory_increase:
-  total:
-    heap_delta: 0
-    instructions: 0
-    stable_memory_delta: 0
+  # A benchmark that is expected to return a delta of new scopes steps.
+  bench_scope_exists:
+    total:
+      heap_delta: 0
+      instructions: 0
+      stable_memory_delta: 0
 
-# A benchmark that is expected to return a delta of new scopes steps.
-bench_scope_exists:
-  total:
-    heap_delta: 0
-    instructions: 0
-    stable_memory_delta: 0
-
-  scopes:
-    scope_1:
-      heap_delta: 12
-      instructions: 800
+    scopes:
+      scope_1:
+        heap_delta: 12
+        instructions: 800
+version: 0.1.0
