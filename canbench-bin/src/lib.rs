@@ -114,7 +114,7 @@ fn maybe_download_drun(verbose: bool) {
 
 fn download_drun(verbose: bool) {
     const DRUN_URL_PREFIX: &str =
-            "https://github.com/dfinity/ic/releases/download/release-2023-09-27_23-01%2Bquic/drun-x86_64-";
+        "https://github.com/dfinity/ic/releases/download/release-2023-09-27_23-01%2Bquic/drun-x86_64-";
 
     if verbose {
         println!("Downloading runtime (will be cached for future uses)...");

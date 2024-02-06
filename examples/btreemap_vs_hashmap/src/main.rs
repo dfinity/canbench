@@ -11,7 +11,7 @@ struct User {
 struct State {
     // TIP: try replacing the `BTreeMap` below with a `HashMap` and run `canbench`.
     // Notice how the performance changes.
-    users: std::collections::HashMap<u64, User>,
+    users: std::collections::BTreeMap<u64, User>,
 }
 
 thread_local! {
