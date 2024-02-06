@@ -38,9 +38,11 @@ if [ -f "$MAIN_BRANCH_RESULTS_FILE" ]; then
     cp "$MAIN_BRANCH_RESULTS_FILE" "$CANBENCH_RESULTS_FILE"
 fi
 
-cd "$CANISTER_PATH"
+pushd "$CANISTER_PATH"
 
 canbench --less-verbose >> $CANBENCH_OUTPUT
+
+popd
 
 echo "# \`canbench\` 🏋 (dir: $CANISTER_PATH)" > $COMMENT_MESSAGE_PATH
 
