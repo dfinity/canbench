@@ -11,4 +11,4 @@ benches:
       heap_delta: 0
       stable_memory_delta: 0
     scopes: {}
-version: 0.2.0
+version: 0.1.0

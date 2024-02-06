@@ -11,7 +11,7 @@ use std::{
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
-/// An error returned if the current version if canbench is older than the
+/// An error returned if the current version of canbench is older than the
 /// version used to created the results file.
 pub struct VersionError {
     pub our_version: Version,
@@ -36,6 +36,8 @@ pub fn read(results_file: &PathBuf) -> Result<BTreeMap<String, BenchResult>, Ver
 
     let results: PersistedResults = serde_yaml::from_str(&results_str).unwrap();
 
+    // Validate that our version of canbench is not older than what was used
+    // to generate the file.
     let our_version = Version::parse(VERSION).unwrap();
     let their_version =
         Version::parse(results.version).expect("couldn't parse version in results file");
@@ -56,7 +58,6 @@ pub fn write(results_file: &PathBuf, results: BTreeMap<String, BenchResult>) {
         benches: results,
     };
 
-    // Open a file in write-only mode.
     let mut file = File::create(results_file).unwrap();
     file.write_all(
         serde_yaml::to_string(&persisted_results)
