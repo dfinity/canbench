@@ -18,8 +18,6 @@ CANBENCH_OUTPUT=/tmp/canbench_output.txt
 CANBENCH_RESULTS_FILE="$CANISTER_PATH/canbench_results.yml"
 MAIN_BRANCH_RESULTS_FILE="$MAIN_BRANCH_DIR/$CANBENCH_RESULTS_FILE"
 
-CANBENCH_RESULTS_FILE_BACKUP="${CANBENCH_RESULTS_FILE}.bk"
-
 # Install canbench
 cargo install --path ./canbench-bin
 
@@ -31,7 +29,7 @@ fi
 
 # Detect if canbench results file is up to date.
 pushd "$CANISTER_PATH"
-canbench --less-verbose >> $CANBENCH_OUTPUT
+canbench --less-verbose > $CANBENCH_OUTPUT
 if grep -q "(regressed by \|(improved by \|(new)" "$CANBENCH_OUTPUT"; then
   UPDATED_MSG="**\`$CANBENCH_RESULTS_FILE\` is not up to date ❌**
   If the performance change is expected, run \`canbench --persist\` to save the updated benchmark results.";
@@ -42,16 +40,15 @@ popd
 
 # Detect if there are performance changes relative to the main branch.
 if [ -f "$MAIN_BRANCH_RESULTS_FILE" ]; then
-    # Backup the current results file.
-    mv "$CANBENCH_RESULTS_FILE" "$CANBENCH_RESULTS_FILE_BACKUP"
-
     # Copy the results of the main branch into the current branch.
-    cp "$MAIN_BRANCH_RESULTS_FILE" "$CANBENCH_RESULTS_FILE"
+    mv "$MAIN_BRANCH_RESULTS_FILE" "$CANBENCH_RESULTS_FILE"
+
+    # Run canbench to compare result to main branch.
+    pushd "$CANISTER_PATH"
+    canbench --less-verbose > $CANBENCH_OUTPUT
+    popd
 fi
 
-pushd "$CANISTER_PATH"
-canbench --less-verbose >> $CANBENCH_OUTPUT
-popd
 
 echo "# \`canbench\` 🏋 (dir: $CANISTER_PATH)" > $COMMENT_MESSAGE_PATH
 
@@ -74,3 +71,5 @@ fi
 
 # Output the comment to stdout.
 cat $COMMENT_MESSAGE_PATH
+
+echo "::set-env name=EXIT_STATUS::148"

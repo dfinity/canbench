@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -Eexuo pipefail
 
+echo "$EXIT_STATUS"
+
 # Script that, given a comment that was prepared by `ci_run_benchmark.sh`,
 # fails or succeeds depending on whether or not there were changes in performance.
 
