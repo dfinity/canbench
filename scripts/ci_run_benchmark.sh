@@ -32,10 +32,10 @@ fi
 # Detect if there are performance changes relative to the main branch.
 if [ -f "$MAIN_BRANCH_RESULTS_FILE" ]; then
     # Backup the current results file.
-    mv "$CANBENCH_RESULTS_FILE" "$CANBENCH_RESULTS_FILE_BACKUP"
+#    mv "$CANBENCH_RESULTS_FILE" "$CANBENCH_RESULTS_FILE_BACKUP"
 
     # Copy the results of the main branch into the current branch.
-    cp "$MAIN_BRANCH_RESULTS_FILE" "$CANBENCH_RESULTS_FILE"
+#    cp "$MAIN_BRANCH_RESULTS_FILE" "$CANBENCH_RESULTS_FILE"
 fi
 
 pushd "$CANISTER_PATH"
