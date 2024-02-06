@@ -29,19 +29,28 @@ if [ ! -f "$CANBENCH_RESULTS_FILE" ]; then
     exit 1
 fi
 
+# Detect if canbench results file is up to date.
+pushd "$CANISTER_PATH"
+canbench --less-verbose >> $CANBENCH_OUTPUT
+if grep -q "(regressed by \|(improved by \|(new)" "$CANBENCH_OUTPUT"; then
+  UPDATED_MSG="**\`$CANBENCH_RESULTS_FILE\` is not up to date ❌**
+  If the performance change is expected, run \`canbench --persist\` to save the updated benchmark results.";
+else
+  UPDATED_MSG="**\`$CANBENCH_RESULTS_FILE\` is up to date ✅**";
+fi
+popd
+
 # Detect if there are performance changes relative to the main branch.
 if [ -f "$MAIN_BRANCH_RESULTS_FILE" ]; then
     # Backup the current results file.
-    cp "$CANBENCH_RESULTS_FILE" "$CANBENCH_RESULTS_FILE_BACKUP"
+    mv "$CANBENCH_RESULTS_FILE" "$CANBENCH_RESULTS_FILE_BACKUP"
 
     # Copy the results of the main branch into the current branch.
-#    cp "$MAIN_BRANCH_RESULTS_FILE" "$CANBENCH_RESULTS_FILE"
+    cp "$MAIN_BRANCH_RESULTS_FILE" "$CANBENCH_RESULTS_FILE"
 fi
 
 pushd "$CANISTER_PATH"
-
-canbench --less-verbose --persist >> $CANBENCH_OUTPUT
-
+canbench --less-verbose >> $CANBENCH_OUTPUT
 popd
 
 echo "# \`canbench\` 🏋 (dir: $CANISTER_PATH)" > $COMMENT_MESSAGE_PATH
@@ -54,28 +63,9 @@ else
 " >> $COMMENT_MESSAGE_PATH
 fi
 
-echo "$CANBENCH_RESULTS_FILE_BACKUP"
-cat "$CANBENCH_RESULTS_FILE_BACKUP"
-echo "
-===========
-";
-echo "$CANBENCH_RESULTS_FILE"
-cat "$CANBENCH_RESULTS_FILE"
-echo "
------------
-";
-sha256sum $CANBENCH_RESULTS_FILE_BACKUP
-sha256sum $CANBENCH_RESULTS_FILE
-
-if cmp -s "$CANBENCH_RESULTS_FILE_BACKUP" "$CANBENCH_RESULTS_FILE"; then
-  echo "**$CANBENCH_RESULTS_FILE is up to date ✅**" >> $COMMENT_MESSAGE_PATH;
-else
-  echo "**\`$CANBENCH_RESULTS_FILE\` is not up to date ❌**
-  If the performance change is expected, run \`canbench --persist\` to save the updated benchmark results." >> $COMMENT_MESSAGE_PATH
-fi
-
 ## Add the output of canbench to the file.
 {
+  echo "$UPDATED_MSG"
   echo ""
   echo "\`\`\`"
   cat "$CANBENCH_OUTPUT"
