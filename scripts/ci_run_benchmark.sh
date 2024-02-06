@@ -72,4 +72,4 @@ fi
 # Output the comment to stdout.
 cat $COMMENT_MESSAGE_PATH
 
-echo "::set-env name=EXIT_STATUS::148"
+echo "::set-output name=EXIT_STATUS::148"
