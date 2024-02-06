@@ -72,4 +72,4 @@ fi
 # Output the comment to stdout.
 cat $COMMENT_MESSAGE_PATH
 
-echo "::set-output name=EXIT_STATUS::148"
+echo "EXIT_STATUS=148" >> "$GITHUB_ENV"
