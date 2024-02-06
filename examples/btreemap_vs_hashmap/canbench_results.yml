@@ -1,18 +1,18 @@
 insert_users:
   total:
-    instructions: 1130235951
-    heap_delta: 1608
+    instructions: 2564620808
+    heap_delta: 871
     stable_memory_delta: 0
   scopes: {}
 pre_upgrade_bench:
   total:
-    instructions: 631121288
-    heap_delta: 0
+    instructions: 717106465
+    heap_delta: 519
     stable_memory_delta: 184
   scopes:
     serialize_state:
-      instructions: 631118859
-      heap_delta: 0
+      instructions: 717103975
+      heap_delta: 519
       stable_memory_delta: 0
     writing_to_stable_memory:
       instructions: 502
@@ -20,7 +20,7 @@ pre_upgrade_bench:
       stable_memory_delta: 184
 remove_users:
   total:
-    instructions: 724813476
+    instructions: 2057543279
     heap_delta: 0
     stable_memory_delta: 0
   scopes: {}
