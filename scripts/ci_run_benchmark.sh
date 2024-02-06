@@ -7,40 +7,34 @@ set -Eexuo pipefail
 # Path to run `canbench` from.
 CANISTER_PATH=$1
 
-pwd
-ls -al
-
-CANBENCH_OUTPUT=/tmp/canbench_output.txt
-
 # If changed, then other scripts need to be updated as well.
 COMMENT_MESSAGE_PATH=/tmp/canbench_comment_message.txt
 
 # Github CI is expected to have the main branch checked out in this folder.
 MAIN_BRANCH_DIR=_canbench_main_branch
 
-CANBENCH_RESULTS_FILE="$CANISTER_PATH/canbench_results.yml"
-CANBENCH_RESULTS_FILE_TEMP="${CANBENCH_RESULTS_FILE}.current"
+CANBENCH_OUTPUT=/tmp/canbench_output.txt
 
+CANBENCH_RESULTS_FILE="$CANISTER_PATH/canbench_results.yml"
 MAIN_BRANCH_RESULTS_FILE="$MAIN_BRANCH_DIR/$CANBENCH_RESULTS_FILE"
+
+CANBENCH_RESULTS_FILE_BACKUP="${CANBENCH_RESULTS_FILE}.bk"
 
 # Install canbench
 cargo install --path ./canbench-bin
 
-# Detect if there are performance changes relative to the main branch.
-# Github CI is setup such that the main branch is available in the directory.
-
-ls -al $MAIN_BRANCH_DIR
-ls -al $MAIN_BRANCH_DIR/"$CANISTER_PATH"
-
+# Verify that canbench results are available.
 if [ ! -f "$CANBENCH_RESULTS_FILE" ]; then
     echo "$CANBENCH_RESULTS_FILE not found. Did you forget to run \`canbench --persist\`?";
     exit 1
 fi
 
-# If the main branch has a results file, compare the PR with the current result.
+# Detect if there are performance changes relative to the main branch.
 if [ -f "$MAIN_BRANCH_RESULTS_FILE" ]; then
-    mv "$CANBENCH_RESULTS_FILE" "$CANBENCH_RESULTS_FILE_TEMP"
+    # Backup the current results file.
+    mv "$CANBENCH_RESULTS_FILE" "$CANBENCH_RESULTS_FILE_BACKUP"
 
+    # Copy the results of the main branch into the current branch.
     cp "$MAIN_BRANCH_RESULTS_FILE" "$CANBENCH_RESULTS_FILE"
 fi
 
@@ -56,12 +50,12 @@ else
   echo "**No significant performance changes detected ✅**" >> $COMMENT_MESSAGE_PATH
 fi
 
-echo "$CANBENCH_RESULTS_FILE_TEMP"
-cat "$CANBENCH_RESULTS_FILE_TEMP"
+echo "$CANBENCH_RESULTS_FILE_BACKUP"
+cat "$CANBENCH_RESULTS_FILE_BACKUP"
 echo "$MAIN_BRANCH_RESULTS_FILE"
 cat "$MAIN_BRANCH_RESULTS_FILE"
 
-if cmp -s "$CANBENCH_RESULTS_FILE_TEMP" "$MAIN_BRANCH_RESULTS_FILE"; then
+if cmp -s "$CANBENCH_RESULTS_FILE_BACKUP" "$MAIN_BRANCH_RESULTS_FILE"; then
   echo "**$CANBENCH_RESULTS_FILE is up to date ✅**" >> $COMMENT_MESSAGE_PATH;
 else
   echo "**$CANBENCH_RESULTS_FILE is not up to date ❌**
