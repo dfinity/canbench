@@ -200,6 +200,8 @@ dependencies = [
  "hex",
  "pretty_assertions",
  "reqwest",
+ "semver",
+ "serde",
  "serde_yaml",
  "sha256",
  "tempdir",

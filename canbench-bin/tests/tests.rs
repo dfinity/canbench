@@ -270,3 +270,15 @@ Benchmark: bench_scope_exists
             );
         });
 }
+
+#[test]
+fn newer_version() {
+    BenchTest::canister("newer_version")
+        .run(|output| {
+        assert_err!(
+                output,
+                "canbench is at version 0.1.0 while the results were generated with version 99.0.0. Please upgrade canbench.
+"
+            );
+        });
+}

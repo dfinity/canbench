@@ -11,7 +11,9 @@ use std::{
     process::Command,
 };
 mod print_benchmark;
+mod results_file;
 use print_benchmark::print_benchmark;
+use results_file::VersionError;
 use wasmparser::Parser as WasmParser;
 
 // The prefix benchmarks are expected to have in their name.
@@ -28,7 +30,16 @@ pub fn run_benchmarks(
 ) {
     maybe_download_drun(verbose);
 
-    let current_results = read_current_results(results_file);
+    let current_results = match results_file::read(results_file) {
+        Ok(current_results) => current_results,
+        Err(VersionError {
+            our_version,
+            their_version,
+        }) => {
+            eprintln!("canbench is at version {our_version} while the results were generated with version {their_version}. Please upgrade canbench.");
+            std::process::exit(1);
+        }
+    };
 
     let mut results = BTreeMap::new();
     let mut num_executed_bench_fns = 0;
@@ -47,7 +58,7 @@ pub fn run_benchmarks(
         let result = run_benchmark(canister_wasm_path, bench_fn);
         print_benchmark(bench_fn, &result, current_results.get(bench_fn));
 
-        results.insert(bench_fn, result);
+        results.insert(bench_fn.to_string(), result);
         num_executed_bench_fns += 1;
     }
 
@@ -64,10 +75,7 @@ pub fn run_benchmarks(
 
     // Persist the result if requested.
     if persist {
-        // Open a file in write-only mode, returns `io::Result<File>`
-        let mut file = File::create(results_file).unwrap();
-        file.write_all(serde_yaml::to_string(&results).unwrap().as_bytes())
-            .unwrap();
+        results_file::write(results_file, results);
         println!(
             "Successfully persisted results to {}",
             results_file.display()
@@ -193,23 +201,6 @@ query rwlgt-iiaaa-aaaaa-aaaaa-cai {}{} \"DIDL\x00\x00\"",
         BenchResult
     )
     .expect("error decoding benchmark result {:?}")
-}
-
-fn read_current_results(results_file: &PathBuf) -> BTreeMap<String, BenchResult> {
-    // Create a path to the desired file
-    let mut file = match File::open(results_file) {
-        Err(_) => {
-            // No current results found.
-            return BTreeMap::new();
-        }
-        Ok(file) => file,
-    };
-
-    // Read the current results.
-    let mut results_str = String::new();
-    file.read_to_string(&mut results_str)
-        .expect("error reading results file");
-    serde_yaml::from_str(&results_str).unwrap()
 }
 
 // Extract the benchmarks that need to be run.
