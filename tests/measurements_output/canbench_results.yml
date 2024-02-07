@@ -5,7 +5,7 @@ benches:
   no_changes_test:
     total:
       heap_delta: 0
-      instructions: 207
+      instructions: 206
       stable_memory_delta: 0
 
   # A benchmark that is expected to return a noisy change.
