@@ -97,8 +97,8 @@ fn drun_path() -> PathBuf {
 
 // Downloads drun if it's not already downloaded.
 fn maybe_download_drun(verbose: bool) {
-    const DRUN_LINUX_SHA: &str = "7bf08d5f1c1a7cd44f62c03f8554f07aa2430eb3ae81c7c0a143a68ff52dc7f7";
-    const DRUN_MAC_SHA: &str = "57b506d05a6f42f7461198f79f648ad05434c72f3904834db2ced30853d01a62";
+    const DRUN_LINUX_SHA: &str = "182b800a7979e1e3e516e54e4b9980e5407ced7464c0b3aec9ff7af6e9e69a1b";
+    const DRUN_MAC_SHA: &str = "8e0d0758d5a5c6f367e2c374dc7eae0106c7f46a3457f81018af6d5159d2dad4";
 
     if drun_path().exists() {
         // Drun found. Verify that it's the version we expect it to be.
@@ -122,7 +122,7 @@ fn maybe_download_drun(verbose: bool) {
 
 fn download_drun(verbose: bool) {
     const DRUN_URL_PREFIX: &str =
-        "https://github.com/dfinity/ic/releases/download/release-2023-09-27_23-01%2Bquic/drun-x86_64-";
+        "https://github.com/dfinity/ic/releases/download/release-2024-01-25_14-09/drun-x86_64-";
 
     if verbose {
         println!("Downloading runtime (will be cached for future uses)...");
