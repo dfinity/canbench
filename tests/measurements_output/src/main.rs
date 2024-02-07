@@ -28,24 +28,24 @@ fn improvement_test() {}
 // The values of the benchmark are persisted such that a regression from zero
 // is reported.
 #[bench]
-fn stable_memory_increase() {
+fn stable_memory_increase_from_zero() {
     unsafe { stable64_grow(123) };
 }
 
-// A benchmark to check that only the _delta_ in stable memory is reported, not
+// A benchmark to check that only the _increase_ in stable memory is reported, not
 // the total stable memory.
 #[bench(raw)]
-fn stable_memory_delta() -> BenchResult {
+fn stable_memory_only_increase() -> BenchResult {
     unsafe { stable64_grow(123) };
 
-    // Since only the delta is reported, the benchmark should return a delta
+    // Since only the increase is reported, the benchmark should return an increase
     // of 456 (and ignore the stable memory allocation above).
     bench_fn(|| unsafe { stable64_grow(456) })
 }
 
-// A benchmark where we allocate some memory on the heap to increase the heap delta.
+// A benchmark where we allocate some memory on the heap to increase the heap increase.
 #[bench]
-fn increase_heap_delta() {
+fn increase_heap_increase() {
     let _ = vec![1; 1_000_000];
 }
 

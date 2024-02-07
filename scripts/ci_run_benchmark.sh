@@ -30,7 +30,7 @@ fi
 # Detect if canbench results file is up to date.
 pushd "$CANISTER_PATH"
 canbench --less-verbose > $CANBENCH_OUTPUT
-if grep -q "(regressed by \|(improved by \|(new)" "$CANBENCH_OUTPUT"; then
+if grep -q "(regress \|(improved by \|(new)" "$CANBENCH_OUTPUT"; then
   UPDATED_MSG="**\`$CANBENCH_RESULTS_FILE\` is not up to date ❌**
   If the performance change is expected, run \`canbench --persist\` to save the updated benchmark results.";
 

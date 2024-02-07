@@ -98,16 +98,16 @@
 //! Benchmark: fibonacci_20 (new)
 //!   total:
 //!     instructions: 2301 (new)
-//!     heap_delta: 0 pages (new)
-//!     stable_memory_delta: 0 pages (new)
+//!     heap_increase: 0 pages (new)
+//!     stable_memory_increase: 0 pages (new)
 //!
 //! ---------------------------------------------------
 //!
 //! Benchmark: fibonacci_45 (new)
 //!   total:
 //!     instructions: 3088 (new)
-//!     heap_delta: 0 pages (new)
-//!     stable_memory_delta: 0 pages (new)
+//!     heap_increase: 0 pages (new)
+//!     stable_memory_increase: 0 pages (new)
 //!
 //! ---------------------------------------------------
 //!
@@ -142,16 +142,16 @@
 //! Benchmark: fibonacci_20
 //!   total:
 //!     instructions: 2301 (no change)
-//!     heap_delta: 0 pages (no change)
-//!     stable_memory_delta: 0 pages (no change)
+//!     heap_increase: 0 pages (no change)
+//!     stable_memory_increase: 0 pages (no change)
 //!
 //! ---------------------------------------------------
 //!
 //! Benchmark: fibonacci_45
 //!   total:
 //!     instructions: 3088 (no change)
-//!     heap_delta: 0 pages (no change)
-//!     stable_memory_delta: 0 pages (no change)
+//!     heap_increase: 0 pages (no change)
+//!     stable_memory_increase: 0 pages (no change)
 //!
 //! ---------------------------------------------------
 //!
@@ -182,16 +182,16 @@
 //! Benchmark: fibonacci_20
 //!   total:
 //!     instructions: 337.93 K (regressed by 14586.14%)
-//!     heap_delta: 0 pages (no change)
-//!     stable_memory_delta: 0 pages (no change)
+//!     heap_increase: 0 pages (no change)
+//!     stable_memory_increase: 0 pages (no change)
 //!
 //! ---------------------------------------------------
 //!
 //! Benchmark: fibonacci_45
 //!   total:
 //!     instructions: 56.39 B (regressed by 1826095830.76%)
-//!     heap_delta: 0 pages (no change)
-//!     stable_memory_delta: 0 pages (no change)
+//!     heap_increase: 0 pages (no change)
+//!     stable_memory_increase: 0 pages (no change)
 //!
 //! ---------------------------------------------------
 //!
@@ -297,8 +297,8 @@
 //! Benchmark: pre_upgrade_bench (new)
 //!   total:
 //!     instructions: 717.10 M (new)
-//!     heap_delta: 519 pages (new)
-//!     stable_memory_delta: 184 pages (new)
+//!     heap_increase: 519 pages (new)
+//!     stable_memory_increase: 184 pages (new)
 //!
 //! ---------------------------------------------------
 //!
@@ -365,18 +365,18 @@
 //! Benchmark: pre_upgrade_bench (new)
 //!   total:
 //!     instructions: 717.11 M (new)
-//!     heap_delta: 519 pages (new)
-//!     stable_memory_delta: 184 pages (new)
+//!     heap_increase: 519 pages (new)
+//!     stable_memory_increase: 184 pages (new)
 //!
 //!   serialize_state (profiling):
 //!     instructions: 717.10 M (new)
-//!     heap_delta: 519 pages (new)
-//!     stable_memory_delta: 0 pages (new)
+//!     heap_increase: 519 pages (new)
+//!     stable_memory_increase: 0 pages (new)
 //!
 //!   writing_to_stable_memory (profiling):
 //!     instructions: 502 (new)
-//!     heap_delta: 0 pages (new)
-//!     stable_memory_delta: 184 pages (new)
+//!     heap_increase: 0 pages (new)
+//!     stable_memory_increase: 184 pages (new)
 //!
 //! ---------------------------------------------------
 //!
@@ -412,11 +412,11 @@ pub struct Measurement {
 
     /// The increase in heap (measured in pages).
     #[serde(default)]
-    pub heap_delta: u64,
+    pub heap_increase: u64,
 
     /// The increase in stable memory (measured in pages).
     #[serde(default)]
-    pub stable_memory_delta: u64,
+    pub stable_memory_increase: u64,
 }
 
 /// Benchmarks the given function.
@@ -427,13 +427,13 @@ pub fn bench_fn<R>(f: impl FnOnce() -> R) -> BenchResult {
     let start_instructions = instruction_count();
     f();
     let instructions = instruction_count() - start_instructions;
-    let stable_memory_delta = ic_cdk::api::stable::stable64_size() - start_stable_memory;
-    let heap_delta = heap_size() - start_heap;
+    let stable_memory_increase = ic_cdk::api::stable::stable64_size() - start_stable_memory;
+    let heap_increase = heap_size() - start_heap;
 
     let total = Measurement {
         instructions,
-        heap_delta,
-        stable_memory_delta,
+        heap_increase,
+        stable_memory_increase,
     };
 
     let scopes: std::collections::BTreeMap<_, _> = get_scopes_measurements()
@@ -503,8 +503,9 @@ impl BenchScope {
 impl Drop for BenchScope {
     fn drop(&mut self) {
         let instructions = instruction_count() - self.start_instructions;
-        let stable_memory_delta = ic_cdk::api::stable::stable64_size() - self.start_stable_memory;
-        let heap_delta = heap_size() - self.start_heap;
+        let stable_memory_increase =
+            ic_cdk::api::stable::stable64_size() - self.start_stable_memory;
+        let heap_increase = heap_size() - self.start_heap;
 
         SCOPES.with(|p| {
             let mut p = p.borrow_mut();
@@ -512,8 +513,8 @@ impl Drop for BenchScope {
                 self.name,
                 Measurement {
                     instructions,
-                    heap_delta,
-                    stable_memory_delta,
+                    heap_increase,
+                    stable_memory_increase,
                 },
             );
 

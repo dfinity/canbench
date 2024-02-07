@@ -35,11 +35,15 @@ fn print_measurement(new: &Measurement, old: Option<&Measurement>) {
         new.instructions,
         old.map(|m| m.instructions),
     );
-    print_metric("heap_delta", new.heap_delta, old.map(|m| m.heap_delta));
     print_metric(
-        "stable_memory_delta",
-        new.stable_memory_delta,
-        old.map(|m| m.stable_memory_delta),
+        "heap_increase",
+        new.heap_increase,
+        old.map(|m| m.heap_increase),
+    );
+    print_metric(
+        "stable_memory_increase",
+        new.stable_memory_increase,
+        old.map(|m| m.stable_memory_increase),
     );
 }
 
@@ -64,8 +68,8 @@ fn print_metric(metric: &str, value: u64, old_value: Option<u64>) {
             // Don't include a unit with instructions since it's clear from the metric name.
             value_str
         }
-        "heap_delta" => format!("{value_str} pages"),
-        "stable_memory_delta" => format!("{value_str} pages"),
+        "heap_increase" => format!("{value_str} pages"),
+        "stable_memory_increase" => format!("{value_str} pages"),
         other => panic!("unknown metric {}", other),
     };
 
