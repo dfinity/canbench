@@ -1,22 +1,20 @@
 #[ic_cdk::query]
 fn fibonacci(n: u32) -> u32 {
-    if n == 0 {
-        return 0;
-    } else if n == 1 {
-        return 1;
+    match n {
+        0 => 1,
+        1 => 1,
+        _ => fibonacci(n - 1) + fibonacci(n - 2),
     }
+}
 
-    let mut a = 0;
-    let mut b = 1;
-    let mut result = 0;
+#[canbench::bench]
+fn fibonacci_20() {
+    println!("{:?}", fibonacci(20));
+}
 
-    for _ in 2..=n {
-        result = a + b;
-        a = b;
-        b = result;
-    }
-
-    result
+#[canbench::bench]
+fn fibonacci_45() {
+    println!("{:?}", fibonacci(45));
 }
 
 fn main() {}
