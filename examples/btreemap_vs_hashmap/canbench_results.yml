@@ -1,27 +1,27 @@
 benches:
   insert_users:
     total:
-      instructions: 2564620808
+      instructions: 2570835903
       heap_delta: 871
       stable_memory_delta: 0
     scopes: {}
   pre_upgrade_bench:
     total:
-      instructions: 717106465
+      instructions: 729107688
       heap_delta: 519
       stable_memory_delta: 184
     scopes:
       serialize_state:
-        instructions: 717103975
+        instructions: 729105169
         heap_delta: 519
         stable_memory_delta: 0
       writing_to_stable_memory:
-        instructions: 502
+        instructions: 506
         heap_delta: 0
         stable_memory_delta: 184
   remove_users:
     total:
-      instructions: 2057543279
+      instructions: 2072135114
       heap_delta: 0
       stable_memory_delta: 0
     scopes: {}
