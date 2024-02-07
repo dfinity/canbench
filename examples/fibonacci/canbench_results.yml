@@ -1,13 +1,13 @@
 benches:
   fibonacci_20:
     total:
-      instructions: 2197
+      instructions: 2224
       heap_delta: 0
       stable_memory_delta: 0
     scopes: {}
   fibonacci_45:
     total:
-      instructions: 2984
+      instructions: 3011
       heap_delta: 0
       stable_memory_delta: 0
     scopes: {}
