@@ -143,7 +143,12 @@ jobs:
   checks-pass:
     # Always run this job!
     if: always()
-    needs: [build, shell-checks]
+    needs: [
+      build,
+      shell-checks,
+      benchmark-fibonacci-example,
+      benchmark-btreemap-vs-hashmap-example
+    ]
     runs-on: ubuntu-latest
     steps:
       - name: check build result
@@ -152,4 +157,12 @@ jobs:
 
       - name: check shell-checks result
         if: ${{ needs.shell-checks.result != 'success' }}
+        run: exit 1
+
+      - name: check benchmark-fibonacci-example result
+        if: ${{ needs.benchmark-fibonacci-example.result != 'success' }}
+        run: exit 1
+
+      - name: check benchmark-btreemap-vs-hashmap-example result
+        if: ${{ needs.benchmark-btreemap-vs-hashmap-example.result != 'success' }}
         run: exit 1
