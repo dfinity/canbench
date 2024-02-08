@@ -65,7 +65,6 @@ Note you'll need to copy the scripts in the `scripts` directory to your own repo
 ```
   benchmark-my-canister:
     runs-on: ubuntu-latest
-    needs: [build]
     env:
       PROJECT_DIR: <PATH/TO/YOUR/CANISTER>
     steps:
@@ -77,14 +76,6 @@ Note you'll need to copy the scripts in the `scripts` directory to your own repo
         with:
           ref: main
           path: _canbench_main_branch
-
-      - uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
 
       - name: Install Rust
         run: |
