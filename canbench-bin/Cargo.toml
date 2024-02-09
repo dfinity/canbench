@@ -2,6 +2,7 @@
 name = "canbench-bin"
 version = "0.1.0"
 edition = "2021"
+license = "Apache-2.0"
 
 [[bin]]
 name = "canbench"
@@ -24,4 +25,3 @@ wasmparser.workspace = true
 
 [dev-dependencies]
 pretty_assertions = "1.4.0"
-tempdir = "0.3.7"

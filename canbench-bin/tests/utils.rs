@@ -5,7 +5,7 @@ use std::{
     path::PathBuf,
     process::{Command, Output},
 };
-use tempdir::TempDir;
+use tempfile::tempdir;
 
 #[macro_export]
 macro_rules! assert_err {
@@ -71,7 +71,7 @@ impl BenchTest {
         let canbench: &'static str = env!("CARGO_BIN_EXE_canbench");
 
         // Create a temporary directory in case no specific directory is specified.
-        let dir = TempDir::new("").unwrap();
+        let dir = tempdir().unwrap();
 
         let dir_path = match &self.base_dir {
             BaseDir::Temp => dir.path(),
