@@ -30,7 +30,7 @@
 //!
 //! ```yml
 //! build_cmd:
-//!   cargo build --release --target wasm32-unknown-unknown --features canbench
+//!   cargo build --release --target wasm32-unknown-unknown --features canbench-rs
 //!
 //! wasm_path:
 //!   ./target/wasm32-unknown-unknown/release/<YOUR_CANISTER>.wasm
@@ -67,7 +67,7 @@
 //! Now, let's add some benchmarks to this query:
 //!
 //! ```rust
-//! #[cfg(feature = "canbench")]
+//! #[cfg(feature = "canbench-rs")]
 //! mod benches {
 //!     use super::*;
 //!     use canbench_rs::bench;
@@ -244,7 +244,7 @@
 //! Let's say we want to benchmark how long it takes to run the `pre_upgrade` function. We can define the following benchmark:
 //!
 //! ```rust
-//! #[cfg(feature = "canbench")]
+//! #[cfg(feature = "canbench-rs")]
 //! mod benches {
 //!     use super::*;
 //!     use canbench_rs::bench;
@@ -267,7 +267,7 @@
 //! To address this, we can use the `#[bench(raw)]` macro to specify exactly which code we'd like to benchmark.
 //!
 //! ```rust
-//! #[cfg(feature = "canbench")]
+//! #[cfg(feature = "canbench-rs")]
 //! mod benches {
 //!     use super::*;
 //!     use canbench_rs::bench;
@@ -340,13 +340,13 @@
 //! fn pre_upgrade() {
 //!     // Serialize state.
 //!     let bytes = {
-//!         #[cfg(feature = "canbench")]
+//!         #[cfg(feature = "canbench-rs")]
 //!         let _p = canbench_rs::bench_scope("serialize_state");
 //!         STATE.with(|s| Encode!(s).unwrap())
 //!     };
 //!
 //!     // Write to stable memory.
-//!     #[cfg(feature = "canbench")]
+//!     #[cfg(feature = "canbench-rs")]
 //!     let _p = canbench_rs::bench_scope("writing_to_stable_memory");
 //!     ic_cdk::api::stable::StableWriter::default()
 //!         .write(&bytes)
