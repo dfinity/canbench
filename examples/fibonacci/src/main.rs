@@ -32,7 +32,7 @@ fn fibonacci(n: u32) -> u32 {
     }
 }*/
 
-#[cfg(feature = "canbench")]
+#[cfg(feature = "canbench-rs")]
 mod benches {
     use super::*;
     use canbench_rs::bench;
