@@ -1,11 +1,12 @@
 [package]
 name = "canbench-rs"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 license = "Apache-2.0"
 description = "The rust library for `canbench`, the benchmarking framework for canisters on the Internet Computer."
 repository = "https://github.com/dfinity/canbench"
-tags = ["internet computer", "benchmark", "canister", "canisters", "ic", "perf", "optimize"]
+keywords = ["internet-computer", "benchmark", "canister", "ic", "perf"]
+readme = "../README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
