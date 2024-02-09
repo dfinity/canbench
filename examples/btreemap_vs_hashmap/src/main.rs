@@ -22,20 +22,20 @@ thread_local! {
 fn pre_upgrade() {
     // Serialize state.
     let bytes = {
-        #[cfg(feature = "canbench")]
+        #[cfg(feature = "canbench-rs")]
         let _p = canbench_rs::bench_scope("serialize_state");
         STATE.with(|s| Encode!(s).unwrap())
     };
 
     // Write to stable memory.
-    #[cfg(feature = "canbench")]
+    #[cfg(feature = "canbench-rs")]
     let _p = canbench_rs::bench_scope("writing_to_stable_memory");
     ic_cdk::api::stable::StableWriter::default()
         .write(&bytes)
         .unwrap();
 }
 
-#[cfg(feature = "canbench")]
+#[cfg(feature = "canbench-rs")]
 mod benches {
     use super::*;
     use canbench_rs::bench;
