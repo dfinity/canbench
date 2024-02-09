@@ -51,9 +51,9 @@ A single message execution must stay within the allowed bounds, otherwise it's t
 cargo install canbench
 ```
 
-## Quickstart
+## Quickstart (Rust)
 
-See the [crate's documentation](https://docs.rs/canbench).
+See the [crate's documentation](https://docs.rs/canbench-rs).
 
 ## Github CI Support
 

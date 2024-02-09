@@ -1,4 +1,4 @@
-use canbench::bench;
+use canbench_rs::bench;
 
 #[bench]
 fn bench_1() {}

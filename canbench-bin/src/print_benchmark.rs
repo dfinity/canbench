@@ -1,4 +1,4 @@
-use canbench::{BenchResult, Measurement};
+use canbench_rs::{BenchResult, Measurement};
 use colored::Colorize;
 
 // The threshold that determines whether or not a change is significant.

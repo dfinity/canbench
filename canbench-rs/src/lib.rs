@@ -19,7 +19,7 @@
 //! For more information about optional dependencies, you can read more about them [here](https://doc.rust-lang.org/cargo/reference/features.html#optional-dependencies).
 //!
 //! ```toml
-//! canbench = { version = "x.y.z", optional = true }
+//! canbench_rs = { version = "x.y.z", optional = true }
 //! ```
 //!
 //! ### 3. Add a configuration to `canbench.yml`
@@ -30,7 +30,7 @@
 //!
 //! ```yml
 //! build_cmd:
-//!   cargo build --release --target wasm32-unknown-unknown --features canbench
+//!   cargo build --release --target wasm32-unknown-unknown --features canbench-rs
 //!
 //! wasm_path:
 //!   ./target/wasm32-unknown-unknown/release/<YOUR_CANISTER>.wasm
@@ -67,10 +67,10 @@
 //! Now, let's add some benchmarks to this query:
 //!
 //! ```rust
-//! #[cfg(feature = "canbench")]
+//! #[cfg(feature = "canbench-rs")]
 //! mod benches {
 //!     use super::*;
-//!     use canbench::bench;
+//!     use canbench_rs::bench;
 //!
 //!     # fn fibonacci(_: u32) -> u32 { 0 }
 //!
@@ -244,10 +244,10 @@
 //! Let's say we want to benchmark how long it takes to run the `pre_upgrade` function. We can define the following benchmark:
 //!
 //! ```rust
-//! #[cfg(feature = "canbench")]
+//! #[cfg(feature = "canbench-rs")]
 //! mod benches {
 //!     use super::*;
-//!     use canbench::bench;
+//!     use canbench_rs::bench;
 //!
 //!     # fn initialize_state() {}
 //!     # fn pre_upgrade() {}
@@ -267,27 +267,27 @@
 //! To address this, we can use the `#[bench(raw)]` macro to specify exactly which code we'd like to benchmark.
 //!
 //! ```rust
-//! #[cfg(feature = "canbench")]
+//! #[cfg(feature = "canbench-rs")]
 //! mod benches {
 //!     use super::*;
-//!     use canbench::bench;
+//!     use canbench_rs::bench;
 //!
 //!     # fn initialize_state() {}
 //!     # fn pre_upgrade() {}
 //!
 //!     #[bench(raw)]
-//!     fn pre_upgrade_bench() -> canbench::BenchResult {
+//!     fn pre_upgrade_bench() -> canbench_rs::BenchResult {
 //!         // Some function that fills the state with lots of data.
 //!         initialize_state();
 //!
 //!         // Only benchmark the pre_upgrade. Initializing the state isn't
 //!         // included in the results of our benchmark.
-//!         canbench::bench_fn(pre_upgrade)
+//!         canbench_rs::bench_fn(pre_upgrade)
 //!     }
 //! }
 //! ```
 //!
-//! Running `canbench` on the example above will benchmark only the code wrapped in `canbench::bench_fn`, which in this case is the call to `pre_upgrade`.
+//! Running `canbench` on the example above will benchmark only the code wrapped in `canbench_rs::bench_fn`, which in this case is the call to `pre_upgrade`.
 //!
 //! ```txt
 //! $ canbench pre_upgrade_bench
@@ -313,7 +313,7 @@
 //! 2. Write to stable memory
 //!
 //! Suppose we're interested in understanding, within `pre_upgrade`, the resources spent in each of these steps.
-//! `canbench` allows you to do more granular benchmarking using the `canbench::bench_scope` function.
+//! `canbench` allows you to do more granular benchmarking using the `canbench_rs::bench_scope` function.
 //! Here's how we can modify our `pre_upgrade` function:
 //!
 //!
@@ -340,14 +340,14 @@
 //! fn pre_upgrade() {
 //!     // Serialize state.
 //!     let bytes = {
-//!         #[cfg(feature = "canbench")]
-//!         let _p = canbench::bench_scope("serialize_state");
+//!         #[cfg(feature = "canbench-rs")]
+//!         let _p = canbench_rs::bench_scope("serialize_state");
 //!         STATE.with(|s| Encode!(s).unwrap())
 //!     };
 //!
 //!     // Write to stable memory.
-//!     #[cfg(feature = "canbench")]
-//!     let _p = canbench::bench_scope("writing_to_stable_memory");
+//!     #[cfg(feature = "canbench-rs")]
+//!     let _p = canbench_rs::bench_scope("writing_to_stable_memory");
 //!     ic_cdk::api::stable::StableWriter::default()
 //!         .write(&bytes)
 //!         .unwrap();
@@ -382,7 +382,7 @@
 //!
 //! Executed 1 of 1 benchmarks.
 //! ```
-pub use canbench_macros::bench;
+pub use canbench_rs_macros::bench;
 use candid::CandidType;
 use serde::{Deserialize, Serialize};
 use std::cell::RefCell;
@@ -452,7 +452,7 @@ pub fn bench_fn<R>(f: impl FnOnce() -> R) -> BenchResult {
 ///
 /// ```
 /// fn my_func() {
-///   let _p = canbench::bench_scope("my_scope");
+///   let _p = canbench_rs::bench_scope("my_scope");
 ///   // Do something.
 /// }
 /// ```
@@ -461,14 +461,14 @@ pub fn bench_fn<R>(f: impl FnOnce() -> R) -> BenchResult {
 ///
 /// ```
 /// fn my_func() {
-///   let _ = canbench::bench_scope("my_scope"); // Doesn't capture the scope.
+///   let _ = canbench_rs::bench_scope("my_scope"); // Doesn't capture the scope.
 ///   // Do something.
 /// }
 /// ```
 ///
 /// ```
 /// fn my_func() {
-///   canbench::bench_scope("my_scope"); // Doesn't capture the scope.
+///   canbench_rs::bench_scope("my_scope"); // Doesn't capture the scope.
 ///   // Do something.
 /// }
 /// ```

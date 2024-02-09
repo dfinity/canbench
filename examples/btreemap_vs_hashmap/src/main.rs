@@ -22,23 +22,23 @@ thread_local! {
 fn pre_upgrade() {
     // Serialize state.
     let bytes = {
-        #[cfg(feature = "canbench")]
-        let _p = canbench::bench_scope("serialize_state");
+        #[cfg(feature = "canbench-rs")]
+        let _p = canbench_rs::bench_scope("serialize_state");
         STATE.with(|s| Encode!(s).unwrap())
     };
 
     // Write to stable memory.
-    #[cfg(feature = "canbench")]
-    let _p = canbench::bench_scope("writing_to_stable_memory");
+    #[cfg(feature = "canbench-rs")]
+    let _p = canbench_rs::bench_scope("writing_to_stable_memory");
     ic_cdk::api::stable::StableWriter::default()
         .write(&bytes)
         .unwrap();
 }
 
-#[cfg(feature = "canbench")]
+#[cfg(feature = "canbench-rs")]
 mod benches {
     use super::*;
-    use canbench::bench;
+    use canbench_rs::bench;
 
     // Benchmarks inserting 1 million users into the state.
     #[bench]
@@ -58,12 +58,12 @@ mod benches {
 
     // Benchmarks removing 1 million users from the state.
     #[bench(raw)]
-    fn remove_users() -> canbench::BenchResult {
+    fn remove_users() -> canbench_rs::BenchResult {
         insert_users();
 
         // Only benchmark removing users. Inserting users isn't
         // included in the results of our benchmark.
-        canbench::bench_fn(|| {
+        canbench_rs::bench_fn(|| {
             STATE.with(|s| {
                 let mut s = s.borrow_mut();
                 for i in 0..1_000_000 {
@@ -74,12 +74,12 @@ mod benches {
     }
 
     #[bench(raw)]
-    fn pre_upgrade_bench() -> canbench::BenchResult {
+    fn pre_upgrade_bench() -> canbench_rs::BenchResult {
         insert_users();
 
         // Only benchmark the pre_upgrade. Inserting users isn't
         // included in the results of our benchmark.
-        canbench::bench_fn(pre_upgrade)
+        canbench_rs::bench_fn(pre_upgrade)
     }
 }
 
