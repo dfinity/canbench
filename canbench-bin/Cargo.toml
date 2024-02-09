@@ -1,8 +1,12 @@
 [package]
-name = "canbench-bin"
-version = "0.1.0"
+name = "canbench"
+version = "0.1.1"
 edition = "2021"
 license = "Apache-2.0"
+description = "A benchmarking framework for canisters on the Internet Computer."
+repository = "https://github.com/dfinity/canbench"
+keywords = ["internet-computer", "benchmark", "canister", "ic", "perf"]
+readme = "../README.md"
 
 [[bin]]
 name = "canbench"

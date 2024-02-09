@@ -19,7 +19,7 @@ CANBENCH_RESULTS_FILE="$CANISTER_PATH/canbench_results.yml"
 MAIN_BRANCH_RESULTS_FILE="$MAIN_BRANCH_DIR/$CANBENCH_RESULTS_FILE"
 
 # Install canbench
-cargo install --path ./canbench-bin
+cargo install canbench
 
 # Verify that canbench results are available.
 if [ ! -f "$CANBENCH_RESULTS_FILE" ]; then

@@ -67,7 +67,7 @@ fn main() {
     }
 
     // Run the benchmarks.
-    canbench_bin::run_benchmarks(
+    canbench::run_benchmarks(
         &wasm_path,
         args.pattern,
         args.persist,
