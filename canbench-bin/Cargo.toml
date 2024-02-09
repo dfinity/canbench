@@ -9,7 +9,7 @@ name = "canbench"
 path = "src/main.rs"
 
 [dependencies]
-canbench = { path = "../canbench-rs" }
+canbench-rs = { path = "../canbench-rs" }
 candid.workspace = true
 clap.workspace = true
 colored.workspace = true

@@ -36,7 +36,7 @@ pub fn bench(arg_tokens: TokenStream, item: TokenStream) -> TokenStream {
             // If the argument is "raw", validate that the function returns BenchResult
             if let ReturnType::Type(_, ty) = output {
                 if ty.to_token_stream().to_string() != quote!(BenchResult).to_string()
-                    && ty.to_token_stream().to_string() != quote!(canbench::BenchResult).to_string()
+                    && ty.to_token_stream().to_string() != quote!(canbench_rs::BenchResult).to_string()
                 {
                     // If the return type is not BenchResult, generate a compile-time error
                     return syn::Error::new_spanned(ty, "Raw benchmark should return BenchResult.")
@@ -55,7 +55,7 @@ pub fn bench(arg_tokens: TokenStream, item: TokenStream) -> TokenStream {
 
                 #[ic_cdk::query]
                 #[allow(non_snake_case)]
-                fn #renamed_func_name() -> canbench::BenchResult {
+                fn #renamed_func_name() -> canbench_rs::BenchResult {
                     #func_name()
                 }
             }
@@ -74,8 +74,8 @@ pub fn bench(arg_tokens: TokenStream, item: TokenStream) -> TokenStream {
 
                 #[ic_cdk::query]
                 #[allow(non_snake_case)]
-                fn #renamed_func_name() -> canbench::BenchResult {
-                    canbench::bench_fn(|| {
+                fn #renamed_func_name() -> canbench_rs::BenchResult {
+                    canbench_rs::bench_fn(|| {
                         #func_name();
                     })
                 }

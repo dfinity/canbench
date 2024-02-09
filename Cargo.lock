@@ -178,21 +178,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a2bd12c1caf447e69cd4528f47f94d203fd2582878ecb9e9465484c4148a8223"
 
 [[package]]
-name = "canbench"
-version = "0.1.0"
-dependencies = [
- "canbench-macros",
- "candid",
- "ic-cdk",
- "ic-cdk-macros",
- "serde",
-]
-
-[[package]]
 name = "canbench-bin"
 version = "0.1.0"
 dependencies = [
- "canbench",
+ "canbench-rs",
  "candid",
  "clap",
  "colored",
@@ -209,7 +198,18 @@ dependencies = [
 ]
 
 [[package]]
-name = "canbench-macros"
+name = "canbench-rs"
+version = "0.1.0"
+dependencies = [
+ "canbench-rs-macros",
+ "candid",
+ "ic-cdk",
+ "ic-cdk-macros",
+ "serde",
+]
+
+[[package]]
+name = "canbench-rs-macros"
 version = "0.1.0"
 dependencies = [
  "proc-macro2",
@@ -424,7 +424,7 @@ dependencies = [
 name = "example"
 version = "0.1.0"
 dependencies = [
- "canbench",
+ "canbench-rs",
  "candid",
  "ic-cdk",
  "ic-cdk-macros",
@@ -1330,7 +1330,7 @@ dependencies = [
 name = "tests"
 version = "0.1.0"
 dependencies = [
- "canbench",
+ "canbench-rs",
  "candid",
  "ic-cdk",
  "serde",

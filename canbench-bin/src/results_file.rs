@@ -1,4 +1,4 @@
-use canbench::BenchResult;
+use canbench_rs::BenchResult;
 use semver::Version;
 use serde::{Deserialize, Serialize};
 use std::{

@@ -12,7 +12,7 @@ name = "btreemap_vs_hashmap"
 path = "btreemap_vs_hashmap/src/main.rs"
 
 [dependencies]
-canbench = { path = "../canbench-rs", optional = true }
+canbench-rs = { path = "../canbench-rs", optional = true }
 candid.workspace = true
 ic-cdk.workspace= true
 ic-cdk-macros.workspace = true

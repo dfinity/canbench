@@ -1,4 +1,4 @@
-use canbench::{bench, bench_fn, bench_scope, BenchResult};
+use canbench_rs::{bench, bench_fn, bench_scope, BenchResult};
 
 #[link(wasm_import_module = "ic0")]
 extern "C" {

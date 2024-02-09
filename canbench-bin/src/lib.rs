@@ -1,5 +1,5 @@
 //! A module for running benchmarks.
-use canbench::BenchResult;
+use canbench_rs::BenchResult;
 use candid::Decode;
 use flate2::read::GzDecoder;
 use std::{
