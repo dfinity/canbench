@@ -63,7 +63,7 @@ Have a look at the workflows in this repository for working examples.
 A github CI action looks like the following.
 Note you'll need to copy the scripts in the `scripts` directory to your own repository and update `<PATH/TO/YOUR/CANISTER>`.
 
-```
+```yaml
   benchmark-my-canister:
     runs-on: ubuntu-latest
     env:
