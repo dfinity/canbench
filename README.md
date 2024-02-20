@@ -16,7 +16,8 @@ Given that resources are finite, there are bounds in place when canisters execut
 2. __Dirty Pages__: the number of memory pages that are written to.
 
 A single message execution must stay within the allowed bounds, otherwise it's terminated.
-`canbench` provides developers the tools and insights to understand how their code is using these resources.
+`canbench` provides developers the tools and insights to understand how their code is using instructions and memory.
+Support for reporting dirty pages will be available once there's a way to retrieve dirty page information from the IC.
 
 ## Use Cases
 
