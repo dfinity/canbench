@@ -11,7 +11,13 @@ use tempfile::tempdir;
 macro_rules! assert_err {
     ($output:expr, $err_str:expr) => {
         assert_eq!($output.status.code(), Some(1), "output: {:?}", $output);
-        pretty_assertions::assert_eq!(&String::from_utf8($output.stderr).unwrap(), $err_str);
+
+        // Stderr can contain cargo specific output like compilation time, which isn't
+        // deterministic. To ensure our tests are deterministic, we only verify that the suffix of
+        // stderr matches the given error string.
+        let stderr = String::from_utf8($output.stderr).unwrap();
+        let stderr_suffix = &stderr[stderr.len() - $err_str.len()..];
+        pretty_assertions::assert_eq!(stderr_suffix, $err_str);
     };
 }
 

@@ -191,10 +191,13 @@ query rwlgt-iiaaa-aaaaa-aaaaa-cai {}{} \"DIDL\x00\x00\"",
 
     // Decode the response.
     Decode!(
-        &hex::decode(&output_hex[2..]).unwrap_or_else(|_| panic!(
-            "error parsing result of benchmark {}. Output: {}",
-            bench_fn, output_str
-        )),
+        &hex::decode(&output_hex[2..]).unwrap_or_else(|_| {
+            eprintln!(
+                "Error executing benchmark {}. Error:\n{}",
+                bench_fn, output_str
+            );
+            std::process::exit(1);
+        }),
         BenchResult
     )
     .expect("error decoding benchmark result {:?}")
