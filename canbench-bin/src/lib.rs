@@ -184,20 +184,20 @@ query rwlgt-iiaaa-aaaaa-aaaaa-cai {}{} \"DIDL\x00\x00\"",
         .output()
         .unwrap();
 
+    let output_str = String::from_utf8(drun_output.stdout).unwrap();
+
     // Extract the hex response.
-    let result_hex = String::from_utf8(drun_output.stdout)
-        .unwrap()
-        .split_whitespace()
-        .last()
-        .unwrap()
-        .to_string();
+    let output_hex = output_str.split_whitespace().last().unwrap().to_string();
 
     // Decode the response.
     Decode!(
-        &hex::decode(&result_hex[2..]).unwrap_or_else(|_| panic!(
-            "error parsing result of benchmark {}. Result: {}",
-            bench_fn, result_hex
-        )),
+        &hex::decode(&output_hex[2..]).unwrap_or_else(|_| {
+            eprintln!(
+                "Error executing benchmark {}. Error:\n{}",
+                bench_fn, output_str
+            );
+            std::process::exit(1);
+        }),
         BenchResult
     )
     .expect("error decoding benchmark result {:?}")

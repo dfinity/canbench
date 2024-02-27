@@ -77,4 +77,9 @@ fn bench_scope_exists() {
     }
 }
 
+#[export_name = "canister_query __canbench__broken_benchmark"]
+fn broken_benchmark() {
+    // This benchmark doesn't reply, and will therefore fail.
+}
+
 fn main() {}

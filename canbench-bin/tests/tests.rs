@@ -46,6 +46,23 @@ Benchmark: no_changes_test
 }
 
 #[test]
+fn broken_benchmark_returns_full_error() {
+    BenchTest::canister("measurements_output")
+        .with_bench("broken_benchmark")
+        .run(|output| {
+            assert_err!(
+                output,
+                "Error executing benchmark broken_benchmark. Error:
+ingress Completed: Reply: 0x4449444c016c01b3c4b1f204680100010a00000000000000000101
+ingress Completed: Reply: 0x4449444c0000
+Err: IC0506: Canister rwlgt-iiaaa-aaaaa-aaaaa-cai did not produce a response
+
+"
+            );
+        });
+}
+
+#[test]
 fn benchmark_reports_noisy_change() {
     BenchTest::canister("measurements_output")
         .with_bench("noisy_change_test")
@@ -277,7 +294,7 @@ fn newer_version() {
         .run(|output| {
         assert_err!(
                 output,
-                "canbench is at version 0.1.1 while the results were generated with version 99.0.0. Please upgrade canbench.
+                "canbench is at version 0.1.2 while the results were generated with version 99.0.0. Please upgrade canbench.
 "
             );
         });
