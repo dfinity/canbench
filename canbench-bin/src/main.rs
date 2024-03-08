@@ -1,6 +1,6 @@
 //! A script for running benchmarks on a canister.
 //! To run this script, run `cargo bench`.
-use clap::Parser;
+use clap::{value_parser, Parser};
 use std::{collections::BTreeMap, fs::File, io::Read, path::PathBuf, process::Command};
 
 const CFG_FILE_NAME: &str = "canbench.yml";
@@ -19,13 +19,21 @@ struct Args {
     // If true, only prints the benchmark results (and nothing else).
     #[clap(long)]
     less_verbose: bool,
+
+    // If provided, use the specified configuration file instead of the default one.
+    #[clap(long, value_parser = value_parser!(PathBuf))]
+    cfg_file_path: Option<PathBuf>,
 }
 
 fn main() {
     let args = Args::parse();
 
+    let cfg_file_path = args
+        .cfg_file_path
+        .unwrap_or_else(|| PathBuf::from(CFG_FILE_NAME));
+
     // Read and parse the configuration file.
-    let mut file = match File::open(CFG_FILE_NAME) {
+    let mut file = match File::open(cfg_file_path) {
         Ok(file) => file,
         Err(err) => {
             match err.kind() {
@@ -53,6 +61,8 @@ fn main() {
             .unwrap_or(&DEFAULT_RESULTS_FILE.to_string()),
     );
 
+    let custom_drun_path = cfg.get("drun_path").map(|p| PathBuf::from(p));
+
     // Build the canister if a build command is specified.
     if let Some(build_cmd) = cfg.get("build_cmd") {
         assert!(
@@ -73,5 +83,6 @@ fn main() {
         args.persist,
         &results_path,
         !args.less_verbose,
+        custom_drun_path,
     );
 }
