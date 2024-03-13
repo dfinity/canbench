@@ -4,7 +4,7 @@ members = [
   "canbench-rs",
   "canbench-rs-macros",
   "examples",
-  "tests"
+  "tests",
 ]
 resolver = "2"
 
@@ -26,3 +26,4 @@ sha256 = "1.5.0"
 syn = "1.0"
 tempfile = "3.3.0"
 wasmparser = "0.119.0"
+pocket-ic = { path = "/home/mwe/dup/ic/packages/pocket-ic" }

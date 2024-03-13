@@ -26,6 +26,7 @@ serde_yaml.workspace = true
 sha256.workspace = true
 tempfile.workspace = true
 wasmparser.workspace = true
+pocket-ic.workspace = true
 
 [dev-dependencies]
 pretty_assertions = "1.4.0"

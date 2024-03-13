@@ -1,12 +1,13 @@
 //! A module for running benchmarks.
 use canbench_rs::BenchResult;
-use candid::Decode;
+use candid::Principal;
 use flate2::read::GzDecoder;
+use pocket_ic::{PocketIcBuilder, WasmResult};
 use std::{
     collections::BTreeMap,
     env,
     fs::File,
-    io::{Read, Write},
+    io::Read,
     path::{Path, PathBuf},
     process::Command,
 };
@@ -160,47 +161,43 @@ fn download_drun(verbose: bool) {
 
 // Runs the given benchmark.
 fn run_benchmark(canister_wasm_path: &Path, bench_fn: &str) -> BenchResult {
-    // drun is used for running the benchmark.
-    // First, we create a temporary file with steps for drun to execute the benchmark.
-    let mut temp_file = tempfile::Builder::new().tempfile().unwrap();
-    write!(
-        temp_file,
-        "create
-install rwlgt-iiaaa-aaaaa-aaaaa-cai {} \"\"
-query rwlgt-iiaaa-aaaaa-aaaaa-cai {}{} \"DIDL\x00\x00\"",
-        canister_wasm_path.display(),
-        BENCH_PREFIX,
-        bench_fn
-    )
-    .unwrap();
-
-    // Run the benchmark with drun.
-    let drun_output = Command::new(drun_path())
-        .args(vec![
-            temp_file.into_temp_path().to_str().unwrap(),
-            "--instruction-limit",
-            "99999999999999",
-        ])
-        .output()
-        .unwrap();
-
-    let output_str = String::from_utf8(drun_output.stdout).unwrap();
-
-    // Extract the hex response.
-    let output_hex = output_str.split_whitespace().last().unwrap().to_string();
-
-    // Decode the response.
-    Decode!(
-        &hex::decode(&output_hex[2..]).unwrap_or_else(|_| {
-            eprintln!(
-                "Error executing benchmark {}. Error:\n{}",
-                bench_fn, output_str
-            );
+    // PocketIC is used for running the benchmark.
+    let pic = PocketIcBuilder::new()
+        .with_benchmarking_application_subnet()
+        .build();
+    let can_id = pic.create_canister();
+    pic.add_cycles(can_id, 1_000_000_000_000_000);
+    pic.install_canister(
+        can_id,
+        std::fs::read(canister_wasm_path).unwrap(),
+        vec![],
+        None,
+    );
+    match pic.query_call(
+        can_id,
+        Principal::anonymous(),
+        &format!("{}{}", BENCH_PREFIX, bench_fn),
+        b"DIDL\x00\x00".to_vec(),
+    ) {
+        Ok(wasm_res) => match wasm_res {
+            WasmResult::Reply(res) => {
+                let res: BenchResult =
+                    candid::decode_one(&res).expect("error decoding benchmark result");
+                res
+            }
+            WasmResult::Reject(output_str) => {
+                eprintln!(
+                    "Error executing benchmark {}. Error:\n{}",
+                    bench_fn, output_str
+                );
+                std::process::exit(1);
+            }
+        },
+        Err(e) => {
+            eprintln!("Error executing benchmark {}. Error:\n{}", bench_fn, e);
             std::process::exit(1);
-        }),
-        BenchResult
-    )
-    .expect("error decoding benchmark result {:?}")
+        }
+    }
 }
 
 // Extract the benchmarks that need to be run.
