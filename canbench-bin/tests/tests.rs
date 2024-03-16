@@ -4,7 +4,7 @@ use utils::BenchTest;
 #[test]
 fn no_config_prints_error() {
     BenchTest::no_config().run(|output| {
-        assert_err!(output, "canbench.yml not found in current directory.\n");
+        assert_err!(output, "canbench yml not found at \"canbench.yml\"\n");
     });
 }
 
@@ -38,6 +38,28 @@ Benchmark: no_changes_test
     instructions: 207 (no change)
     heap_increase: 0 pages (no change)
     stable_memory_increase: 0 pages (no change)
+
+---------------------------------------------------
+"
+            );
+        });
+}
+
+#[test]
+fn benchmark_reports_custom_cfg() {
+    BenchTest::canister("custom_cfg")
+        .with_custom_cfg_file_name("custom_canbench.yml")
+        .run(|output| {
+            assert_success!(
+                output,
+                "
+---------------------------------------------------
+
+Benchmark: bench (new)
+  total:
+    instructions: 207 (new)
+    heap_increase: 0 pages (new)
+    stable_memory_increase: 0 pages (new)
 
 ---------------------------------------------------
 "

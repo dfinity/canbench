@@ -33,6 +33,7 @@ pub struct BenchTest {
     config: Option<String>,
     bench_name: Option<String>,
     base_dir: BaseDir,
+    custom_cfg_file_name: Option<String>,
 }
 
 impl BenchTest {
@@ -41,6 +42,7 @@ impl BenchTest {
             config: None,
             bench_name: None,
             base_dir: BaseDir::Temp,
+            custom_cfg_file_name: None,
         }
     }
 
@@ -49,6 +51,7 @@ impl BenchTest {
             config: Some(config.into()),
             bench_name: None,
             base_dir: BaseDir::Temp,
+            custom_cfg_file_name: None,
         }
     }
 
@@ -63,12 +66,20 @@ impl BenchTest {
                     .join("tests")
                     .join(canister_name),
             ),
+            custom_cfg_file_name: None,
         }
     }
 
     pub fn with_bench(self, bench_name: &str) -> Self {
         Self {
             bench_name: Some(bench_name.to_string()),
+            ..self
+        }
+    }
+
+    pub fn with_custom_cfg_file_name(self, custom_cfg_file_name: &str) -> Self {
+        Self {
+            custom_cfg_file_name: Some(custom_cfg_file_name.to_string()),
             ..self
         }
     }
@@ -94,6 +105,18 @@ impl BenchTest {
         // Only output the benchmarks so that the output isn't polluted by other
         // statements (e.g. downloading runtime).
         let mut cmd_args = vec!["--less-verbose".to_string()];
+
+        // If a custom file name is provided, supply the path to the config file as an argument.
+        if let Some(custom_cfg_file_name) = self.custom_cfg_file_name {
+            cmd_args.push("--cfg-file-path".to_string());
+            cmd_args.push(
+                dir_path
+                    .join(custom_cfg_file_name)
+                    .to_string_lossy()
+                    .to_string(),
+            );
+        }
+
         if let Some(bench_name) = self.bench_name {
             cmd_args.push(bench_name.clone());
         }

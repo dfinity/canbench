@@ -13,8 +13,12 @@ path = "measurements_output/src/main.rs"
 name = "gzipped_wasm"
 path = "gzipped_wasm/src/main.rs"
 
+[[bin]]
+name = "custom_cfg"
+path = "custom_cfg/src/main.rs"
+
 [dependencies]
 canbench-rs = { path = "../canbench-rs" }
 candid.workspace = true
-ic-cdk.workspace= true
+ic-cdk.workspace = true
 serde.workspace = true
