@@ -29,7 +29,7 @@ pub fn run_benchmarks(
     results_file: &PathBuf,
     verbose: bool,
 ) {
-    maybe_download_drun(verbose);
+    maybe_download_pocket_ic(verbose);
 
     let current_results = match results_file::read(results_file) {
         Ok(current_results) => current_results,
@@ -91,39 +91,41 @@ fn canbench_dir() -> PathBuf {
         .join(".canbench")
 }
 
-// Path to drun.
-fn drun_path() -> PathBuf {
-    canbench_dir().join("drun")
+// Path to PocketIC.
+fn pocket_ic_path() -> PathBuf {
+    canbench_dir().join("pocket-ic")
 }
 
-// Downloads drun if it's not already downloaded.
-fn maybe_download_drun(verbose: bool) {
-    const DRUN_LINUX_SHA: &str = "182b800a7979e1e3e516e54e4b9980e5407ced7464c0b3aec9ff7af6e9e69a1b";
-    const DRUN_MAC_SHA: &str = "8e0d0758d5a5c6f367e2c374dc7eae0106c7f46a3457f81018af6d5159d2dad4";
+// Downloads PocketIC if it's not already downloaded.
+fn maybe_download_pocket_ic(verbose: bool) {
+    const POCKET_IC_LINUX_SHA: &str =
+        "15feab44ebdc7b4b0157edd1a37ca07b8286262e7798abd531a5747b8fa8ea82";
+    const POCKET_IC_MAC_SHA: &str =
+        "fc536d3d582575df799ff3de0303ea383c68e5dd99754469303d55b6c32fd160";
 
-    if drun_path().exists() {
-        // Drun found. Verify that it's the version we expect it to be.
+    if pocket_ic_path().exists() {
+        // PocketIC found. Verify that it's the version we expect it to be.
         let expected_sha = match env::consts::OS {
-            "linux" => DRUN_LINUX_SHA,
-            "macos" => DRUN_MAC_SHA,
+            "linux" => POCKET_IC_LINUX_SHA,
+            "macos" => POCKET_IC_MAC_SHA,
             _ => panic!("only linux and macos are currently supported."),
         };
 
-        let drun_sha = sha256::try_digest(drun_path()).unwrap();
+        let pocket_ic_sha = sha256::try_digest(pocket_ic_path()).unwrap();
 
-        if drun_sha == expected_sha {
-            // Shas match. No need to download drun.
+        if pocket_ic_sha == expected_sha {
+            // Shas match. No need to download PocketIC.
             return;
         }
     }
 
-    // The expected version of drun isn't present. Download it.
-    download_drun(verbose);
+    // The expected version of PocketIC isn't present. Download it.
+    download_pocket_ic(verbose);
 }
 
-fn download_drun(verbose: bool) {
-    const DRUN_URL_PREFIX: &str =
-        "https://github.com/dfinity/ic/releases/download/release-2024-01-25_14-09/drun-x86_64-";
+fn download_pocket_ic(verbose: bool) {
+    const POCKET_IC_URL_PREFIX: &str =
+        "https://download.dfinity.systems/ic/5bcbdc7848400491ca9b738f3652a22094f21a3b/binaries/x86_64-";
 
     if verbose {
         println!("Downloading runtime (will be cached for future uses)...");
@@ -140,21 +142,21 @@ fn download_drun(verbose: bool) {
         panic!("Unsupported operating system");
     };
 
-    let url = format!("{}{}.gz", DRUN_URL_PREFIX, os);
-    let drun_compressed = reqwest::blocking::get(url)
+    let url = format!("{}{}/pocket-ic.gz", POCKET_IC_URL_PREFIX, os);
+    let pocket_ic_compressed = reqwest::blocking::get(url)
         .unwrap()
         .bytes()
-        .expect("Failed to download drun");
+        .expect("Failed to download PocketIC");
 
-    let mut decoder = GzDecoder::new(&drun_compressed[..]);
-    let mut file = File::create(drun_path()).expect("Failed to create drun file");
+    let mut decoder = GzDecoder::new(&pocket_ic_compressed[..]);
+    let mut file = File::create(pocket_ic_path()).expect("Failed to create PocketIC file");
 
-    std::io::copy(&mut decoder, &mut file).expect("Failed to write drun file");
+    std::io::copy(&mut decoder, &mut file).expect("Failed to write PocketIC file");
 
     // Make the file executable.
     Command::new("chmod")
         .arg("+x")
-        .arg(drun_path())
+        .arg(pocket_ic_path())
         .status()
         .unwrap();
 }
@@ -162,6 +164,9 @@ fn download_drun(verbose: bool) {
 // Runs the given benchmark.
 fn run_benchmark(canister_wasm_path: &Path, bench_fn: &str) -> BenchResult {
     // PocketIC is used for running the benchmark.
+    // Set the appropriate ENV variables
+    std::env::set_var("POCKET_IC_BIN", pocket_ic_path());
+    std::env::set_var("POCKET_IC_MUTE_SERVER", "1");
     let pic = PocketIcBuilder::new()
         .with_benchmarking_application_subnet()
         .build();
