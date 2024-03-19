@@ -22,25 +22,25 @@ struct Args {
 
     // If provided, use the specified configuration file instead of the default one.
     #[clap(long, value_parser = value_parser!(PathBuf))]
-    cfg_file_path: Option<PathBuf>,
+    cfg_path: Option<PathBuf>,
 }
 
 fn main() {
     let args = Args::parse();
 
-    let cfg_file_path = args
-        .cfg_file_path
+    let cfg_path = args
+        .cfg_path
         .unwrap_or_else(|| PathBuf::from(CFG_FILE_NAME));
 
     // Read and parse the configuration file.
-    let mut file = match File::open(cfg_file_path.clone()) {
+    let mut file = match File::open(cfg_path.clone()) {
         Ok(file) => file,
         Err(err) => {
             match err.kind() {
                 std::io::ErrorKind::NotFound => {
-                    eprintln!("canbench yml not found at {:?}", cfg_file_path)
+                    eprintln!("canbench yml not found at {:?}", cfg_path)
                 }
-                other => println!("Error while opening `{:?}`: {}", cfg_file_path, other),
+                other => println!("Error while opening `{:?}`: {}", cfg_path, other),
             }
 
             std::process::exit(1);
@@ -60,8 +60,6 @@ fn main() {
         cfg.get("results_path")
             .unwrap_or(&DEFAULT_RESULTS_FILE.to_string()),
     );
-
-    let custom_drun_path = cfg.get("drun_path").map(PathBuf::from);
 
     // Build the canister if a build command is specified.
     if let Some(build_cmd) = cfg.get("build_cmd") {
@@ -83,6 +81,5 @@ fn main() {
         args.persist,
         &results_path,
         !args.less_verbose,
-        custom_drun_path,
     );
 }

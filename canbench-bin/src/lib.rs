@@ -27,15 +27,8 @@ pub fn run_benchmarks(
     persist: bool,
     results_file: &PathBuf,
     verbose: bool,
-    custom_drun_path: Option<PathBuf>,
 ) {
-    let drun_path = match custom_drun_path {
-        Some(custom_drun_path) => custom_drun_path,
-        None => {
-            maybe_download_drun(verbose);
-            download_drun_path()
-        }
-    };
+    maybe_download_drun(verbose);
 
     let current_results = match results_file::read(results_file) {
         Ok(current_results) => current_results,
@@ -62,7 +55,7 @@ pub fn run_benchmarks(
         println!("---------------------------------------------------");
         println!();
 
-        let result = run_benchmark(canister_wasm_path, drun_path.clone(), bench_fn);
+        let result = run_benchmark(canister_wasm_path, bench_fn);
         print_benchmark(bench_fn, &result, current_results.get(bench_fn));
 
         results.insert(bench_fn.to_string(), result);
@@ -98,7 +91,7 @@ fn canbench_dir() -> PathBuf {
 }
 
 // Path to drun.
-fn download_drun_path() -> PathBuf {
+fn drun_path() -> PathBuf {
     canbench_dir().join("drun")
 }
 
@@ -107,7 +100,7 @@ fn maybe_download_drun(verbose: bool) {
     const DRUN_LINUX_SHA: &str = "182b800a7979e1e3e516e54e4b9980e5407ced7464c0b3aec9ff7af6e9e69a1b";
     const DRUN_MAC_SHA: &str = "8e0d0758d5a5c6f367e2c374dc7eae0106c7f46a3457f81018af6d5159d2dad4";
 
-    if download_drun_path().exists() {
+    if drun_path().exists() {
         // Drun found. Verify that it's the version we expect it to be.
         let expected_sha = match env::consts::OS {
             "linux" => DRUN_LINUX_SHA,
@@ -115,7 +108,7 @@ fn maybe_download_drun(verbose: bool) {
             _ => panic!("only linux and macos are currently supported."),
         };
 
-        let drun_sha = sha256::try_digest(download_drun_path()).unwrap();
+        let drun_sha = sha256::try_digest(drun_path()).unwrap();
 
         if drun_sha == expected_sha {
             // Shas match. No need to download drun.
@@ -153,20 +146,20 @@ fn download_drun(verbose: bool) {
         .expect("Failed to download drun");
 
     let mut decoder = GzDecoder::new(&drun_compressed[..]);
-    let mut file = File::create(download_drun_path()).expect("Failed to create drun file");
+    let mut file = File::create(drun_path()).expect("Failed to create drun file");
 
     std::io::copy(&mut decoder, &mut file).expect("Failed to write drun file");
 
     // Make the file executable.
     Command::new("chmod")
         .arg("+x")
-        .arg(download_drun_path())
+        .arg(drun_path())
         .status()
         .unwrap();
 }
 
 // Runs the given benchmark.
-fn run_benchmark(canister_wasm_path: &Path, drun_path: PathBuf, bench_fn: &str) -> BenchResult {
+fn run_benchmark(canister_wasm_path: &Path, bench_fn: &str) -> BenchResult {
     // drun is used for running the benchmark.
     // First, we create a temporary file with steps for drun to execute the benchmark.
     let mut temp_file = tempfile::Builder::new().tempfile().unwrap();
@@ -182,7 +175,7 @@ query rwlgt-iiaaa-aaaaa-aaaaa-cai {}{} \"DIDL\x00\x00\"",
     .unwrap();
 
     // Run the benchmark with drun.
-    let drun_output = Command::new(drun_path)
+    let drun_output = Command::new(drun_path())
         .args(vec![
             temp_file.into_temp_path().to_str().unwrap(),
             "--instruction-limit",

@@ -108,7 +108,7 @@ impl BenchTest {
 
         // If a custom file name is provided, supply the path to the config file as an argument.
         if let Some(custom_cfg_file_name) = self.custom_cfg_file_name {
-            cmd_args.push("--cfg-file-path".to_string());
+            cmd_args.push("--cfg-path".to_string());
             cmd_args.push(
                 dir_path
                     .join(custom_cfg_file_name)
