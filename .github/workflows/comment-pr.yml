@@ -6,11 +6,27 @@ on:
   workflow_run:
     workflows: ["ci"]
     types:
-      - completed
+      - requested
 
 jobs:
   upload:
     runs-on: ubuntu-latest
+      #    if: >
+      #github.event.workflow_run.event == 'pull_request'
     steps:
-      - name: 'hi'
-        run: echo "hello"
+      - name: 'Download artifact'
+        uses: actions/github-script@v3.1.0
+        with:
+          script: |
+            var artifacts = await github.actions.listWorkflowRunArtifacts({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               run_id: ${{github.event.workflow_run.id }},
+            });
+            console.log(artifacts);
+
+      - name: Post comment
+        uses: thollander/actions-comment-pull-request@v2
+          with:
+            message: hi
+            comment_tag: comment_tag
