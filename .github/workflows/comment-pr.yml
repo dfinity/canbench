@@ -4,7 +4,7 @@ name: Comment on PR
 # access to secrets
 on:
   workflow_run:
-    workflows: [upload_file_test]
+    workflows: [CI]
     types:
       - completed
 
