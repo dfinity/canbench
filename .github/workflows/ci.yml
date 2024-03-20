@@ -12,6 +12,7 @@ jobs:
     steps:
       - name: Test
         run: |
+          mkdir -p $PROJECT_DIR
           echo "my message" > $PROJECT_DIR/__canbench_comment_message.txt
 
       - name: Upload results
