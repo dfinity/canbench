@@ -4,9 +4,9 @@ name: Comment on PR
 # access to secrets
 on:
   workflow_run:
-    workflows: ["ci"]
+    workflows: ["CI"]
     types:
-      - requested
+      - completed
 
 jobs:
   upload:
@@ -25,8 +25,8 @@ jobs:
             });
             console.log(artifacts);
 
-      - name: Post comment
-          uses: thollander/actions-comment-pull-request@v2
-          with:
-            message: hi
-            comment_tag: comment_tag
+            #- name: Post comment
+            #uses: thollander/actions-comment-pull-request@v2
+            #with:
+            #message: hi
+            #comment_tag: comment_tag
