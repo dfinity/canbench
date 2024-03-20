@@ -14,9 +14,3 @@ jobs:
         run: |
           mkdir -p $PROJECT_DIR
           echo "my message" > $PROJECT_DIR/__canbench_comment_message.txt
-
-          #      - name: Upload results
-          #uses: actions/upload-artifact@v4
-          #with:
-          #name: fibonacci
-          #path: ${{ env.PROJECT_DIR }}/__canbench_comment_message.txt
