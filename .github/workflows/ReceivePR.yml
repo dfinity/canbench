@@ -24,8 +24,8 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: pr
-          path: pr/
+          name: pr-number
+          path: pr/NR
 
       - uses: actions/upload-artifact@v2
         with:
