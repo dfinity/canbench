@@ -16,7 +16,8 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: pr-number
+          name: pr-number.zip
+      - run: unzip pr-number.zip
 
       - name: 'Download canbench comments'
         uses: actions/github-script@v3.1.0
