@@ -5,7 +5,6 @@ name: Receive PR
 on:
   pull_request:
 
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,8 +16,20 @@ jobs:
         run: |
           mkdir -p ./pr
           echo ${{ github.event.number }} > ./pr/NR
+
+      - name: Save canbench comments
+        run: |
+          mkdir -p ./canbench_comments
+          echo "# \`canbench\`" > ./canbench_comments/canbench_comment
+
       - uses: actions/upload-artifact@v2
         with:
           name: pr
           path: pr/
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: canbench_comments
+          path: canbench_comments/
+
 
