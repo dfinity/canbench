@@ -58,23 +58,15 @@ jobs:
 
       - name: 'Set PR'
         id: set_pr
-        run: echo "::set-output name=number::$(echo 42)"
+        run: echo "::set-output name=pr_number::$(cat ./NR)"
 
       - name: 'Read PR'
-        run: echo "The number is ${{ steps.set_pr.outputs.number }}"
+        run: echo "The number is ${{ steps.set_pr.outputs.pr_number }}"
 
-      - name: 'Comment on PR'
-        uses: actions/github-script@v3
+      - name: Post comment
+        uses: thollander/actions-comment-pull-request@v2
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            var fs = require('fs');
-            var issue_number = Number(fs.readFileSync('./NR'));
-            var message = fs.readFileSync('./canbench_comment', 'utf8');
-            await github.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: issue_number,
-              body: message,
-            });
+          filePath: ./canbench_comment
+          comment_tag: test
+          pr_number: ${{ steps.set_pr.outputs.pr_number }}
 
