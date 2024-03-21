@@ -72,11 +72,7 @@ jobs:
           script: |
             var fs = require('fs');
             var issue_number = Number(fs.readFileSync('./NR'));
-            var message = fs.readFileSync('./canbench_comment', {encoding: 'utf8'});
-            console.log("issue_number");
-            console.log(issue_number);
-            console.log("message");
-            console.log(message);
+            var message = fs.readFileSync('./canbench_comment', 'utf8');
             await github.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
