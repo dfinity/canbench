@@ -22,12 +22,12 @@ jobs:
           mkdir -p ./canbench_comments
           echo "# \`canbench\`" > ./canbench_comments/canbench_comment
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: pr-number
           path: pr/NR
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: canbench_comments
           path: canbench_comments/
