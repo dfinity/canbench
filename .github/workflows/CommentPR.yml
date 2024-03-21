@@ -63,7 +63,7 @@ jobs:
           script: |
             var fs = require('fs');
             var issue_number = Number(fs.readFileSync('./NR'));
-            var message = Number(fs.readFileSync('./canbench_comment'));
+            var message = fs.readFileSync('./canbench_comment');
             await github.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
