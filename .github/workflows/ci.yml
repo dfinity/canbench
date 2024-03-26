@@ -82,12 +82,6 @@ jobs:
           name: canbench_result_${{github.job}}
           path: /tmp/canbench_result_${{ github.job }}
 
-      - name: Post comment
-        uses: thollander/actions-comment-pull-request@v2
-        with:
-          filePath: /tmp/canbench_comment_message.txt
-          comment_tag: ${{ env.PROJECT_DIR }}
-
       - name: Pass or fail
         run: |
           bash ./scripts/ci_post_run_benchmark.sh
