@@ -75,7 +75,12 @@ jobs:
 
       - name: Benchmark
         run: |
-          bash ./scripts/ci_run_benchmark.sh $PROJECT_DIR
+          bash ./scripts/ci_run_benchmark.sh $PROJECT_DIR ${{ github.job }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: canbench_result_${{github.job}}
+          path: /tmp/canbench_result_${{ github.job }}
 
       - name: Post comment
         uses: thollander/actions-comment-pull-request@v2
@@ -118,13 +123,12 @@ jobs:
 
       - name: Benchmark
         run: |
-          bash ./scripts/ci_run_benchmark.sh $PROJECT_DIR
+          bash ./scripts/ci_run_benchmark.sh $PROJECT_DIR ${{ github.job }}
 
-      - name: Post comment
-        uses: thollander/actions-comment-pull-request@v2
+      - uses: actions/upload-artifact@v4
         with:
-          filePath: /tmp/canbench_comment_message.txt
-          comment_tag: ${{ env.PROJECT_DIR }}
+          name: canbench_result_${{github.job}}
+          path: /tmp/canbench_result_${{ github.job }}
 
       - name: Pass or fail
         run: |
