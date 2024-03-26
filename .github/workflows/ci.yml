@@ -82,6 +82,15 @@ jobs:
           name: canbench_result_${{github.job}}
           path: /tmp/canbench_result_${{ github.job }}
 
+      - name: Upload PR number
+        run: |
+          echo ${{ github.event.number }} > /tmp/pr_number
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pr_number
+          path: /tmp/pr_number
+
       - name: Pass or fail
         run: |
           bash ./scripts/ci_post_run_benchmark.sh
@@ -123,6 +132,15 @@ jobs:
         with:
           name: canbench_result_${{github.job}}
           path: /tmp/canbench_result_${{ github.job }}
+
+      - name: Upload PR number
+        run: |
+          echo ${{ github.event.number }} > /tmp/pr_number
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pr_number
+          path: /tmp/pr_number
 
       - name: Pass or fail
         run: |
