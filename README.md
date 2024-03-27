@@ -60,44 +60,12 @@ See the [crate's documentation](https://docs.rs/canbench-rs).
 
 `canbench` can be included in Github CI to automatically detect performance changes.
 Have a look at the workflows in this repository for working examples.
-A github CI action looks like the following.
-Note you'll need to copy the scripts in the `scripts` directory to your own repository and update `<PATH/TO/YOUR/CANISTER>`.
+You'll need the following:
 
-```yaml
-  benchmark-my-canister:
-    runs-on: ubuntu-latest
-    env:
-      PROJECT_DIR: <PATH/TO/YOUR/CANISTER>
-    steps:
-      - name: Checkout current PR
-        uses: actions/checkout@v4
+1. Scripts for executing the benchmark, which can be found in the `scripts` directory.
+2. A workflow for `canbench` to post a comment with the benchmarking results. See `canbench-post-comment.yml`.
+3. A job for uploading the PR number to the artifacts. This is necessary for step #2 to work correctly. See `upload-pr-number` in `ci.yml`.
+4. The benchmarking job in CI. See `benchmark-fibonacci-example` in `ci.yml`.
 
-      - name: Checkout main branch
-        uses: actions/checkout@v4
-        with:
-          ref: main
-          path: _canbench_main_branch
-
-      - name: Install Rust
-        run: |
-          rustup update $RUST_VERSION --no-self-update
-          rustup default $RUST_VERSION
-          rustup target add wasm32-unknown-unknown
-
-      - name: Benchmark
-        run: |
-          bash ./scripts/ci_run_benchmark.sh $PROJECT_DIR
-
-      - name: Post comment
-        uses: thollander/actions-comment-pull-request@v2
-        with:
-          filePath: /tmp/canbench_comment_message.txt
-          comment_tag: ${{ env.PROJECT_DIR }}
-
-      - name: Pass or fail
-        run: |
-          bash ./scripts/ci_post_run_benchmark.sh
-```
-
-Once you have the CI job above set up, the job will pass if there are no significant performance changes detected and fail otherwise.
+Once you have the CI workflow set up, the job will pass if there are no significant performance changes detected and fail otherwise.
 A comment is added to the PR to show the results. See [this PR](https://github.com/dfinity/bench/pull/18) for an example.
