@@ -53,10 +53,7 @@ fn broken_benchmark_returns_full_error() {
             assert_err!(
                 output,
                 "Error executing benchmark broken_benchmark. Error:
-ingress Completed: Reply: 0x4449444c016c01b3c4b1f204680100010a00000000000000000101
-ingress Completed: Reply: 0x4449444c0000
-Err: IC0506: Canister rwlgt-iiaaa-aaaaa-aaaaa-cai did not produce a response
-
+IC0506: Canister lxzze-o7777-77777-aaaaa-cai did not produce a response
 "
             );
         });
