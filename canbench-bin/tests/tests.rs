@@ -294,7 +294,7 @@ fn newer_version() {
         .run(|output| {
         assert_err!(
                 output,
-                "canbench is at version 0.1.2 while the results were generated with version 99.0.0. Please upgrade canbench.
+                "canbench is at version 0.1.3 while the results were generated with version 99.0.0. Please upgrade canbench.
 "
             );
         });
