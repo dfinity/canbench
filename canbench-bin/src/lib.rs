@@ -1,12 +1,13 @@
 //! A module for running benchmarks.
 use canbench_rs::BenchResult;
-use candid::Decode;
+use candid::Principal;
 use flate2::read::GzDecoder;
+use pocket_ic::{PocketIcBuilder, WasmResult};
 use std::{
     collections::BTreeMap,
     env,
     fs::File,
-    io::{Read, Write},
+    io::Read,
     path::{Path, PathBuf},
     process::Command,
 };
@@ -28,7 +29,7 @@ pub fn run_benchmarks(
     results_file: &PathBuf,
     verbose: bool,
 ) {
-    maybe_download_drun(verbose);
+    maybe_download_pocket_ic(verbose);
 
     let current_results = match results_file::read(results_file) {
         Ok(current_results) => current_results,
@@ -90,40 +91,41 @@ fn canbench_dir() -> PathBuf {
         .join(".canbench")
 }
 
-// Path to drun.
-fn drun_path() -> PathBuf {
-    canbench_dir().join("drun")
+// Path to PocketIC.
+fn pocket_ic_path() -> PathBuf {
+    canbench_dir().join("pocket-ic")
 }
 
-// Downloads drun if it's not already downloaded.
-fn maybe_download_drun(verbose: bool) {
-    const DRUN_LINUX_SHA: &str = "182b800a7979e1e3e516e54e4b9980e5407ced7464c0b3aec9ff7af6e9e69a1b";
-    const DRUN_MAC_SHA: &str = "8e0d0758d5a5c6f367e2c374dc7eae0106c7f46a3457f81018af6d5159d2dad4";
+// Downloads PocketIC if it's not already downloaded.
+fn maybe_download_pocket_ic(verbose: bool) {
+    const POCKET_IC_LINUX_SHA: &str =
+        "f4ed7d378fbdb12483570501d72eb6696ca789010a3479a7b726b2736901bf8a";
+    const POCKET_IC_MAC_SHA: &str =
+        "a4d3903f3932888aa1e2c2c06c1e122a8da98ebd7c0839e02991a62b6e47cefe";
 
-    if drun_path().exists() {
-        // Drun found. Verify that it's the version we expect it to be.
+    if pocket_ic_path().exists() {
+        // PocketIC found. Verify that it's the version we expect it to be.
         let expected_sha = match env::consts::OS {
-            "linux" => DRUN_LINUX_SHA,
-            "macos" => DRUN_MAC_SHA,
+            "linux" => POCKET_IC_LINUX_SHA,
+            "macos" => POCKET_IC_MAC_SHA,
             _ => panic!("only linux and macos are currently supported."),
         };
 
-        let drun_sha = sha256::try_digest(drun_path()).unwrap();
+        let pocket_ic_sha = sha256::try_digest(pocket_ic_path()).unwrap();
 
-        if drun_sha == expected_sha {
-            // Shas match. No need to download drun.
+        if pocket_ic_sha == expected_sha {
+            // Shas match. No need to download PocketIC.
             return;
         }
     }
 
-    // The expected version of drun isn't present. Download it.
-    download_drun(verbose);
+    // The expected version of PocketIC isn't present. Download it.
+    download_pocket_ic(verbose);
 }
 
-fn download_drun(verbose: bool) {
-    const DRUN_URL_PREFIX: &str =
-        "https://github.com/dfinity/ic/releases/download/release-2024-01-25_14-09/drun-x86_64-";
-
+fn download_pocket_ic(verbose: bool) {
+    const POCKET_IC_URL_PREFIX: &str =
+        "https://github.com/dfinity/pocketic/releases/download/4.0.0/pocket-ic-x86_64-";
     if verbose {
         println!("Downloading runtime (will be cached for future uses)...");
     }
@@ -139,68 +141,66 @@ fn download_drun(verbose: bool) {
         panic!("Unsupported operating system");
     };
 
-    let url = format!("{}{}.gz", DRUN_URL_PREFIX, os);
-    let drun_compressed = reqwest::blocking::get(url)
+    let url = format!("{}{}.gz", POCKET_IC_URL_PREFIX, os);
+    let pocket_ic_compressed = reqwest::blocking::get(url)
         .unwrap()
         .bytes()
-        .expect("Failed to download drun");
+        .expect("Failed to download PocketIC");
 
-    let mut decoder = GzDecoder::new(&drun_compressed[..]);
-    let mut file = File::create(drun_path()).expect("Failed to create drun file");
+    let mut decoder = GzDecoder::new(&pocket_ic_compressed[..]);
+    let mut file = File::create(pocket_ic_path()).expect("Failed to create PocketIC file");
 
-    std::io::copy(&mut decoder, &mut file).expect("Failed to write drun file");
-
+    std::io::copy(&mut decoder, &mut file).expect("Failed to write PocketIC file");
     // Make the file executable.
     Command::new("chmod")
         .arg("+x")
-        .arg(drun_path())
+        .arg(pocket_ic_path())
         .status()
         .unwrap();
 }
 
 // Runs the given benchmark.
 fn run_benchmark(canister_wasm_path: &Path, bench_fn: &str) -> BenchResult {
-    // drun is used for running the benchmark.
-    // First, we create a temporary file with steps for drun to execute the benchmark.
-    let mut temp_file = tempfile::Builder::new().tempfile().unwrap();
-    write!(
-        temp_file,
-        "create
-install rwlgt-iiaaa-aaaaa-aaaaa-cai {} \"\"
-query rwlgt-iiaaa-aaaaa-aaaaa-cai {}{} \"DIDL\x00\x00\"",
-        canister_wasm_path.display(),
-        BENCH_PREFIX,
-        bench_fn
-    )
-    .unwrap();
-
-    // Run the benchmark with drun.
-    let drun_output = Command::new(drun_path())
-        .args(vec![
-            temp_file.into_temp_path().to_str().unwrap(),
-            "--instruction-limit",
-            "99999999999999",
-        ])
-        .output()
-        .unwrap();
-
-    let output_str = String::from_utf8(drun_output.stdout).unwrap();
-
-    // Extract the hex response.
-    let output_hex = output_str.split_whitespace().last().unwrap().to_string();
-
-    // Decode the response.
-    Decode!(
-        &hex::decode(&output_hex[2..]).unwrap_or_else(|_| {
-            eprintln!(
-                "Error executing benchmark {}. Error:\n{}",
-                bench_fn, output_str
-            );
+    // PocketIC is used for running the benchmark.
+    // Set the appropriate ENV variables
+    std::env::set_var("POCKET_IC_BIN", pocket_ic_path());
+    std::env::set_var("POCKET_IC_MUTE_SERVER", "1");
+    let pic = PocketIcBuilder::new()
+        .with_benchmarking_system_subnet()
+        .build();
+    let can_id = pic.create_canister();
+    pic.add_cycles(can_id, 1_000_000_000_000_000);
+    pic.install_canister(
+        can_id,
+        std::fs::read(canister_wasm_path).unwrap(),
+        vec![],
+        None,
+    );
+    match pic.query_call(
+        can_id,
+        Principal::anonymous(),
+        &format!("{}{}", BENCH_PREFIX, bench_fn),
+        b"DIDL\x00\x00".to_vec(),
+    ) {
+        Ok(wasm_res) => match wasm_res {
+            WasmResult::Reply(res) => {
+                let res: BenchResult =
+                    candid::decode_one(&res).expect("error decoding benchmark result");
+                res
+            }
+            WasmResult::Reject(output_str) => {
+                eprintln!(
+                    "Error executing benchmark {}. Error:\n{}",
+                    bench_fn, output_str
+                );
+                std::process::exit(1);
+            }
+        },
+        Err(e) => {
+            eprintln!("Error executing benchmark {}. Error:\n{}", bench_fn, e);
             std::process::exit(1);
-        }),
-        BenchResult
-    )
-    .expect("error decoding benchmark result {:?}")
+        }
+    }
 }
 
 // Extract the benchmarks that need to be run.
