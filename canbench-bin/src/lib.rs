@@ -99,9 +99,9 @@ fn pocket_ic_path() -> PathBuf {
 // Downloads PocketIC if it's not already downloaded.
 fn maybe_download_pocket_ic(verbose: bool) {
     const POCKET_IC_LINUX_SHA: &str =
-        "15feab44ebdc7b4b0157edd1a37ca07b8286262e7798abd531a5747b8fa8ea82";
+        "f4ed7d378fbdb12483570501d72eb6696ca789010a3479a7b726b2736901bf8a";
     const POCKET_IC_MAC_SHA: &str =
-        "fc536d3d582575df799ff3de0303ea383c68e5dd99754469303d55b6c32fd160";
+        "a4d3903f3932888aa1e2c2c06c1e122a8da98ebd7c0839e02991a62b6e47cefe";
 
     if pocket_ic_path().exists() {
         // PocketIC found. Verify that it's the version we expect it to be.
@@ -125,8 +125,7 @@ fn maybe_download_pocket_ic(verbose: bool) {
 
 fn download_pocket_ic(verbose: bool) {
     const POCKET_IC_URL_PREFIX: &str =
-        "https://download.dfinity.systems/ic/5bcbdc7848400491ca9b738f3652a22094f21a3b/binaries/x86_64-";
-
+        "https://github.com/dfinity/pocketic/releases/download/4.0.0/pocket-ic-x86_64-";
     if verbose {
         println!("Downloading runtime (will be cached for future uses)...");
     }
@@ -142,7 +141,7 @@ fn download_pocket_ic(verbose: bool) {
         panic!("Unsupported operating system");
     };
 
-    let url = format!("{}{}/pocket-ic.gz", POCKET_IC_URL_PREFIX, os);
+    let url = format!("{}{}.gz", POCKET_IC_URL_PREFIX, os);
     let pocket_ic_compressed = reqwest::blocking::get(url)
         .unwrap()
         .bytes()
@@ -152,7 +151,6 @@ fn download_pocket_ic(verbose: bool) {
     let mut file = File::create(pocket_ic_path()).expect("Failed to create PocketIC file");
 
     std::io::copy(&mut decoder, &mut file).expect("Failed to write PocketIC file");
-
     // Make the file executable.
     Command::new("chmod")
         .arg("+x")
