@@ -166,7 +166,7 @@ fn run_benchmark(canister_wasm_path: &Path, bench_fn: &str) -> BenchResult {
     std::env::set_var("POCKET_IC_BIN", pocket_ic_path());
     std::env::set_var("POCKET_IC_MUTE_SERVER", "1");
     let pic = PocketIcBuilder::new()
-        .with_benchmarking_application_subnet()
+        .with_benchmarking_system_subnet()
         .build();
     let can_id = pic.create_canister();
     pic.add_cycles(can_id, 1_000_000_000_000_000);
