@@ -25,6 +25,7 @@ const BENCH_PREFIX: &str = "__canbench__";
 pub fn run_benchmarks(
     canister_wasm_path: &PathBuf,
     pattern: Option<String>,
+    init: Option<&String>,
     persist: bool,
     results_file: &PathBuf,
     verbose: bool,
@@ -56,7 +57,7 @@ pub fn run_benchmarks(
         println!("---------------------------------------------------");
         println!();
 
-        let result = run_benchmark(canister_wasm_path, bench_fn);
+        let result = run_benchmark(canister_wasm_path, &init, bench_fn);
         print_benchmark(bench_fn, &result, current_results.get(bench_fn));
 
         results.insert(bench_fn.to_string(), result);
@@ -160,7 +161,7 @@ fn download_pocket_ic(verbose: bool) {
 }
 
 // Runs the given benchmark.
-fn run_benchmark(canister_wasm_path: &Path, bench_fn: &str) -> BenchResult {
+fn run_benchmark(canister_wasm_path: &Path, init: &Option<&String>, bench_fn: &str) -> BenchResult {
     // PocketIC is used for running the benchmark.
     // Set the appropriate ENV variables
     std::env::set_var("POCKET_IC_BIN", pocket_ic_path());
@@ -173,7 +174,8 @@ fn run_benchmark(canister_wasm_path: &Path, bench_fn: &str) -> BenchResult {
     pic.install_canister(
         can_id,
         std::fs::read(canister_wasm_path).unwrap(),
-        vec![],
+        init.map(|blob| hex::decode(blob).expect("init argument could not be decoded"))
+            .unwrap_or_default(),
         None,
     );
     match pic.query_call(

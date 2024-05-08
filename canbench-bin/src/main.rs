@@ -19,6 +19,9 @@ struct Args {
     // If true, only prints the benchmark results (and nothing else).
     #[clap(long)]
     less_verbose: bool,
+
+    // hex encoded blob: if provided, supply as init argument to canister.
+    init: Option<String>,
 }
 
 fn main() {
@@ -66,10 +69,13 @@ fn main() {
         );
     }
 
+    let init = cfg.get("init");
+
     // Run the benchmarks.
     canbench::run_benchmarks(
         &wasm_path,
         args.pattern,
+        init,
         args.persist,
         &results_path,
         !args.less_verbose,

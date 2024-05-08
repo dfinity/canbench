@@ -1796,6 +1796,7 @@ dependencies = [
  "canbench-rs",
  "candid",
  "ic-cdk 0.12.1",
+ "ic-cdk-macros 0.8.4",
  "serde",
 ]
 
