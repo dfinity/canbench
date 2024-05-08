@@ -35,7 +35,13 @@
 //! wasm_path:
 //!   ./target/wasm32-unknown-unknown/release/<YOUR_CANISTER>.wasm
 //! ```
+//! #### Init Args
 //!
+//! Init args can be specified using the `init` key in the configuration file:
+//! ```yml
+//! init:
+//!   4449444c0001710568656c6c6f
+//! ```
 //! ### 4. Start benching! 🏋🏽
 //!
 //! Let's say we have a canister that exposes a `query` computing the fibonacci sequence of a given number.
