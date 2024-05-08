@@ -19,9 +19,6 @@ struct Args {
     // If true, only prints the benchmark results (and nothing else).
     #[clap(long)]
     less_verbose: bool,
-
-    // hex encoded blob: if provided, supply as init argument to canister.
-    init: Option<String>,
 }
 
 fn main() {
