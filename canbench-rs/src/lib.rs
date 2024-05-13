@@ -39,8 +39,8 @@
 //!
 //! Init args can be specified using the `init` key in the configuration file:
 //! ```yml
-//! init:
-//!   4449444c0001710568656c6c6f
+//! init_args:
+//!   hex: 4449444c0001710568656c6c6f
 //! ```
 //! ### 4. Start benching! 🏋🏽
 //!

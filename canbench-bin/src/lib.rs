@@ -25,7 +25,7 @@ const BENCH_PREFIX: &str = "__canbench__";
 pub fn run_benchmarks(
     canister_wasm_path: &PathBuf,
     pattern: Option<String>,
-    init: Option<&String>,
+    init: Option<String>,
     persist: bool,
     results_file: &PathBuf,
     verbose: bool,
@@ -161,7 +161,7 @@ fn download_pocket_ic(verbose: bool) {
 }
 
 // Runs the given benchmark.
-fn run_benchmark(canister_wasm_path: &Path, init: &Option<&String>, bench_fn: &str) -> BenchResult {
+fn run_benchmark(canister_wasm_path: &Path, init: &Option<String>, bench_fn: &str) -> BenchResult {
     // PocketIC is used for running the benchmark.
     // Set the appropriate ENV variables
     std::env::set_var("POCKET_IC_BIN", pocket_ic_path());
@@ -174,7 +174,8 @@ fn run_benchmark(canister_wasm_path: &Path, init: &Option<&String>, bench_fn: &s
     pic.install_canister(
         can_id,
         std::fs::read(canister_wasm_path).unwrap(),
-        init.map(|blob| hex::decode(blob).expect("init argument could not be decoded"))
+        init.as_ref()
+            .map(|blob| hex::decode(blob).expect("init argument could not be decoded"))
             .unwrap_or_default(),
         None,
     );
