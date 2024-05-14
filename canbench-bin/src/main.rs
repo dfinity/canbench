@@ -37,6 +37,7 @@ struct Config {
     wasm_path: String,
 
     // If provided, instructs canbench to store the results in this file
+    // Otherwise, `canbench_results.yml` is used by default
     results_path: Option<String>,
 
     // If provided, the init arguments to pass to the canister
@@ -85,11 +86,16 @@ fn main() {
         );
     }
 
+    let init_args = cfg
+        .init_args
+        .map(|args| hex::decode(args.hex).expect("invalid init_args hex value"))
+        .unwrap_or_default();
+
     // Run the benchmarks.
     canbench::run_benchmarks(
         &wasm_path,
         args.pattern,
-        cfg.init_args.map(|args| args.hex),
+        init_args,
         args.persist,
         &results_path,
         !args.less_verbose,

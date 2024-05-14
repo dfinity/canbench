@@ -1,10 +1,9 @@
 # The results in this file are artificial and are designed to trigger
 # certain scenarios.
 benches:
-  # A benchmark that is expected to return no changes.
-  no_changes_test:
+  state_check:
     total:
       heap_delta: 0
-      instructions: 207
+      instructions: 804
       stable_memory_delta: 0
 version: 0.1.0

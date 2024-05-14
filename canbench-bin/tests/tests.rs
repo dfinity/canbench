@@ -300,16 +300,16 @@ fn newer_version() {
 #[test]
 fn benchmark_works_with_init_args() {
     BenchTest::canister("init_arg")
-        .with_bench("no_changes_test")
+        .with_bench("state_check")
         .run(|output| {
             assert_success!(
                 output,
                 "
 ---------------------------------------------------
 
-Benchmark: no_changes_test
+Benchmark: state_check
   total:
-    instructions: 207 (no change)
+    instructions: 804 (no change)
     heap_increase: 0 pages (no change)
     stable_memory_increase: 0 pages (no change)
 
