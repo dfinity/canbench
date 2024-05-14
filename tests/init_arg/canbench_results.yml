@@ -1,0 +1,9 @@
+# The results in this file are artificial and are designed to trigger
+# certain scenarios.
+benches:
+  state_check:
+    total:
+      heap_delta: 0
+      instructions: 804
+      stable_memory_delta: 0
+version: 0.1.0

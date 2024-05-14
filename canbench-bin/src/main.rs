@@ -1,7 +1,8 @@
 //! A script for running benchmarks on a canister.
 //! To run this script, run `cargo bench`.
 use clap::Parser;
-use std::{collections::BTreeMap, fs::File, io::Read, path::PathBuf, process::Command};
+use serde::Deserialize;
+use std::{fs::File, io::Read, path::PathBuf, process::Command};
 
 const CFG_FILE_NAME: &str = "canbench.yml";
 const DEFAULT_RESULTS_FILE: &str = "canbench_results.yml";
@@ -19,6 +20,28 @@ struct Args {
     // If true, only prints the benchmark results (and nothing else).
     #[clap(long)]
     less_verbose: bool,
+}
+
+#[derive(Debug, Deserialize)]
+struct InitArgs {
+    // hex encoded argument to pass to the canister
+    hex: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct Config {
+    // If provided, instructs canbench to build the canister
+    build_cmd: Option<String>,
+
+    // Where to find the wasm to be benchmarked
+    wasm_path: String,
+
+    // If provided, instructs canbench to store the results in this file
+    // Otherwise, `canbench_results.yml` is used by default
+    results_path: Option<String>,
+
+    // If provided, the init arguments to pass to the canister
+    init_args: Option<InitArgs>,
 }
 
 fn main() {
@@ -41,20 +64,17 @@ fn main() {
 
     let mut config_str = String::new();
     file.read_to_string(&mut config_str).unwrap();
-    let cfg: BTreeMap<String, String> = serde_yaml::from_str(&config_str).unwrap();
+    let cfg: Config = serde_yaml::from_str(&config_str).unwrap();
 
-    let wasm_path = PathBuf::from(
-        cfg.get("wasm_path")
-            .expect("`wasm_path` in bench.yml must be specified."),
-    );
-
+    let wasm_path = PathBuf::from(&cfg.wasm_path);
     let results_path = PathBuf::from(
-        cfg.get("results_path")
+        cfg.results_path
+            .as_ref()
             .unwrap_or(&DEFAULT_RESULTS_FILE.to_string()),
     );
 
     // Build the canister if a build command is specified.
-    if let Some(build_cmd) = cfg.get("build_cmd") {
+    if let Some(build_cmd) = cfg.build_cmd {
         assert!(
             Command::new("bash")
                 .arg("-c")
@@ -66,10 +86,16 @@ fn main() {
         );
     }
 
+    let init_args = cfg
+        .init_args
+        .map(|args| hex::decode(args.hex).expect("invalid init_args hex value"))
+        .unwrap_or_default();
+
     // Run the benchmarks.
     canbench::run_benchmarks(
         &wasm_path,
         args.pattern,
+        init_args,
         args.persist,
         &results_path,
         !args.less_verbose,

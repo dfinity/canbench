@@ -296,3 +296,25 @@ fn newer_version() {
             );
         });
 }
+
+#[test]
+fn benchmark_works_with_init_args() {
+    BenchTest::canister("init_arg")
+        .with_bench("state_check")
+        .run(|output| {
+            assert_success!(
+                output,
+                "
+---------------------------------------------------
+
+Benchmark: state_check
+  total:
+    instructions: 804 (no change)
+    heap_increase: 0 pages (no change)
+    stable_memory_increase: 0 pages (no change)
+
+---------------------------------------------------
+"
+            );
+        });
+}
