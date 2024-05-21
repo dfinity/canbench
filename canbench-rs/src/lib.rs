@@ -37,7 +37,7 @@
 //! ```
 //! #### Init Args
 //!
-//! Init args can be specified using the `init` key in the configuration file:
+//! Init args can be specified using the `init_args` key in the configuration file:
 //! ```yml
 //! init_args:
 //!   hex: 4449444c0001710568656c6c6f
