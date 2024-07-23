@@ -126,7 +126,7 @@ fn maybe_download_pocket_ic(verbose: bool) {
 
 fn download_pocket_ic(verbose: bool) {
     const POCKET_IC_URL_PREFIX: &str =
-        "https://github.com/dfinity/pocketic/releases/download/4.0.0/pocket-ic-x86_64-";
+        "https://github.com/dfinity/pocketic/releases/download/5.0.0/pocket-ic-x86_64-";
     if verbose {
         println!("Downloading runtime (will be cached for future uses)...");
     }
@@ -167,6 +167,7 @@ fn run_benchmark(canister_wasm_path: &Path, init_args: Vec<u8>, bench_fn: &str) 
     std::env::set_var("POCKET_IC_BIN", pocket_ic_path());
     std::env::set_var("POCKET_IC_MUTE_SERVER", "1");
     let pic = PocketIcBuilder::new()
+        .with_max_request_time_ms(None)
         .with_benchmarking_system_subnet()
         .build();
     let can_id = pic.create_canister();
