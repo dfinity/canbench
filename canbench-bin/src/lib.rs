@@ -100,9 +100,9 @@ fn pocket_ic_path() -> PathBuf {
 // Downloads PocketIC if it's not already downloaded.
 fn maybe_download_pocket_ic(verbose: bool) {
     const POCKET_IC_LINUX_SHA: &str =
-        "f4ed7d378fbdb12483570501d72eb6696ca789010a3479a7b726b2736901bf8a";
+        "a972e562b45edb6c683b5bd1e846cf6a8848d0cdad2c6cbf364bb374a12a4c33";
     const POCKET_IC_MAC_SHA: &str =
-        "a4d3903f3932888aa1e2c2c06c1e122a8da98ebd7c0839e02991a62b6e47cefe";
+        "a2a1d9b2281a9dd040eff84b9fbeafdfefccc66757bcaaae28b60fdf94592eee";
 
     if pocket_ic_path().exists() {
         // PocketIC found. Verify that it's the version we expect it to be.
