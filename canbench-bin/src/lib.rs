@@ -2,15 +2,8 @@
 use canbench_rs::BenchResult;
 use candid::Principal;
 use flate2::read::GzDecoder;
-use pocket_ic::{PocketIcBuilder, WasmResult};
-use std::{
-    collections::BTreeMap,
-    env,
-    fs::File,
-    io::Read,
-    path::{Path, PathBuf},
-    process::Command,
-};
+use pocket_ic::{PocketIc, PocketIcBuilder, WasmResult};
+use std::{collections::BTreeMap, env, fs::File, io::Read, path::PathBuf, process::Command};
 mod print_benchmark;
 mod results_file;
 use print_benchmark::print_benchmark;
@@ -43,9 +36,15 @@ pub fn run_benchmarks(
         }
     };
 
+    // Extract the benchmark functions in the Wasm.
+    let benchmark_fns = extract_benchmark_fns(canister_wasm_path);
+
+    // Initialize PocketIC
+    let (pocket_ic, canister_id) = init_pocket_ic(canister_wasm_path, init_args);
+
+    // Run the benchmarks
     let mut results = BTreeMap::new();
     let mut num_executed_bench_fns = 0;
-    let benchmark_fns = extract_benchmark_fns(canister_wasm_path);
     for bench_fn in &benchmark_fns {
         if let Some(pattern) = &pattern {
             if !bench_fn.contains(pattern) {
@@ -57,7 +56,7 @@ pub fn run_benchmarks(
         println!("---------------------------------------------------");
         println!();
 
-        let result = run_benchmark(canister_wasm_path, init_args.clone(), bench_fn);
+        let result = run_benchmark(&pocket_ic, canister_id, bench_fn);
         print_benchmark(bench_fn, &result, current_results.get(bench_fn));
 
         results.insert(bench_fn.to_string(), result);
@@ -161,25 +160,9 @@ fn download_pocket_ic(verbose: bool) {
 }
 
 // Runs the given benchmark.
-fn run_benchmark(canister_wasm_path: &Path, init_args: Vec<u8>, bench_fn: &str) -> BenchResult {
-    // PocketIC is used for running the benchmark.
-    // Set the appropriate ENV variables
-    std::env::set_var("POCKET_IC_BIN", pocket_ic_path());
-    std::env::set_var("POCKET_IC_MUTE_SERVER", "1");
-    let pic = PocketIcBuilder::new()
-        .with_max_request_time_ms(None)
-        .with_benchmarking_system_subnet()
-        .build();
-    let can_id = pic.create_canister();
-    pic.add_cycles(can_id, 1_000_000_000_000_000);
-    pic.install_canister(
-        can_id,
-        std::fs::read(canister_wasm_path).unwrap(),
-        init_args,
-        None,
-    );
-    match pic.query_call(
-        can_id,
+fn run_benchmark(pocket_ic: &PocketIc, canister_id: Principal, bench_fn: &str) -> BenchResult {
+    match pocket_ic.query_call(
+        canister_id,
         Principal::anonymous(),
         &format!("{}{}", BENCH_PREFIX, bench_fn),
         b"DIDL\x00\x00".to_vec(),
@@ -260,4 +243,25 @@ fn extract_benchmark_fns(canister_wasm_path: &PathBuf) -> Vec<String> {
         })
         .flatten()
         .collect()
+}
+
+// Initializes PocketIC and installs the canister to benchmark.
+fn init_pocket_ic(canister_wasm_path: &PathBuf, init_args: Vec<u8>) -> (PocketIc, Principal) {
+    // PocketIC is used for running the benchmark.
+    // Set the appropriate ENV variables
+    std::env::set_var("POCKET_IC_BIN", pocket_ic_path());
+    std::env::set_var("POCKET_IC_MUTE_SERVER", "1");
+    let pocket_ic = PocketIcBuilder::new()
+        .with_max_request_time_ms(None)
+        .with_benchmarking_system_subnet()
+        .build();
+    let canister_id = pocket_ic.create_canister();
+    pocket_ic.add_cycles(canister_id, 1_000_000_000_000_000);
+    pocket_ic.install_canister(
+        canister_id,
+        std::fs::read(canister_wasm_path).unwrap(),
+        init_args,
+        None,
+    );
+    (pocket_ic, canister_id)
 }
