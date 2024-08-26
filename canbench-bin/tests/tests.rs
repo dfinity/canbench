@@ -318,3 +318,26 @@ Benchmark: state_check
             );
         });
 }
+
+// Ensures writes to stable memory are accounted for in the same way as application subnets.
+#[test]
+fn benchmark_stable_writes() {
+    BenchTest::canister("measurements_output")
+        .with_bench("write_stable_memory")
+        .run(|output| {
+            assert_success!(
+                output,
+                "
+---------------------------------------------------
+
+Benchmark: write_stable_memory (new)
+  total:
+    instructions: 49.09 K (new)
+    heap_increase: 0 pages (new)
+    stable_memory_increase: 1 pages (new)
+
+---------------------------------------------------
+"
+            );
+        });
+}

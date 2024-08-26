@@ -3,6 +3,7 @@ use canbench_rs::{bench, bench_fn, bench_scope, BenchResult};
 #[link(wasm_import_module = "ic0")]
 extern "C" {
     pub fn stable64_grow(additional_pages: u64) -> i64;
+    pub fn stable64_write(offset: i64, src: i64, size: i64);
 }
 
 // A benchmark that does nothing.
@@ -47,6 +48,17 @@ fn stable_memory_only_increase() -> BenchResult {
 #[bench]
 fn increase_heap_increase() {
     let _ = vec![1; 1_000_000];
+}
+
+// A benchmark where some bytes are written to stable memory.
+#[bench]
+fn write_stable_memory() {
+    let v = vec![1; 10_000];
+
+    unsafe {
+        stable64_grow(1);
+        stable64_write(0, v.as_ptr() as i64, v.len() as i64);
+    }
 }
 
 // A benchmark that includes some profiling, but isn't persisted in the results.
