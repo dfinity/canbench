@@ -253,7 +253,7 @@ fn init_pocket_ic(canister_wasm_path: &PathBuf, init_args: Vec<u8>) -> (PocketIc
     std::env::set_var("POCKET_IC_MUTE_SERVER", "1");
     let pocket_ic = PocketIcBuilder::new()
         .with_max_request_time_ms(None)
-        .with_benchmarking_system_subnet()
+        .with_benchmarking_application_subnet()
         .build();
     let canister_id = pocket_ic.create_canister();
     pocket_ic.add_cycles(canister_id, 1_000_000_000_000_000);
