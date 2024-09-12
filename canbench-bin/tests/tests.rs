@@ -1,4 +1,5 @@
 mod utils;
+use tempfile::NamedTempFile;
 use utils::BenchTest;
 
 #[test]
@@ -251,6 +252,45 @@ Benchmark: bench_scope_new (new)
 "
             );
         });
+}
+
+#[test]
+fn specifying_a_bogus_runtime_path_causes_integrity_check_to_fail() {
+    // Create an empty file and pass it as the runtime.
+    // Given that this file's digest doesn't match what canbench expects, it should fail.
+    let runtime_file = NamedTempFile::new().unwrap();
+    let runtime_path = runtime_file.path().to_path_buf();
+
+    BenchTest::with_config(
+        "
+wasm_path:
+  ./wasm.wasm",
+    )
+    .with_runtime_path(runtime_path)
+    .run(|output| {
+        assert_err!(output, "Runtime has incorrect digest");
+    });
+}
+
+#[test]
+fn specifying_a_bogus_runtime_without_integrity_check() {
+    // Create an empty file and pass it as the runtime.
+    let runtime_file = NamedTempFile::new().unwrap();
+    let runtime_path = runtime_file.path().to_path_buf();
+
+    // Since the runtime integrity check is skipped, canbench won't report
+    // a bad digest for the runtime, but will instead report that it can't
+    // find the wasm.
+    BenchTest::with_config(
+        "
+wasm_path:
+  ./wasm.wasm",
+    )
+    .with_runtime_path(runtime_path)
+    .with_no_runtime_integrity_check()
+    .run(|output| {
+        assert_err!(output, "Couldn't read file at ./wasm.wasm.");
+    });
 }
 
 #[test]

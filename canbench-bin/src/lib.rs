@@ -15,6 +15,7 @@ use wasmparser::Parser as WasmParser;
 const BENCH_PREFIX: &str = "__canbench__";
 
 /// Runs the benchmarks on the canister available in the provided `canister_wasm_path`.
+#[allow(clippy::too_many_arguments)]
 pub fn run_benchmarks(
     canister_wasm_path: &PathBuf,
     pattern: Option<String>,
@@ -22,8 +23,10 @@ pub fn run_benchmarks(
     persist: bool,
     results_file: &PathBuf,
     verbose: bool,
+    no_runtime_integrity_check: bool,
+    runtime_path: &PathBuf,
 ) {
-    maybe_download_pocket_ic(verbose);
+    maybe_download_pocket_ic(runtime_path, verbose, no_runtime_integrity_check);
 
     let current_results = match results_file::read(results_file) {
         Ok(current_results) => current_results,
@@ -40,7 +43,7 @@ pub fn run_benchmarks(
     let benchmark_fns = extract_benchmark_fns(canister_wasm_path);
 
     // Initialize PocketIC
-    let (pocket_ic, canister_id) = init_pocket_ic(canister_wasm_path, init_args);
+    let (pocket_ic, canister_id) = init_pocket_ic(runtime_path, canister_wasm_path, init_args);
 
     // Run the benchmarks
     let mut results = BTreeMap::new();
@@ -84,46 +87,41 @@ pub fn run_benchmarks(
     }
 }
 
-// Path to the canbench directory where we keep internal data.
-fn canbench_dir() -> PathBuf {
-    PathBuf::new()
-        .join(env::current_dir().unwrap())
-        .join(".canbench")
-}
-
-// Path to PocketIC.
-fn pocket_ic_path() -> PathBuf {
-    canbench_dir().join("pocket-ic")
-}
-
 // Downloads PocketIC if it's not already downloaded.
-fn maybe_download_pocket_ic(verbose: bool) {
-    const POCKET_IC_LINUX_SHA: &str =
-        "bcdfbe1c72fb9761b086ae0f34f54a6b85b6a7dd7f52f8003b41cd233b164711";
-    const POCKET_IC_MAC_SHA: &str =
-        "07cfda0a46b179446509fefab35375e4ec73e4e0cc0facde2fd41d96dadfcf7c";
+fn maybe_download_pocket_ic(path: &PathBuf, verbose: bool, no_integrity_check: bool) {
+    // If PocketIC doesn't exist at the expected path, download it.
+    if !path.exists() {
+        download_pocket_ic(path, verbose);
+    }
 
-    if pocket_ic_path().exists() {
-        // PocketIC found. Verify that it's the version we expect it to be.
+    // Verify that it's the version we expect it to be.
+    if !no_integrity_check {
+        const POCKET_IC_LINUX_SHA: &str =
+            "bcdfbe1c72fb9761b086ae0f34f54a6b85b6a7dd7f52f8003b41cd233b164711";
+        const POCKET_IC_MAC_SHA: &str =
+            "07cfda0a46b179446509fefab35375e4ec73e4e0cc0facde2fd41d96dadfcf7c";
+
         let expected_sha = match env::consts::OS {
             "linux" => POCKET_IC_LINUX_SHA,
             "macos" => POCKET_IC_MAC_SHA,
             _ => panic!("only linux and macos are currently supported."),
         };
 
-        let pocket_ic_sha = sha256::try_digest(pocket_ic_path()).unwrap();
+        let pocket_ic_sha = sha256::try_digest(path).unwrap();
 
         if pocket_ic_sha == expected_sha {
-            // Shas match. No need to download PocketIC.
-            return;
+            // Shas match.
+        } else {
+            eprintln!(
+                "Runtime has incorrect digest. Expected: {}, actual: {}",
+                expected_sha, pocket_ic_sha
+            );
+            std::process::exit(1);
         }
     }
-
-    // The expected version of PocketIC isn't present. Download it.
-    download_pocket_ic(verbose);
 }
 
-fn download_pocket_ic(verbose: bool) {
+fn download_pocket_ic(path: &PathBuf, verbose: bool) {
     const POCKET_IC_URL_PREFIX: &str =
         "https://github.com/dfinity/pocketic/releases/download/5.0.0/pocket-ic-x86_64-";
     if verbose {
@@ -131,7 +129,7 @@ fn download_pocket_ic(verbose: bool) {
     }
 
     // Create the canbench directory if it doesn't exist.
-    std::fs::create_dir_all(canbench_dir()).unwrap();
+    std::fs::create_dir_all(path.parent().unwrap()).unwrap();
 
     let os = if cfg!(target_os = "linux") {
         "linux"
@@ -148,15 +146,11 @@ fn download_pocket_ic(verbose: bool) {
         .expect("Failed to download PocketIC");
 
     let mut decoder = GzDecoder::new(&pocket_ic_compressed[..]);
-    let mut file = File::create(pocket_ic_path()).expect("Failed to create PocketIC file");
+    let mut file = File::create(path).expect("Failed to create PocketIC file");
 
     std::io::copy(&mut decoder, &mut file).expect("Failed to write PocketIC file");
     // Make the file executable.
-    Command::new("chmod")
-        .arg("+x")
-        .arg(pocket_ic_path())
-        .status()
-        .unwrap();
+    Command::new("chmod").arg("+x").arg(path).status().unwrap();
 }
 
 // Runs the given benchmark.
@@ -246,10 +240,14 @@ fn extract_benchmark_fns(canister_wasm_path: &PathBuf) -> Vec<String> {
 }
 
 // Initializes PocketIC and installs the canister to benchmark.
-fn init_pocket_ic(canister_wasm_path: &PathBuf, init_args: Vec<u8>) -> (PocketIc, Principal) {
+fn init_pocket_ic(
+    path: &PathBuf,
+    canister_wasm_path: &PathBuf,
+    init_args: Vec<u8>,
+) -> (PocketIc, Principal) {
     // PocketIC is used for running the benchmark.
     // Set the appropriate ENV variables
-    std::env::set_var("POCKET_IC_BIN", pocket_ic_path());
+    std::env::set_var("POCKET_IC_BIN", path);
     std::env::set_var("POCKET_IC_MUTE_SERVER", "1");
     let pocket_ic = PocketIcBuilder::new()
         .with_max_request_time_ms(None)

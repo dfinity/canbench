@@ -10,16 +10,31 @@ const DEFAULT_RESULTS_FILE: &str = "canbench_results.yml";
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
-    // If provided, only benchmarks that match this pattern will be executed.
+    /// If provided, only benchmarks that match this pattern will be executed.
     pattern: Option<String>,
 
-    // Whether or not results should be persisted to disk.
+    /// Whether or not results should be persisted to disk.
     #[clap(long)]
     persist: bool,
 
-    // If true, only prints the benchmark results (and nothing else).
+    /// Only print the benchmark results (and nothing else).
     #[clap(long)]
     less_verbose: bool,
+
+    /// Skip checking the integrity (hash) of the runtime.
+    ///
+    /// Checking the hash ensures that canbench is using the runtime it's expecting.
+    /// Only enable this flag if you explicitly want to run canbench using a different
+    /// runtime.
+    ///
+    /// NOTE: canbench can report different benchmark numbers if used with a different runtime.
+    #[clap(long)]
+    no_runtime_integrity_check: bool,
+
+    /// A path to the runtime to use.
+    /// Defaults to `.canbench/pocket-ic`.
+    #[clap(long)]
+    runtime_path: Option<PathBuf>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -42,6 +57,18 @@ struct Config {
 
     // If provided, the init arguments to pass to the canister
     init_args: Option<InitArgs>,
+}
+
+// Path to the canbench directory where we keep internal data.
+fn canbench_dir() -> PathBuf {
+    PathBuf::new()
+        .join(std::env::current_dir().unwrap())
+        .join(".canbench")
+}
+
+// Default path to the runtime (PocketIC)
+fn default_runtime_path() -> PathBuf {
+    canbench_dir().join("pocket-ic")
 }
 
 fn main() {
@@ -99,5 +126,7 @@ fn main() {
         args.persist,
         &results_path,
         !args.less_verbose,
+        args.no_runtime_integrity_check,
+        &args.runtime_path.unwrap_or_else(default_runtime_path),
     );
 }
