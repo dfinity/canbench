@@ -40,7 +40,9 @@ pub fn run_benchmarks(
     let benchmark_fns = extract_benchmark_fns(canister_wasm_path);
 
     // Initialize PocketIC
+    println!("initializing pocket IC");
     let (pocket_ic, canister_id) = init_pocket_ic(canister_wasm_path, init_args);
+    println!("initialized");
 
     // Run the benchmarks
     let mut results = BTreeMap::new();
@@ -56,6 +58,7 @@ pub fn run_benchmarks(
         println!("---------------------------------------------------");
         println!();
 
+        println!("running benchmark {}", bench_fn);
         let result = run_benchmark(&pocket_ic, canister_id, bench_fn);
         print_benchmark(bench_fn, &result, current_results.get(bench_fn));
 
@@ -98,10 +101,11 @@ fn pocket_ic_path() -> PathBuf {
 
 // Downloads PocketIC if it's not already downloaded.
 fn maybe_download_pocket_ic(verbose: bool) {
+    println!("MAYBE DOWNLIADING POCKET IC");
     const POCKET_IC_LINUX_SHA: &str =
-        "bcdfbe1c72fb9761b086ae0f34f54a6b85b6a7dd7f52f8003b41cd233b164711";
+        "740a8fc203adaf694f989761b067ce9756baad3afe62525142e9ee17d0907cd9";
     const POCKET_IC_MAC_SHA: &str =
-        "07cfda0a46b179446509fefab35375e4ec73e4e0cc0facde2fd41d96dadfcf7c";
+        "a4d3903f3932888aa1e2c2c06c1e122a8da98ebd7c0839e02991a62b6e47cefe";
 
     if pocket_ic_path().exists() {
         // PocketIC found. Verify that it's the version we expect it to be.
@@ -114,18 +118,21 @@ fn maybe_download_pocket_ic(verbose: bool) {
         let pocket_ic_sha = sha256::try_digest(pocket_ic_path()).unwrap();
 
         if pocket_ic_sha == expected_sha {
+            println!("SHAS MATCHING");
             // Shas match. No need to download PocketIC.
             return;
         }
     }
 
+    println!("DOWNLIADING POCKET IC");
     // The expected version of PocketIC isn't present. Download it.
     download_pocket_ic(verbose);
 }
 
 fn download_pocket_ic(verbose: bool) {
+    println!("DOWNLOADING POCKET IC");
     const POCKET_IC_URL_PREFIX: &str =
-        "https://github.com/dfinity/pocketic/releases/download/5.0.0/pocket-ic-x86_64-";
+        "https://github.com/dfinity/pocketic/releases/download/6.0.0/pocket-ic-x86_64-";
     if verbose {
         println!("Downloading runtime (will be cached for future uses)...");
     }
@@ -255,6 +262,7 @@ fn init_pocket_ic(canister_wasm_path: &PathBuf, init_args: Vec<u8>) -> (PocketIc
         .with_max_request_time_ms(None)
         .with_benchmarking_application_subnet()
         .build();
+    println!("creating canister");
     let canister_id = pocket_ic.create_canister();
     pocket_ic.add_cycles(canister_id, 1_000_000_000_000_000);
     pocket_ic.install_canister(
