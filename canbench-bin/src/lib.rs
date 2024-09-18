@@ -14,6 +14,10 @@ use wasmparser::Parser as WasmParser;
 // Other queries exposed by the canister are ignored.
 const BENCH_PREFIX: &str = "__canbench__";
 
+const POCKET_IC_LINUX_SHA: &str =
+    "bcdfbe1c72fb9761b086ae0f34f54a6b85b6a7dd7f52f8003b41cd233b164711";
+const POCKET_IC_MAC_SHA: &str = "07cfda0a46b179446509fefab35375e4ec73e4e0cc0facde2fd41d96dadfcf7c";
+
 /// Runs the benchmarks on the canister available in the provided `canister_wasm_path`.
 #[allow(clippy::too_many_arguments)]
 pub fn run_benchmarks(
@@ -23,10 +27,10 @@ pub fn run_benchmarks(
     persist: bool,
     results_file: &PathBuf,
     verbose: bool,
-    no_runtime_integrity_check: bool,
+    integrity_check: bool,
     runtime_path: &PathBuf,
 ) {
-    maybe_download_pocket_ic(runtime_path, verbose, no_runtime_integrity_check);
+    maybe_download_pocket_ic(runtime_path, verbose, integrity_check);
 
     let current_results = match results_file::read(results_file) {
         Ok(current_results) => current_results,
@@ -88,35 +92,27 @@ pub fn run_benchmarks(
 }
 
 // Downloads PocketIC if it's not already downloaded.
-fn maybe_download_pocket_ic(path: &PathBuf, verbose: bool, no_integrity_check: bool) {
-    // If PocketIC doesn't exist at the expected path, download it.
-    if !path.exists() {
-        download_pocket_ic(path, verbose);
-    }
+fn maybe_download_pocket_ic(path: &PathBuf, verbose: bool, integrity_check: bool) {
+    match (path.exists(), integrity_check) {
+        (true, true) => {
+            // Verify that it's the version we expect it to be.
 
-    // Verify that it's the version we expect it to be.
-    if !no_integrity_check {
-        const POCKET_IC_LINUX_SHA: &str =
-            "bcdfbe1c72fb9761b086ae0f34f54a6b85b6a7dd7f52f8003b41cd233b164711";
-        const POCKET_IC_MAC_SHA: &str =
-            "07cfda0a46b179446509fefab35375e4ec73e4e0cc0facde2fd41d96dadfcf7c";
+            let pocket_ic_sha = sha256::try_digest(path).unwrap();
+            let expected_sha = expected_runtime_digest();
 
-        let expected_sha = match env::consts::OS {
-            "linux" => POCKET_IC_LINUX_SHA,
-            "macos" => POCKET_IC_MAC_SHA,
-            _ => panic!("only linux and macos are currently supported."),
-        };
-
-        let pocket_ic_sha = sha256::try_digest(path).unwrap();
-
-        if pocket_ic_sha == expected_sha {
-            // Shas match.
-        } else {
-            eprintln!(
-                "Runtime has incorrect digest. Expected: {}, actual: {}",
-                expected_sha, pocket_ic_sha
-            );
-            std::process::exit(1);
+            if pocket_ic_sha != expected_sha {
+                eprintln!(
+                    "Runtime has incorrect digest. Expected: {}, actual: {}",
+                    expected_sha, pocket_ic_sha
+                );
+                eprintln!("Runtime will be redownloaded...");
+                download_pocket_ic(path, verbose);
+            }
+        }
+        (true, false) => {} // Nothing to do
+        (false, _) => {
+            // Pocket IC not present. Download it.
+            download_pocket_ic(path, verbose);
         }
     }
 }
@@ -262,4 +258,14 @@ fn init_pocket_ic(
         None,
     );
     (pocket_ic, canister_id)
+}
+
+// Public only for tests.
+#[doc(hidden)]
+pub fn expected_runtime_digest() -> &'static str {
+    match env::consts::OS {
+        "linux" => POCKET_IC_LINUX_SHA,
+        "macos" => POCKET_IC_MAC_SHA,
+        _ => panic!("only linux and macos are currently supported."),
+    }
 }

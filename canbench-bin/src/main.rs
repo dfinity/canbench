@@ -126,7 +126,7 @@ fn main() {
         args.persist,
         &results_path,
         !args.less_verbose,
-        args.no_runtime_integrity_check,
+        !args.no_runtime_integrity_check,
         &args.runtime_path.unwrap_or_else(default_runtime_path),
     );
 }

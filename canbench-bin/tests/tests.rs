@@ -255,7 +255,7 @@ Benchmark: bench_scope_new (new)
 }
 
 #[test]
-fn specifying_a_bogus_runtime_path_causes_integrity_check_to_fail() {
+fn specifying_a_bogus_runtime_triggers_a_redownload() {
     // Create an empty file and pass it as the runtime.
     // Given that this file's digest doesn't match what canbench expects, it should fail.
     let runtime_file = NamedTempFile::new().unwrap();
@@ -266,9 +266,15 @@ fn specifying_a_bogus_runtime_path_causes_integrity_check_to_fail() {
 wasm_path:
   ./wasm.wasm",
     )
-    .with_runtime_path(runtime_path)
+    .with_runtime_path(runtime_path.clone())
     .run(|output| {
-        assert_err!(output, "Runtime has incorrect digest");
+        assert_err!(output.clone(), "Runtime has incorrect digest");
+        assert_err!(output, "Runtime will be redownloaded");
+
+        // Verify that the runtime has been redownloaded and now has the correct digest.
+        let digest = sha256::try_digest(runtime_path).unwrap();
+
+        assert_eq!(digest, canbench::expected_runtime_digest());
     });
 }
 
