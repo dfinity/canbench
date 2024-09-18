@@ -21,8 +21,9 @@ CANBENCH_OUTPUT=/tmp/canbench_output.txt
 CANBENCH_RESULTS_FILE="$CANISTER_PATH/canbench_results.yml"
 MAIN_BRANCH_RESULTS_FILE="$MAIN_BRANCH_DIR/$CANBENCH_RESULTS_FILE"
 
-# Install canbench
-cargo install canbench
+# Install canbench.
+# NOTE: canbench-bin from HEAD is used, and not the version deployes to crates.io
+cargo install --path canbench-bin
 
 # Verify that canbench results are available.
 if [ ! -f "$CANBENCH_RESULTS_FILE" ]; then
