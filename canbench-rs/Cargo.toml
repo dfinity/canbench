@@ -1,6 +1,6 @@
 [package]
 name = "canbench-rs"
-version = "0.1.6"
+version = "0.1.6" # NOTE: whenever this is updated, canbench-rs-macros below should also be updated.
 edition = "2021"
 license = "Apache-2.0"
 description = "The rust library for `canbench`, the benchmarking framework for canisters on the Internet Computer."
@@ -14,7 +14,7 @@ readme = "../README.md"
 path = "src/lib.rs"
 
 [dependencies]
-canbench-rs-macros = { path = "../canbench-rs-macros" }
+canbench-rs-macros = { path = "../canbench-rs-macros", version = "0.1.6" }
 candid.workspace = true
 ic-cdk.workspace= true
 serde.workspace = true
