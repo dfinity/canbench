@@ -15,8 +15,8 @@ use wasmparser::Parser as WasmParser;
 const BENCH_PREFIX: &str = "__canbench__";
 
 const POCKET_IC_LINUX_SHA: &str =
-    "bcdfbe1c72fb9761b086ae0f34f54a6b85b6a7dd7f52f8003b41cd233b164711";
-const POCKET_IC_MAC_SHA: &str = "07cfda0a46b179446509fefab35375e4ec73e4e0cc0facde2fd41d96dadfcf7c";
+    "740a8fc203adaf694f989761b067ce9756baad3afe62525142e9ee17d0907cd9";
+const POCKET_IC_MAC_SHA: &str = "bb393ac65c1e36628eedbd85b08af9f0ebe4e326b74f303ee4f56b5d75a35cf8";
 
 /// Runs the benchmarks on the canister available in the provided `canister_wasm_path`.
 #[allow(clippy::too_many_arguments)]
@@ -119,7 +119,7 @@ fn maybe_download_pocket_ic(path: &PathBuf, verbose: bool, integrity_check: bool
 
 fn download_pocket_ic(path: &PathBuf, verbose: bool) {
     const POCKET_IC_URL_PREFIX: &str =
-        "https://github.com/dfinity/pocketic/releases/download/5.0.0/pocket-ic-x86_64-";
+        "https://github.com/dfinity/pocketic/releases/download/6.0.0/pocket-ic-x86_64-";
     if verbose {
         println!("Downloading runtime (will be cached for future uses)...");
     }
