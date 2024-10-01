@@ -13,11 +13,20 @@ macro_rules! assert_err {
         assert_eq!($output.status.code(), Some(1), "output: {:?}", $output);
 
         // Stderr can contain cargo specific output like compilation time, which isn't
-        // deterministic. To ensure our tests are deterministic, we only verify that the suffix of
-        // stderr matches the given error string.
+        // deterministic. To ensure our tests are deterministic, we only verify that the
+        // given error message is a substring of `stderr`
         let stderr = String::from_utf8($output.stderr).unwrap();
-        let stderr_suffix = &stderr[stderr.len() - $err_str.len()..];
-        pretty_assertions::assert_eq!(stderr_suffix, $err_str);
+        assert!(
+            stderr.contains($err_str),
+            "Cannot find the given error message in the error stream.
+Error message given: {}
+Actual error stream:
+-----------
+{}
+-----------",
+            $err_str,
+            stderr
+        );
     };
 }
 
@@ -33,6 +42,8 @@ pub struct BenchTest {
     config: Option<String>,
     bench_name: Option<String>,
     base_dir: BaseDir,
+    runtime_path: Option<PathBuf>,
+    no_runtime_integrity_check: bool,
 }
 
 impl BenchTest {
@@ -41,6 +52,8 @@ impl BenchTest {
             config: None,
             bench_name: None,
             base_dir: BaseDir::Temp,
+            runtime_path: None,
+            no_runtime_integrity_check: false,
         }
     }
 
@@ -49,6 +62,8 @@ impl BenchTest {
             config: Some(config.into()),
             bench_name: None,
             base_dir: BaseDir::Temp,
+            runtime_path: None,
+            no_runtime_integrity_check: false,
         }
     }
 
@@ -63,12 +78,28 @@ impl BenchTest {
                     .join("tests")
                     .join(canister_name),
             ),
+            runtime_path: None,
+            no_runtime_integrity_check: false,
         }
     }
 
     pub fn with_bench(self, bench_name: &str) -> Self {
         Self {
             bench_name: Some(bench_name.to_string()),
+            ..self
+        }
+    }
+
+    pub fn with_runtime_path(self, path: PathBuf) -> Self {
+        Self {
+            runtime_path: Some(path),
+            ..self
+        }
+    }
+
+    pub fn with_no_runtime_integrity_check(self) -> Self {
+        Self {
+            no_runtime_integrity_check: true,
             ..self
         }
     }
@@ -96,6 +127,15 @@ impl BenchTest {
         let mut cmd_args = vec!["--less-verbose".to_string()];
         if let Some(bench_name) = self.bench_name {
             cmd_args.push(bench_name.clone());
+        }
+
+        if let Some(runtime_path) = self.runtime_path {
+            cmd_args.push("--runtime-path".to_string());
+            cmd_args.push(runtime_path.to_str().unwrap().to_string());
+        }
+
+        if self.no_runtime_integrity_check {
+            cmd_args.push("--no-runtime-integrity-check".to_string());
         }
 
         let output = Command::new(canbench)
