@@ -2,7 +2,7 @@ name: CI
 on: [pull_request]
 
 env:
-  RUST_VERSION: 1.75.0
+  RUST_VERSION: 1.81.0
 
 jobs:
   build:
