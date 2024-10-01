@@ -40,9 +40,7 @@ pub fn run_benchmarks(
     let benchmark_fns = extract_benchmark_fns(canister_wasm_path);
 
     // Initialize PocketIC
-    println!("initializing pocket IC");
     let (pocket_ic, canister_id) = init_pocket_ic(canister_wasm_path, init_args);
-    println!("initialized");
 
     // Run the benchmarks
     let mut results = BTreeMap::new();
@@ -58,7 +56,6 @@ pub fn run_benchmarks(
         println!("---------------------------------------------------");
         println!();
 
-        println!("running benchmark {}", bench_fn);
         let result = run_benchmark(&pocket_ic, canister_id, bench_fn);
         print_benchmark(bench_fn, &result, current_results.get(bench_fn));
 
@@ -101,7 +98,6 @@ fn pocket_ic_path() -> PathBuf {
 
 // Downloads PocketIC if it's not already downloaded.
 fn maybe_download_pocket_ic(verbose: bool) {
-    println!("MAYBE DOWNLIADING POCKET IC");
     const POCKET_IC_LINUX_SHA: &str =
         "740a8fc203adaf694f989761b067ce9756baad3afe62525142e9ee17d0907cd9";
     const POCKET_IC_MAC_SHA: &str =
@@ -118,19 +114,16 @@ fn maybe_download_pocket_ic(verbose: bool) {
         let pocket_ic_sha = sha256::try_digest(pocket_ic_path()).unwrap();
 
         if pocket_ic_sha == expected_sha {
-            println!("SHAS MATCHING");
             // Shas match. No need to download PocketIC.
             return;
         }
     }
 
-    println!("DOWNLIADING POCKET IC");
     // The expected version of PocketIC isn't present. Download it.
     download_pocket_ic(verbose);
 }
 
 fn download_pocket_ic(verbose: bool) {
-    println!("DOWNLOADING POCKET IC");
     const POCKET_IC_URL_PREFIX: &str =
         "https://github.com/dfinity/pocketic/releases/download/6.0.0/pocket-ic-x86_64-";
     if verbose {
@@ -262,7 +255,6 @@ fn init_pocket_ic(canister_wasm_path: &PathBuf, init_args: Vec<u8>) -> (PocketIc
         .with_max_request_time_ms(None)
         .with_benchmarking_application_subnet()
         .build();
-    println!("creating canister");
     let canister_id = pocket_ic.create_canister();
     pocket_ic.add_cycles(canister_id, 1_000_000_000_000_000);
     pocket_ic.install_canister(
