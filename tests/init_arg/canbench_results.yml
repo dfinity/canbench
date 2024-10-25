@@ -4,6 +4,6 @@ benches:
   state_check:
     total:
       heap_delta: 0
-      instructions: 930
+      instructions: 867
       stable_memory_delta: 0
 version: 0.1.0
