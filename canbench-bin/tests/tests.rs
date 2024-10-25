@@ -1,4 +1,5 @@
 mod utils;
+use tempfile::NamedTempFile;
 use utils::BenchTest;
 
 #[test]
@@ -254,6 +255,51 @@ Benchmark: bench_scope_new (new)
 }
 
 #[test]
+fn specifying_a_bogus_runtime_triggers_a_redownload() {
+    // Create an empty file and pass it as the runtime.
+    // Given that this file's digest doesn't match what canbench expects, it should fail.
+    let runtime_file = NamedTempFile::new().unwrap();
+    let runtime_path = runtime_file.path().to_path_buf();
+
+    BenchTest::with_config(
+        "
+wasm_path:
+  ./wasm.wasm",
+    )
+    .with_runtime_path(runtime_path.clone())
+    .run(|output| {
+        assert_err!(output.clone(), "Runtime has incorrect digest");
+        assert_err!(output, "Runtime will be redownloaded");
+
+        // Verify that the runtime has been redownloaded and now has the correct digest.
+        let digest = sha256::try_digest(runtime_path).unwrap();
+
+        assert_eq!(digest, canbench::expected_runtime_digest());
+    });
+}
+
+#[test]
+fn specifying_a_bogus_runtime_without_integrity_check() {
+    // Create an empty file and pass it as the runtime.
+    let runtime_file = NamedTempFile::new().unwrap();
+    let runtime_path = runtime_file.path().to_path_buf();
+
+    // Since the runtime integrity check is skipped, canbench won't report
+    // a bad digest for the runtime, but will instead report that it can't
+    // find the wasm.
+    BenchTest::with_config(
+        "
+wasm_path:
+  ./wasm.wasm",
+    )
+    .with_runtime_path(runtime_path)
+    .with_no_runtime_integrity_check()
+    .run(|output| {
+        assert_err!(output, "Couldn't read file at ./wasm.wasm.");
+    });
+}
+
+#[test]
 fn reports_scopes_in_existing_benchmark() {
     BenchTest::canister("measurements_output")
         .with_bench("bench_scope_exist")
@@ -291,7 +337,7 @@ fn newer_version() {
         .run(|output| {
         assert_err!(
                 output,
-                "canbench is at version 0.1.5 while the results were generated with version 99.0.0. Please upgrade canbench.
+                "canbench is at version 0.1.7 while the results were generated with version 99.0.0. Please upgrade canbench.
 "
             );
         });

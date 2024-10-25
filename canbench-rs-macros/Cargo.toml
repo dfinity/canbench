@@ -1,6 +1,6 @@
 [package]
 name = "canbench-rs-macros"
-version = "0.1.5"
+version = "0.1.7"
 edition = "2021"
 license = "Apache-2.0"
 description = "Macros for canbench-rs"
@@ -14,4 +14,4 @@ proc-macro = true
 [dependencies]
 proc-macro2.workspace = true
 quote.workspace = true
-syn = { workspace = true, features=["full"] }
+syn = { workspace = true, features = ["full"] }
