@@ -395,7 +395,7 @@ use std::cell::RefCell;
 use std::collections::BTreeMap;
 
 thread_local! {
-    static SCOPES: RefCell<BTreeMap<&'static str, Measurement>> = RefCell::new(BTreeMap::new());
+    static SCOPES: RefCell<BTreeMap<&'static str, Measurement>> = const { RefCell::new(BTreeMap::new()) };
 }
 
 /// The results of a benchmark.
