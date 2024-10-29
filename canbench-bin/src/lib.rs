@@ -235,6 +235,13 @@ fn extract_benchmark_fns(canister_wasm_path: &PathBuf) -> Vec<String> {
         .collect()
 }
 
+// Sets the environment variable to the target value if it's not already set.
+fn set_env_var_if_unset(key: &str, target_value: &str) {
+    if std::env::var(key).is_err() {
+        std::env::set_var(key, target_value);
+    }
+}
+
 // Initializes PocketIC and installs the canister to benchmark.
 fn init_pocket_ic(
     path: &PathBuf,
@@ -244,7 +251,7 @@ fn init_pocket_ic(
     // PocketIC is used for running the benchmark.
     // Set the appropriate ENV variables
     std::env::set_var("POCKET_IC_BIN", path);
-    std::env::set_var("POCKET_IC_MUTE_SERVER", "1");
+    set_env_var_if_unset("POCKET_IC_MUTE_SERVER", "1");
     let pocket_ic = PocketIcBuilder::new()
         .with_max_request_time_ms(None)
         .with_benchmarking_application_subnet()
