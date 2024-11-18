@@ -1,6 +1,6 @@
 [package]
 name = "canbench-rs-macros"
-version = "0.1.7"
+version = "0.1.8"
 edition = "2021"
 license = "Apache-2.0"
 description = "Macros for canbench-rs"
