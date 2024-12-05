@@ -411,8 +411,11 @@ Benchmark: read_from_stable_memory (new)
 #[test]
 fn stable_memory_file_not_exit_prints_error() {
     BenchTest::canister("stable_memory_invalid").run(|output| {
-        assert_err!(output, "
+        assert_err!(
+            output,
+            "
 Error reading stable memory file stable_memory_does_not_exist.bin
-Error: No such file or directory");
+Error: No such file or directory"
+        );
     });
 }
