@@ -387,3 +387,32 @@ Benchmark: write_stable_memory (new)
             );
         });
 }
+
+#[test]
+fn loads_stable_memory_file() {
+    BenchTest::canister("stable_memory").run(|output| {
+        assert_success!(
+            output,
+            "
+---------------------------------------------------
+
+Benchmark: read_from_stable_memory (new)
+  total:
+    instructions: 589 (new)
+    heap_increase: 0 pages (new)
+    stable_memory_increase: 0 pages (new)
+
+---------------------------------------------------
+"
+        );
+    });
+}
+
+#[test]
+fn stable_memory_file_not_exit_prints_error() {
+    BenchTest::canister("stable_memory_invalid").run(|output| {
+        assert_err!(output, "
+Error reading stable memory file stable_memory_does_not_exist.bin
+Error: No such file or directory");
+    });
+}

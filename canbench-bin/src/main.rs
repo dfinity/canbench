@@ -44,6 +44,12 @@ struct InitArgs {
 }
 
 #[derive(Debug, Deserialize)]
+struct StableMemory {
+    // File path to load stable memory from.
+    file: String,
+}
+
+#[derive(Debug, Deserialize)]
 struct Config {
     // If provided, instructs canbench to build the canister
     build_cmd: Option<String>,
@@ -57,6 +63,9 @@ struct Config {
 
     // If provided, the init arguments to pass to the canister
     init_args: Option<InitArgs>,
+
+    // The stable memory to load into the canister.
+    stable_memory: Option<StableMemory>,
 }
 
 // Path to the canbench directory where we keep internal data.
@@ -113,6 +122,8 @@ fn main() {
         );
     }
 
+    let stable_memory_path = cfg.stable_memory.map(|sm| PathBuf::from(sm.file));
+
     let init_args = cfg
         .init_args
         .map(|args| hex::decode(args.hex).expect("invalid init_args hex value"))
@@ -128,5 +139,6 @@ fn main() {
         !args.less_verbose,
         !args.no_runtime_integrity_check,
         &args.runtime_path.unwrap_or_else(default_runtime_path),
+        stable_memory_path,
     );
 }
