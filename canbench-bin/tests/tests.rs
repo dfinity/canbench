@@ -387,3 +387,24 @@ Benchmark: write_stable_memory (new)
             );
         });
 }
+
+#[test]
+fn loads_stable_memory_file() {
+    BenchTest::canister("stable_memory").run(|output| {
+        // There are assertions in the code of that canister itself, so
+        // all is needed is to assert that the run succeeded.
+        assert_eq!(output.status.code(), Some(0), "output: {:?}", output);
+    });
+}
+
+#[test]
+fn stable_memory_file_not_exit_prints_error() {
+    BenchTest::canister("stable_memory_invalid").run(|output| {
+        assert_err!(
+            output,
+            "
+Error reading stable memory file stable_memory_does_not_exist.bin
+Error: No such file or directory"
+        );
+    });
+}

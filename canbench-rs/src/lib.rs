@@ -42,6 +42,20 @@
 //! init_args:
 //!   hex: 4449444c0001710568656c6c6f
 //! ```
+//!
+//! #### Stable Memory
+//!
+//! A file can be specified to be loaded in the canister's stable memory _after_ initialization.
+//!
+//! ```yml
+//! stable_memory:
+//!   file:
+//!     stable_memory.bin
+//! ```
+//!
+//! <div class="warning">Contents of the stable memory file are loaded <i>after</i> the call to the canister's init method.
+//! Therefore, changes made to stable memory in the init method would be overwritten.</div>
+//!
 //! ### 4. Start benching! 🏋🏽
 //!
 //! Let's say we have a canister that exposes a `query` computing the fibonacci sequence of a given number.
