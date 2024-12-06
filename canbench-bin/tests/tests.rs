@@ -391,20 +391,9 @@ Benchmark: write_stable_memory (new)
 #[test]
 fn loads_stable_memory_file() {
     BenchTest::canister("stable_memory").run(|output| {
-        assert_success!(
-            output,
-            "
----------------------------------------------------
-
-Benchmark: read_from_stable_memory (new)
-  total:
-    instructions: 589 (new)
-    heap_increase: 0 pages (new)
-    stable_memory_increase: 0 pages (new)
-
----------------------------------------------------
-"
-        );
+        // There are assertions in the code of that canister itself, so
+        // all is needed is to assert that the run succeeded.
+        assert_eq!(output.status.code(), Some(0), "output: {:?}", output);
     });
 }
 
