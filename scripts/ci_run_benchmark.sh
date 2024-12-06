@@ -25,6 +25,9 @@ MAIN_BRANCH_RESULTS_FILE="$MAIN_BRANCH_DIR/$CANBENCH_RESULTS_FILE"
 # NOTE: canbench-bin from HEAD is used, and not the version deployes to crates.io
 cargo install --path canbench-bin
 
+# Install ic-wasm for profiling
+cargo install ic-wasm
+
 # Verify that canbench results are available.
 if [ ! -f "$CANBENCH_RESULTS_FILE" ]; then
     echo "$CANBENCH_RESULTS_FILE not found. Did you forget to run \`canbench --persist\`?";

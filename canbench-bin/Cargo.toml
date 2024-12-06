@@ -20,6 +20,10 @@ clap.workspace = true
 colored.workspace = true
 flate2.workspace = true
 hex.workspace = true
+inferno = { version = "0.11", default-features = false, features = [
+    "multithreaded",
+    "nameattr",
+] }
 reqwest.workspace = true
 semver.workspace = true
 serde.workspace = true

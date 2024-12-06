@@ -2,7 +2,7 @@
 mod print_benchmark;
 mod results_file;
 use canbench_rs::BenchResult;
-use candid::Principal;
+use candid::{Decode, Encode, Principal};
 use flate2::read::GzDecoder;
 use pocket_ic::common::rest::BlobCompression;
 use pocket_ic::{PocketIc, PocketIcBuilder, WasmResult};
@@ -14,6 +14,7 @@ use wasmparser::Parser as WasmParser;
 // The prefix benchmarks are expected to have in their name.
 // Other queries exposed by the canister are ignored.
 const BENCH_PREFIX: &str = "__canbench__";
+const BENCH_PROFILE_PREFIX: &str = "__canbench__update__";
 
 const POCKET_IC_LINUX_SHA: &str =
     "95e3bb14977228efbb5173ea3e044e6b6c8420bb1b3342fa530e3c11f3e9f0cd";
@@ -26,6 +27,7 @@ pub fn run_benchmarks(
     pattern: Option<String>,
     init_args: Vec<u8>,
     persist: bool,
+    profile: bool,
     results_file: &PathBuf,
     verbose: bool,
     integrity_check: bool,
@@ -47,6 +49,11 @@ pub fn run_benchmarks(
 
     // Extract the benchmark functions in the Wasm.
     let benchmark_fns = extract_benchmark_fns(canister_wasm_path);
+    let function_names = if profile {
+        Some(extract_function_names_mapping(canister_wasm_path))
+    } else {
+        None
+    };
 
     // Initialize PocketIC
     let (pocket_ic, canister_id) = init_pocket_ic(
@@ -55,6 +62,18 @@ pub fn run_benchmarks(
         stable_memory_path,
         init_args,
     );
+
+    if profile {
+        // Tracing is enabled by default. Disable first.
+        pocket_ic
+            .update_call(
+                canister_id,
+                Principal::anonymous(),
+                "__toggle_tracing",
+                b"DIDL\x00\x00".to_vec(),
+            )
+            .unwrap();
+    }
 
     // Run the benchmarks
     let mut results = BTreeMap::new();
@@ -70,7 +89,20 @@ pub fn run_benchmarks(
         println!("---------------------------------------------------");
         println!();
 
-        let result = run_benchmark(&pocket_ic, canister_id, bench_fn);
+        let result = run_benchmark(&pocket_ic, canister_id, bench_fn, profile);
+
+        if profile {
+            let filename = results_file.with_file_name(format!("{}.svg", bench_fn));
+            process_profiling(
+                &pocket_ic,
+                canister_id,
+                function_names.as_ref().unwrap().clone(),
+                bench_fn,
+                filename,
+            )
+            .unwrap();
+        }
+
         print_benchmark(bench_fn, &result, current_results.get(bench_fn));
 
         results.insert(bench_fn.to_string(), result);
@@ -156,14 +188,171 @@ fn download_pocket_ic(path: &PathBuf, verbose: bool) {
     Command::new("chmod").arg("+x").arg(path).status().unwrap();
 }
 
+#[allow(clippy::type_complexity)]
+fn call_get_profiling(
+    pocket_ic: &PocketIc,
+    canister_id: Principal,
+    idx: i32,
+) -> Result<(Vec<(i32, i64)>, Option<i32>), String> {
+    let result = pocket_ic
+        .query_call(
+            canister_id,
+            Principal::anonymous(),
+            "__get_profiling",
+            Encode!(&idx).unwrap(),
+        )
+        .unwrap();
+    match result {
+        WasmResult::Reply(res) => {
+            let (trace, opt_idx) =
+                Decode!(&res, Vec<(i32, i64)>, Option<i32>).map_err(|e| e.to_string())?;
+            Ok((trace, opt_idx))
+        }
+        WasmResult::Reject(output_str) => {
+            Err(format!("Error when calling __get_profiling: {output_str}"))
+        }
+    }
+}
+
+/// Fetches the profiling data from the canister. Adapted from
+/// https://github.com/dfinity/ic-repl/blob/master/src/profiling.rs
+fn get_profiling(pocket_ic: &PocketIc, canister_id: Principal) -> Result<Vec<(i32, i64)>, String> {
+    let mut idx = 0;
+    let mut trace = vec![];
+    let mut cnt = 1;
+    loop {
+        let (mut current_trace, opt_idx) = call_get_profiling(pocket_ic, canister_id, idx)?;
+        trace.append(&mut current_trace);
+        if let Some(next_idx) = opt_idx {
+            idx = next_idx;
+            cnt += 1;
+        } else {
+            break;
+        }
+    }
+    if cnt > 1 {
+        eprintln!("large trace: {}MB", cnt * 2);
+    }
+    Ok(trace)
+}
+
+/// Renders the profiling to a file. Adapted from
+/// https://github.com/dfinity/ic-repl/blob/master/src/profiling.rs
+fn write_profiling_to_file(
+    input: Vec<(i32, i64)>,
+    names: &BTreeMap<u16, String>,
+    title: &str,
+    filename: PathBuf,
+) -> Result<(), String> {
+    use inferno::flamegraph::{from_reader, Options};
+    let mut stack = Vec::new();
+    let mut prefix = Vec::new();
+    let mut result = Vec::new();
+    let mut prev = None;
+    for (id, count) in input.into_iter() {
+        if id >= 0 {
+            stack.push((id, count, 0));
+            let name = match names.get(&(id as u16)) {
+                Some(name) => name.clone(),
+                None => "func_".to_string() + &id.to_string(),
+            };
+            prefix.push(name);
+        } else {
+            match stack.pop() {
+                None => return Err("pop empty stack".to_string()),
+                Some((start_id, start, children)) => {
+                    if start_id != -id {
+                        return Err("func id mismatch".to_string());
+                    }
+                    let cost = count - start;
+                    let frame = prefix.join(";");
+                    prefix.pop().unwrap();
+                    if let Some((parent, parent_cost, children_cost)) = stack.pop() {
+                        stack.push((parent, parent_cost, children_cost + cost));
+                    }
+                    match prev {
+                        Some(prev) if prev == frame => {
+                            // Add an empty spacer to avoid collapsing adjacent same-named calls
+                            // See https://github.com/jonhoo/inferno/issues/185#issuecomment-671393504
+                            result.push(format!("{};spacer 0", prefix.join(";")));
+                        }
+                        _ => (),
+                    }
+                    result.push(format!("{} {}", frame, cost - children));
+                    prev = Some(frame);
+                }
+            }
+        }
+    }
+    let is_trace_incomplete = !stack.is_empty();
+    let mut opt = Options::default();
+    opt.count_name = "instructions".to_string();
+    let title = if is_trace_incomplete {
+        title.to_string() + " (incomplete)"
+    } else {
+        title.to_string()
+    };
+    opt.title = title;
+    opt.image_width = Some(1024);
+    opt.flame_chart = true;
+    opt.no_sort = true;
+    // Reserve result order to make flamegraph from left to right.
+    // See https://github.com/jonhoo/inferno/issues/236
+    result.reverse();
+    let logs = result.join("\n");
+    let reader = std::io::Cursor::new(logs);
+    let mut writer = std::fs::File::create(&filename).map_err(|e| e.to_string())?;
+    from_reader(&mut opt, reader, &mut writer).map_err(|e| e.to_string())?;
+    println!("Flamegraph written to {}", filename.display());
+    Ok(())
+}
+
+fn process_profiling(
+    pocket_ic: &PocketIc,
+    canister_id: Principal,
+    function_names: BTreeMap<u16, String>,
+    bench_fn: &str,
+    filename: PathBuf,
+) -> Result<(), String> {
+    let trace = get_profiling(pocket_ic, canister_id)?;
+    write_profiling_to_file(trace, &function_names, bench_fn, filename)
+}
+
 // Runs the given benchmark.
-fn run_benchmark(pocket_ic: &PocketIc, canister_id: Principal, bench_fn: &str) -> BenchResult {
-    match pocket_ic.query_call(
-        canister_id,
-        Principal::anonymous(),
-        &format!("{}{}", BENCH_PREFIX, bench_fn),
-        b"DIDL\x00\x00".to_vec(),
-    ) {
+fn run_benchmark(
+    pocket_ic: &PocketIc,
+    canister_id: Principal,
+    bench_fn: &str,
+    profile: bool,
+) -> BenchResult {
+    if profile {
+        pocket_ic
+            .update_call(
+                canister_id,
+                Principal::anonymous(),
+                "__toggle_tracing",
+                b"DIDL\x00\x00".to_vec(),
+            )
+            .unwrap();
+    }
+
+    let result = if profile {
+        pocket_ic.update_call(
+            canister_id,
+            Principal::anonymous(),
+            &format!("{}{}", BENCH_PROFILE_PREFIX, bench_fn),
+            b"DIDL\x00\x00".to_vec(),
+        )
+    } else {
+        pocket_ic.query_call(
+            canister_id,
+            Principal::anonymous(),
+            &format!("{}{}", BENCH_PREFIX, bench_fn),
+            b"DIDL\x00\x00".to_vec(),
+        )
+    };
+
+    let bench_result = match result {
         Ok(wasm_res) => match wasm_res {
             WasmResult::Reply(res) => {
                 let res: BenchResult =
@@ -182,7 +371,58 @@ fn run_benchmark(pocket_ic: &PocketIc, canister_id: Principal, bench_fn: &str) -
             eprintln!("Error executing benchmark {}. Error:\n{}", bench_fn, e);
             std::process::exit(1);
         }
+    };
+
+    if profile {
+        pocket_ic
+            .update_call(
+                canister_id,
+                Principal::anonymous(),
+                "__toggle_tracing",
+                b"DIDL\x00\x00".to_vec(),
+            )
+            .unwrap();
     }
+
+    bench_result
+}
+
+fn extract_function_names_mapping(canister_wasm_path: &PathBuf) -> BTreeMap<u16, String> {
+    // Parse the canister's wasm.
+    let wasm = std::fs::read(canister_wasm_path).unwrap_or_else(|_| {
+        eprintln!(
+            "Couldn't read file at {}. Are you sure the file exists?",
+            canister_wasm_path.display()
+        );
+        std::process::exit(1);
+    });
+
+    // Decompress the wasm if it's gzipped.
+    let wasm = match canister_wasm_path.extension().unwrap().to_str() {
+        Some("gz") => {
+            // Decompress the wasm if it's gzipped.
+            let mut decoder = GzDecoder::new(&wasm[..]);
+            let mut decompressed_wasm = vec![];
+            decoder.read_to_end(&mut decompressed_wasm).unwrap();
+            decompressed_wasm
+        }
+        _ => wasm,
+    };
+
+    for section in WasmParser::new(0).parse_all(&wasm).flatten() {
+        if let wasmparser::Payload::CustomSection(custom_section) = section {
+            if custom_section.name() == "icp:public name" {
+                let bytes = custom_section.data();
+                let names = Decode!(bytes, BTreeMap<u16, String>)
+                    .map_err(|e| format!("Failed to read names section: {}", e))
+                    .unwrap();
+                return names;
+            }
+        }
+    }
+
+    eprint!("Failed to extract function names mapping from the Wasm file.");
+    std::process::exit(1);
 }
 
 // Extract the benchmarks that need to be run.

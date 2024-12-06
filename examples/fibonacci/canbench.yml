@@ -1,5 +1,5 @@
 build_cmd:
-  cargo build --release --target wasm32-unknown-unknown --features canbench-rs
+  cargo build --release --target wasm32-unknown-unknown --features canbench-rs && ic-wasm ../../target/wasm32-unknown-unknown/release/fibonacci.wasm -o ../../target/wasm32-unknown-unknown/release/fibonacci.wasm instrument
 
 wasm_path:
   ../../target/wasm32-unknown-unknown/release/fibonacci.wasm

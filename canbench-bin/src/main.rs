@@ -35,6 +35,10 @@ struct Args {
     /// Defaults to `.canbench/pocket-ic`.
     #[clap(long)]
     runtime_path: Option<PathBuf>,
+
+    /// If provided, the benchmarks will be profiled.
+    #[clap(long)]
+    profile: bool,
 }
 
 #[derive(Debug, Deserialize)]
@@ -135,6 +139,7 @@ fn main() {
         args.pattern,
         init_args,
         args.persist,
+        args.profile,
         &results_path,
         !args.less_verbose,
         !args.no_runtime_integrity_check,
