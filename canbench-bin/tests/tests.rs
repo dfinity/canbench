@@ -348,6 +348,7 @@ fn benchmark_works_with_init_args() {
     BenchTest::canister("init_arg")
         .with_bench("state_check")
         .run(|output| {
+            println!("{}", String::from_utf8(output.stdout.clone()).unwrap());
             assert_success!(
                 output,
                 "
