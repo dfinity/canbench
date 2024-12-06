@@ -28,7 +28,7 @@ pub fn bench(arg_tokens: TokenStream, item: TokenStream) -> TokenStream {
     // This is to inform that the `canbench` binary that this query is a benchmark
     // that it should run.
     let renamed_func_name =
-        syn::Ident::new(&format!("__canbench__{}", func_name), func_name.span());
+        syn::Ident::new(&format!("__canbench_init__{}", func_name), func_name.span());
 
     // Validate the argument and generate code accordingly
     let expanded = match args.as_slice() {
@@ -95,6 +95,48 @@ pub fn bench(arg_tokens: TokenStream, item: TokenStream) -> TokenStream {
             )
             .to_compile_error()
             .into();
+        }
+    };
+
+    TokenStream::from(expanded)
+}
+
+/// A macro for declaring a benchmark where only some part of the function is
+/// benchmarked.
+#[proc_macro_attribute]
+pub fn init(arg_tokens: TokenStream, item: TokenStream) -> TokenStream {
+    // Parse the input as a function
+    let input = parse_macro_input!(item as ItemFn);
+
+    // Extract function name, inputs, and output
+    let func_name = &input.sig.ident;
+    let inputs = &input.sig.inputs;
+    let output = &input.sig.output;
+
+    // Check that there are no function arguments
+    if !inputs.is_empty() {
+        return syn::Error::new_spanned(inputs, "Setup should not take any arguments")
+            .to_compile_error()
+            .into();
+    }
+
+    // Prefix the benchmark name with "__canbench__".
+    // This is to inform that the `canbench` binary that this query is a benchmark
+    // that it should run.
+    let renamed_func_name = syn::Ident::new(
+        &format!("__canbench_setup__{}", func_name),
+        func_name.span(),
+    );
+
+    let expanded = quote! {
+        #input
+
+        #[ic_cdk::query]
+        #[allow(non_snake_case)]
+        fn #renamed_func_name() {
+            canbench_rs::bench_fn(|| {
+                #func_name();
+            })
         }
     };
 

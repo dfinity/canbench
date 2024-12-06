@@ -31,6 +31,7 @@ pub fn run_benchmarks(
     integrity_check: bool,
     runtime_path: &PathBuf,
     stable_memory_path: Option<PathBuf>,
+    setup_endpoint: Option<String>,
 ) {
     maybe_download_pocket_ic(runtime_path, verbose, integrity_check);
 
@@ -54,6 +55,7 @@ pub fn run_benchmarks(
         canister_wasm_path,
         stable_memory_path,
         init_args,
+        setup_endpoint,
     );
 
     // Run the benchmarks
@@ -255,6 +257,7 @@ fn init_pocket_ic(
     canister_wasm_path: &PathBuf,
     stable_memory_path: Option<PathBuf>,
     init_args: Vec<u8>,
+    setup_endpoint: Option<String>,
 ) -> (PocketIc, Principal) {
     // PocketIC is used for running the benchmark.
     // Set the appropriate ENV variables
@@ -292,6 +295,17 @@ fn init_pocket_ic(
             stable_memory_bytes,
             BlobCompression::NoCompression,
         );
+    }
+
+    if let Some(setup_endpoint) = setup_endpoint {
+        pocket_ic
+            .update_call(
+                canister_id,
+                Principal::anonymous(),
+                &setup_endpoint,
+                candid::encode_one(()).unwrap(),
+            )
+            .expect("Failed to call setup endpoint {setup_endpoint}");
     }
 
     (pocket_ic, canister_id)

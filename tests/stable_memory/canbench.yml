@@ -4,6 +4,7 @@ build_cmd:
 wasm_path:
   ../../target/wasm32-unknown-unknown/release/stable_memory.wasm
 
+setup_endpoint: bench_setup
+
 stable_memory:
-  file:
-    stable_memory.bin
+  file: stable_memory.bin

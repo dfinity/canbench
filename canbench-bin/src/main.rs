@@ -66,6 +66,9 @@ struct Config {
 
     // The stable memory to load into the canister.
     stable_memory: Option<StableMemory>,
+
+    // An endpoint to execute before running the benchmarks (e.g. setup code)
+    setup_endpoint: Option<String>,
 }
 
 // Path to the canbench directory where we keep internal data.
@@ -140,5 +143,6 @@ fn main() {
         !args.no_runtime_integrity_check,
         &args.runtime_path.unwrap_or_else(default_runtime_path),
         stable_memory_path,
+        cfg.setup_endpoint,
     );
 }

@@ -53,8 +53,15 @@
 //!     stable_memory.bin
 //! ```
 //!
-//! <div class="warning">Contents of the stable memory file are loaded <i>after</i> the call to the canister's init method.
-//! Therefore, changes made to stable memory in the init method would be overwritten.</div>
+//! <div class="warning">Contents of the stable memory file are loaded <i>after</i> the call to
+//! the canister's init method. Changes made to stable memory in the init method would be
+//! overwritten.
+//! To run setup code after the stable memory is loaded, use the setup endpoint below.</div>
+//!
+//! #### Setup Endpoint
+//!
+//! When setting up stable memory, it's often useful to setup certain data structures. Such setup
+//! can be done in an update
 //!
 //! ### 4. Start benching! 🏋🏽
 //!
@@ -529,20 +536,21 @@ impl Drop for BenchScope {
 
         SCOPES.with(|p| {
             let mut p = p.borrow_mut();
-            let prev_scope = p.insert(
-                self.name,
-                Measurement {
-                    instructions,
-                    heap_increase,
-                    stable_memory_increase,
-                },
-            );
+            if !p.contains_key(self.name) {
+                p.insert(
+                    self.name,
+                    Measurement {
+                        instructions: 0,
+                        heap_increase: 0,
+                        stable_memory_increase: 0,
+                    },
+                );
+            }
 
-            assert!(
-                prev_scope.is_none(),
-                "scope {} cannot be specified multiple times.",
-                self.name
-            );
+            let scope = p.get_mut(self.name).unwrap();
+            scope.instructions += instructions;
+            scope.heap_increase += heap_increase;
+            scope.stable_memory_increase += stable_memory_increase;
         });
     }
 }
