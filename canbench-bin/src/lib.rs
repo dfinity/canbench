@@ -72,8 +72,14 @@ pub fn run_benchmarks(
         println!("---------------------------------------------------");
         println!();
 
-        let result = run_benchmark(&pocket_ic, canister_id, bench_fn);
+        let (result, duration) = {
+            let start = std::time::Instant::now();
+            let result = run_benchmark(&pocket_ic, canister_id, bench_fn);
+            let duration = start.elapsed();
+            (result, duration)
+        };
         print_benchmark(bench_fn, &result, current_results.get(bench_fn));
+        println!("Benchmark time: {:?}", duration);
 
         results.insert(bench_fn.to_string(), result);
         num_executed_bench_fns += 1;
