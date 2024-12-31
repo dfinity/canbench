@@ -268,7 +268,7 @@ fn init_pocket_ic(
     // PocketIC is used for running the benchmark.
     // Set the appropriate ENV variables
     std::env::set_var("POCKET_IC_BIN", path);
-    set_env_var_if_unset("POCKET_IC_MUTE_SERVER", "1");
+    //set_env_var_if_unset("POCKET_IC_MUTE_SERVER", "1");
     let pocket_ic = PocketIcBuilder::new()
         .with_max_request_time_ms(None)
         .with_benchmarking_application_subnet()
