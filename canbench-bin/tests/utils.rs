@@ -150,7 +150,7 @@ impl BenchTest {
         }
 
         if let Some(noise_threshold) = self.noise_threshold {
-            cmd_args.push("--custom-noise-threshold".to_string());
+            cmd_args.push("--noise-threshold".to_string());
             cmd_args.push(noise_threshold.to_string());
         }
 
