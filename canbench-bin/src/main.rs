@@ -6,6 +6,8 @@ use std::{fs::File, io::Read, path::PathBuf, process::Command};
 
 const CFG_FILE_NAME: &str = "canbench.yml";
 const DEFAULT_RESULTS_FILE: &str = "canbench_results.yml";
+// The default threshold that determines whether or not a change is significant.
+const DEFAULT_NOISE_THRESHOLD: f64 = 2.0;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -35,6 +37,9 @@ struct Args {
     /// Defaults to `.canbench/pocket-ic`.
     #[clap(long)]
     runtime_path: Option<PathBuf>,
+
+    #[clap(long)]
+    custom_noise_threshold: Option<f64>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -140,5 +145,7 @@ fn main() {
         !args.no_runtime_integrity_check,
         &args.runtime_path.unwrap_or_else(default_runtime_path),
         stable_memory_path,
+        args.custom_noise_threshold
+            .unwrap_or(DEFAULT_NOISE_THRESHOLD),
     );
 }

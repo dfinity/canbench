@@ -31,6 +31,7 @@ pub fn run_benchmarks(
     integrity_check: bool,
     runtime_path: &PathBuf,
     stable_memory_path: Option<PathBuf>,
+    noise_threshold: f64,
 ) {
     maybe_download_pocket_ic(runtime_path, verbose, integrity_check);
 
@@ -71,7 +72,12 @@ pub fn run_benchmarks(
         println!();
 
         let result = run_benchmark(&pocket_ic, canister_id, bench_fn);
-        print_benchmark(bench_fn, &result, current_results.get(bench_fn));
+        print_benchmark(
+            bench_fn,
+            &result,
+            current_results.get(bench_fn),
+            noise_threshold,
+        );
 
         results.insert(bench_fn.to_string(), result);
         num_executed_bench_fns += 1;

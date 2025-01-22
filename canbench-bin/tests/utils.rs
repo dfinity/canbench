@@ -44,6 +44,7 @@ pub struct BenchTest {
     base_dir: BaseDir,
     runtime_path: Option<PathBuf>,
     no_runtime_integrity_check: bool,
+    noise_threshold: Option<f64>,
 }
 
 impl BenchTest {
@@ -54,6 +55,7 @@ impl BenchTest {
             base_dir: BaseDir::Temp,
             runtime_path: None,
             no_runtime_integrity_check: false,
+            noise_threshold: None,
         }
     }
 
@@ -64,6 +66,7 @@ impl BenchTest {
             base_dir: BaseDir::Temp,
             runtime_path: None,
             no_runtime_integrity_check: false,
+            noise_threshold: None,
         }
     }
 
@@ -80,6 +83,7 @@ impl BenchTest {
             ),
             runtime_path: None,
             no_runtime_integrity_check: false,
+            noise_threshold: None,
         }
     }
 
@@ -100,6 +104,13 @@ impl BenchTest {
     pub fn with_no_runtime_integrity_check(self) -> Self {
         Self {
             no_runtime_integrity_check: true,
+            ..self
+        }
+    }
+
+    pub fn with_noise_threshold(self, noise_threshold: f64) -> Self {
+        Self {
+            noise_threshold: Some(noise_threshold),
             ..self
         }
     }
@@ -136,6 +147,11 @@ impl BenchTest {
 
         if self.no_runtime_integrity_check {
             cmd_args.push("--no-runtime-integrity-check".to_string());
+        }
+
+        if let Some(noise_threshold) = self.noise_threshold {
+            cmd_args.push("--custom-noise-threshold".to_string());
+            cmd_args.push(noise_threshold.to_string());
         }
 
         let output = Command::new(canbench)
