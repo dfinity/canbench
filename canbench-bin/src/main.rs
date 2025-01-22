@@ -35,6 +35,10 @@ struct Args {
     /// Defaults to `.canbench/pocket-ic`.
     #[clap(long)]
     runtime_path: Option<PathBuf>,
+
+    /// A threshold (in percentage), below which a change in benchmark results is considered noise.
+    #[clap(long, default_value = "2.0")]
+    noise_threshold: f64,
 }
 
 #[derive(Debug, Deserialize)]
@@ -140,5 +144,6 @@ fn main() {
         !args.no_runtime_integrity_check,
         &args.runtime_path.unwrap_or_else(default_runtime_path),
         stable_memory_path,
+        args.noise_threshold,
     );
 }

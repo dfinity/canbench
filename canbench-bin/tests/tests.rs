@@ -83,6 +83,51 @@ Benchmark: noisy_change_test
 }
 
 #[test]
+fn benchmark_reports_noisy_change_above_default_noise_threshold() {
+    BenchTest::canister("measurements_output")
+        .with_bench("noisy_change_above_default_threshold_test")
+        .run(|output| {
+            assert_success!(
+                output,
+                "
+---------------------------------------------------
+
+Benchmark: noisy_change_above_default_threshold_test
+  total:
+    instructions: 3.39 M (improved by 4.36%)
+    heap_increase: 62 pages (improved by 4.62%)
+    stable_memory_increase: 100 pages (improved by 3.85%)
+
+---------------------------------------------------
+"
+            );
+        });
+}
+
+#[test]
+fn benchmark_reports_noisy_change_within_custom_noise_threshold() {
+    BenchTest::canister("measurements_output")
+        .with_bench("noisy_change_above_default_threshold_test")
+        .with_noise_threshold(5.0)
+        .run(|output| {
+            assert_success!(
+                output,
+                "
+---------------------------------------------------
+
+Benchmark: noisy_change_above_default_threshold_test
+  total:
+    instructions: 3.39 M (-4.36%) (change within noise threshold)
+    heap_increase: 62 pages (-4.62%) (change within noise threshold)
+    stable_memory_increase: 100 pages (-3.85%) (change within noise threshold)
+
+---------------------------------------------------
+"
+            );
+        });
+}
+
+#[test]
 fn benchmark_reports_regression() {
     BenchTest::canister("measurements_output")
         .with_bench("regression_test")
