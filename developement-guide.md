@@ -26,6 +26,6 @@ Here's an example PR bumping the versions: https://github.com/dfinity/canbench/p
 2. Run `cargo login` on the command line to authenticate with `crates.io` before publishing the packages. Follow the prompts and enter your API key when requested.
 3. Checkout the repo at the tag that was created for the release above `vX.X.X`. E.g. `git checkout vX.X.X`.
 4. Publish the crates. There is a specific order in which they need to be published.
-  - `cargo publish canbench-rs-macros`
-  - `cargo publish canbench-rs`
-  - `cargo publish canbench`
+  - `cargo publish -p canbench-rs-macros`
+  - `cargo publish -p canbench-rs`
+  - `cargo publish -p canbench`
