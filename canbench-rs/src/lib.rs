@@ -19,7 +19,7 @@
 //! For more information about optional dependencies, you can read more about them [here](https://doc.rust-lang.org/cargo/reference/features.html#optional-dependencies).
 //!
 //! ```toml
-//! canbench_rs = { version = "x.y.z", optional = true }
+//! canbench-rs = { version = "x.y.z", optional = true }
 //! ```
 //!
 //! ### 3. Add a configuration to `canbench.yml`
