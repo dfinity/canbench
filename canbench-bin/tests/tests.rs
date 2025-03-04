@@ -279,17 +279,17 @@ fn reports_scopes_in_new_benchmark() {
 
 Benchmark: bench_scope_new (new)
   total:
-    instructions: 3579 (new)
+    instructions: 3165 (new)
     heap_increase: 0 pages (new)
     stable_memory_increase: 0 pages (new)
 
   scope_1 (scope):
-    instructions: 1286 (new)
+    instructions: 913 (new)
     heap_increase: 0 pages (new)
     stable_memory_increase: 0 pages (new)
 
   scope_2 (scope):
-    instructions: 740 (new)
+    instructions: 714 (new)
     heap_increase: 0 pages (new)
     stable_memory_increase: 0 pages (new)
 
@@ -356,17 +356,17 @@ fn reports_scopes_in_existing_benchmark() {
 
 Benchmark: bench_scope_exists
   total:
-    instructions: 3579 (regressed from 0)
+    instructions: 3165 (regressed from 0)
     heap_increase: 0 pages (no change)
     stable_memory_increase: 0 pages (no change)
 
   scope_1 (scope):
-    instructions: 1286 (regressed by 60.75%)
+    instructions: 913 (regressed by 14.12%)
     heap_increase: 0 pages (improved by 100.00%)
     stable_memory_increase: 0 pages (no change)
 
   scope_2 (scope):
-    instructions: 740 (new)
+    instructions: 714 (new)
     heap_increase: 0 pages (new)
     stable_memory_increase: 0 pages (new)
 
@@ -400,7 +400,7 @@ fn benchmark_works_with_init_args() {
 
 Benchmark: state_check
   total:
-    instructions: 930 (regressed by 7.27%)
+    instructions: 872 (no change)
     heap_increase: 0 pages (no change)
     stable_memory_increase: 0 pages (no change)
 

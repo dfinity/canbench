@@ -1,7 +1,7 @@
 benches:
   state_check:
     total:
-      instructions: 867
+      instructions: 872
       heap_increase: 0
       stable_memory_increase: 0
     scopes: {}
