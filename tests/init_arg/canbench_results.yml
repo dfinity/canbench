@@ -1,9 +1,8 @@
-# The results in this file are artificial and are designed to trigger
-# certain scenarios.
 benches:
   state_check:
     total:
-      heap_delta: 0
-      instructions: 804
-      stable_memory_delta: 0
-version: 0.1.0
+      instructions: 867
+      heap_increase: 0
+      stable_memory_increase: 0
+    scopes: {}
+version: 0.1.9
