@@ -16,6 +16,16 @@ fn no_changes_test() {}
 #[bench]
 fn noisy_change_test() {}
 
+// A benchmark that uses large enough number of instructions, heap and stable memory so that cases
+// related to noise threshold can be tested. The values of the benchmark are persisted such that a
+// noisy change is reported with a higher noise threshold, while significant change is reported with
+// the default noise threshold.
+#[bench]
+fn noisy_change_above_default_threshold_test() {
+    let _ = vec![1; 1_000_000];
+    unsafe { stable64_grow(100) };
+}
+
 // A benchmark that does nothing.
 // The values of the benchmark are persisted such that regression is reported.
 #[bench]

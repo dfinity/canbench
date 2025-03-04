@@ -1,11 +1,13 @@
 use canbench_rs::{BenchResult, Measurement};
 use colored::Colorize;
 
-// The threshold that determines whether or not a change is significant.
-const NOISE_THRESHOLD: f64 = 2.0;
-
 /// Prints a benchmark to stdout, comparing it to the previous result if available.
-pub(crate) fn print_benchmark(name: &str, new: &BenchResult, old: Option<&BenchResult>) {
+pub(crate) fn print_benchmark(
+    name: &str,
+    new: &BenchResult,
+    old: Option<&BenchResult>,
+    noise_threshold: f64,
+) {
     // Print benchmark name.
     if old.is_some() {
         println!("Benchmark: {}", name.bold());
@@ -15,7 +17,7 @@ pub(crate) fn print_benchmark(name: &str, new: &BenchResult, old: Option<&BenchR
 
     // Print totals.
     println!("  total:");
-    print_measurement(&new.total, old.map(|m| &m.total));
+    print_measurement(&new.total, old.map(|m| &m.total), noise_threshold);
 
     // Print scopes
     for (scope, measurement) in &new.scopes {
@@ -24,31 +26,35 @@ pub(crate) fn print_benchmark(name: &str, new: &BenchResult, old: Option<&BenchR
         print_measurement(
             measurement,
             old.map(|m| &m.scopes).and_then(|m| m.get(scope)),
+            noise_threshold,
         );
     }
 }
 
 // Prints a measurement along with a comparison with the old value if available.
-fn print_measurement(new: &Measurement, old: Option<&Measurement>) {
+fn print_measurement(new: &Measurement, old: Option<&Measurement>, noise_threshold: f64) {
     print_metric(
         "instructions",
         new.instructions,
         old.map(|m| m.instructions),
+        noise_threshold,
     );
     print_metric(
         "heap_increase",
         new.heap_increase,
         old.map(|m| m.heap_increase),
+        noise_threshold,
     );
     print_metric(
         "stable_memory_increase",
         new.stable_memory_increase,
         old.map(|m| m.stable_memory_increase),
+        noise_threshold,
     );
 }
 
 // Prints a metric along with its percentage change relative to the old value.
-fn print_metric(metric: &str, value: u64, old_value: Option<u64>) {
+fn print_metric(metric: &str, value: u64, old_value: Option<u64>, noise_threshold: f64) {
     // Convert value to a more readable representation.
     let value_str = if value < 10_000 {
         format!("{}", value)
@@ -101,7 +107,7 @@ fn print_metric(metric: &str, value: u64, old_value: Option<u64>) {
             let diff = ((value as f64 - old_value as f64) / old_value as f64) * 100.0;
             if diff == 0.0 {
                 println!("    {metric}: {value_str} (no change)");
-            } else if diff.abs() < NOISE_THRESHOLD {
+            } else if diff.abs() < noise_threshold {
                 println!(
                     "    {metric}: {value_str} ({:.2}%) (change within noise threshold)",
                     diff
