@@ -17,6 +17,14 @@ path = "gzipped_wasm/src/main.rs"
 name = "init_arg"
 path = "init_arg/src/main.rs"
 
+[[bin]]
+name = "stable_memory"
+path = "stable_memory/src/main.rs"
+
+[[bin]]
+name = "stable_memory_invalid"
+path = "stable_memory_invalid/src/main.rs"
+
 [dependencies]
 canbench-rs = { path = "../canbench-rs" }
 candid.workspace = true

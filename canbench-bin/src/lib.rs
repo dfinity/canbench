@@ -1,13 +1,14 @@
 //! A module for running benchmarks.
+mod print_benchmark;
+mod results_file;
 use canbench_rs::BenchResult;
 use candid::Principal;
 use flate2::read::GzDecoder;
+use pocket_ic::common::rest::BlobCompression;
 use pocket_ic::{PocketIc, PocketIcBuilder, WasmResult};
-use std::{collections::BTreeMap, env, fs::File, io::Read, path::PathBuf, process::Command};
-mod print_benchmark;
-mod results_file;
 use print_benchmark::print_benchmark;
 use results_file::VersionError;
+use std::{collections::BTreeMap, env, fs::File, io::Read, path::PathBuf, process::Command};
 use wasmparser::Parser as WasmParser;
 
 // The prefix benchmarks are expected to have in their name.
@@ -29,6 +30,8 @@ pub fn run_benchmarks(
     verbose: bool,
     integrity_check: bool,
     runtime_path: &PathBuf,
+    stable_memory_path: Option<PathBuf>,
+    noise_threshold: f64,
 ) {
     maybe_download_pocket_ic(runtime_path, verbose, integrity_check);
 
@@ -47,7 +50,12 @@ pub fn run_benchmarks(
     let benchmark_fns = extract_benchmark_fns(canister_wasm_path);
 
     // Initialize PocketIC
-    let (pocket_ic, canister_id) = init_pocket_ic(runtime_path, canister_wasm_path, init_args);
+    let (pocket_ic, canister_id) = init_pocket_ic(
+        runtime_path,
+        canister_wasm_path,
+        stable_memory_path,
+        init_args,
+    );
 
     // Run the benchmarks
     let mut results = BTreeMap::new();
@@ -64,7 +72,12 @@ pub fn run_benchmarks(
         println!();
 
         let result = run_benchmark(&pocket_ic, canister_id, bench_fn);
-        print_benchmark(bench_fn, &result, current_results.get(bench_fn));
+        print_benchmark(
+            bench_fn,
+            &result,
+            current_results.get(bench_fn),
+            noise_threshold,
+        );
 
         results.insert(bench_fn.to_string(), result);
         num_executed_bench_fns += 1;
@@ -246,6 +259,7 @@ fn set_env_var_if_unset(key: &str, target_value: &str) {
 fn init_pocket_ic(
     path: &PathBuf,
     canister_wasm_path: &PathBuf,
+    stable_memory_path: Option<PathBuf>,
     init_args: Vec<u8>,
 ) -> (PocketIc, Principal) {
     // PocketIC is used for running the benchmark.
@@ -264,6 +278,28 @@ fn init_pocket_ic(
         init_args,
         None,
     );
+
+    // Load the canister's stable memory if a stable memory file is specified.
+    if let Some(stable_memory_path) = stable_memory_path {
+        let stable_memory_bytes = match std::fs::read(&stable_memory_path) {
+            Ok(bytes) => bytes,
+            Err(err) => {
+                eprintln!(
+                    "Error reading stable memory file {}",
+                    &stable_memory_path.display()
+                );
+                eprintln!("Error: {}", err);
+                std::process::exit(1);
+            }
+        };
+
+        pocket_ic.set_stable_memory(
+            canister_id,
+            stable_memory_bytes,
+            BlobCompression::NoCompression,
+        );
+    }
+
     (pocket_ic, canister_id)
 }
 

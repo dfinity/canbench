@@ -83,6 +83,51 @@ Benchmark: noisy_change_test
 }
 
 #[test]
+fn benchmark_reports_noisy_change_above_default_noise_threshold() {
+    BenchTest::canister("measurements_output")
+        .with_bench("noisy_change_above_default_threshold_test")
+        .run(|output| {
+            assert_success!(
+                output,
+                "
+---------------------------------------------------
+
+Benchmark: noisy_change_above_default_threshold_test
+  total:
+    instructions: 3.39 M (improved by 4.36%)
+    heap_increase: 62 pages (improved by 4.62%)
+    stable_memory_increase: 100 pages (improved by 3.85%)
+
+---------------------------------------------------
+"
+            );
+        });
+}
+
+#[test]
+fn benchmark_reports_noisy_change_within_custom_noise_threshold() {
+    BenchTest::canister("measurements_output")
+        .with_bench("noisy_change_above_default_threshold_test")
+        .with_noise_threshold(5.0)
+        .run(|output| {
+            assert_success!(
+                output,
+                "
+---------------------------------------------------
+
+Benchmark: noisy_change_above_default_threshold_test
+  total:
+    instructions: 3.39 M (-4.36%) (change within noise threshold)
+    heap_increase: 62 pages (-4.62%) (change within noise threshold)
+    stable_memory_increase: 100 pages (-3.85%) (change within noise threshold)
+
+---------------------------------------------------
+"
+            );
+        });
+}
+
+#[test]
 fn benchmark_reports_regression() {
     BenchTest::canister("measurements_output")
         .with_bench("regression_test")
@@ -234,17 +279,17 @@ fn reports_scopes_in_new_benchmark() {
 
 Benchmark: bench_scope_new (new)
   total:
-    instructions: 3411 (new)
+    instructions: 3165 (new)
     heap_increase: 0 pages (new)
     stable_memory_increase: 0 pages (new)
 
   scope_1 (scope):
-    instructions: 1002 (new)
+    instructions: 913 (new)
     heap_increase: 0 pages (new)
     stable_memory_increase: 0 pages (new)
 
   scope_2 (scope):
-    instructions: 787 (new)
+    instructions: 714 (new)
     heap_increase: 0 pages (new)
     stable_memory_increase: 0 pages (new)
 
@@ -311,17 +356,17 @@ fn reports_scopes_in_existing_benchmark() {
 
 Benchmark: bench_scope_exists
   total:
-    instructions: 3411 (regressed from 0)
+    instructions: 3165 (regressed from 0)
     heap_increase: 0 pages (no change)
     stable_memory_increase: 0 pages (no change)
 
   scope_1 (scope):
-    instructions: 1002 (regressed by 25.25%)
+    instructions: 913 (regressed by 14.12%)
     heap_increase: 0 pages (improved by 100.00%)
     stable_memory_increase: 0 pages (no change)
 
   scope_2 (scope):
-    instructions: 787 (new)
+    instructions: 714 (new)
     heap_increase: 0 pages (new)
     stable_memory_increase: 0 pages (new)
 
@@ -337,7 +382,7 @@ fn newer_version() {
         .run(|output| {
         assert_err!(
                 output,
-                "canbench is at version 0.1.8 while the results were generated with version 99.0.0. Please upgrade canbench.
+                "canbench is at version 0.1.9 while the results were generated with version 99.0.0. Please upgrade canbench.
 "
             );
         });
@@ -355,7 +400,7 @@ fn benchmark_works_with_init_args() {
 
 Benchmark: state_check
   total:
-    instructions: 804 (no change)
+    instructions: 872 (no change)
     heap_increase: 0 pages (no change)
     stable_memory_increase: 0 pages (no change)
 
@@ -378,7 +423,7 @@ fn benchmark_stable_writes() {
 
 Benchmark: write_stable_memory (new)
   total:
-    instructions: 49.09 K (new)
+    instructions: 49.12 K (new)
     heap_increase: 0 pages (new)
     stable_memory_increase: 1 pages (new)
 
@@ -386,4 +431,25 @@ Benchmark: write_stable_memory (new)
 "
             );
         });
+}
+
+#[test]
+fn loads_stable_memory_file() {
+    BenchTest::canister("stable_memory").run(|output| {
+        // There are assertions in the code of that canister itself, so
+        // all is needed is to assert that the run succeeded.
+        assert_eq!(output.status.code(), Some(0), "output: {:?}", output);
+    });
+}
+
+#[test]
+fn stable_memory_file_not_exit_prints_error() {
+    BenchTest::canister("stable_memory_invalid").run(|output| {
+        assert_err!(
+            output,
+            "
+Error reading stable memory file stable_memory_does_not_exist.bin
+Error: No such file or directory"
+        );
+    });
 }

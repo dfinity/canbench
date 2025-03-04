@@ -2,7 +2,7 @@ use canbench_rs::bench;
 use std::cell::RefCell;
 
 thread_local! {
-    static STATE: RefCell<String> = RefCell::new(String::new());
+    static STATE: RefCell<String> = const { RefCell::new(String::new()) };
 }
 // A benchmark that prints the state.
 #[bench]

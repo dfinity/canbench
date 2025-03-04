@@ -15,6 +15,13 @@ benches:
       instructions: 210
       stable_memory_increase: 0
 
+  # A benchmark that is expected to return a noisy change with a higher noise threshold.
+  noisy_change_above_default_threshold_test:
+    total:
+      heap_increase: 65 
+      instructions: 3540000
+      stable_memory_increase: 104
+
   # A benchmark that is expected to return a regression.
   regression_test:
     total:
