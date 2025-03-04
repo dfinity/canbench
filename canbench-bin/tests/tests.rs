@@ -400,7 +400,7 @@ fn benchmark_works_with_init_args() {
 
 Benchmark: state_check
   total:
-    instructions: 867 (regressed by 7.84%)
+    instructions: 930 (regressed by 15.67%)
     heap_increase: 0 pages (no change)
     stable_memory_increase: 0 pages (no change)
 
