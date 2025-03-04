@@ -1,25 +1,26 @@
 [package]
 name = "canbench"
 # NOTE: whenever this version is updated, canbench-rs below should also be updated.
-version = "0.1.9"
-edition = "2021"
-license = "Apache-2.0"
 description = "A benchmarking framework for canisters on the Internet Computer."
-repository = "https://github.com/dfinity/canbench"
-keywords = ["internet-computer", "benchmark", "canister", "ic", "perf"]
+edition = "2021"
+keywords = ["benchmark", "canister", "ic", "internet-computer", "perf"]
+license = "Apache-2.0"
 readme = "../README.md"
+repository = "https://github.com/dfinity/canbench"
+version = "0.1.10"
 
 [[bin]]
 name = "canbench"
 path = "src/main.rs"
 
 [dependencies]
-canbench-rs = { path = "../canbench-rs", version = "0.1.9" }
+canbench-rs = { path = "../canbench-rs", version = "0.1.10" }
 candid.workspace = true
 clap.workspace = true
 colored.workspace = true
 flate2.workspace = true
 hex.workspace = true
+pocket-ic.workspace = true
 reqwest.workspace = true
 semver.workspace = true
 serde.workspace = true
@@ -27,7 +28,6 @@ serde_yaml.workspace = true
 sha256.workspace = true
 tempfile.workspace = true
 wasmparser.workspace = true
-pocket-ic.workspace = true
 
 [dev-dependencies]
 pretty_assertions = "1.4.0"
