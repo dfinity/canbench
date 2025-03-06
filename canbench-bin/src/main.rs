@@ -21,6 +21,10 @@ struct Args {
     #[clap(long)]
     less_verbose: bool,
 
+    /// Show canister's `ic_cdk::eprintln!()` output.
+    #[clap(long)]
+    show_canister_output: bool,
+
     /// Skip checking the integrity (hash) of the runtime.
     ///
     /// Checking the hash ensures that canbench is using the runtime it's expecting.
@@ -141,6 +145,7 @@ fn main() {
         args.persist,
         &results_path,
         !args.less_verbose,
+        args.show_canister_output,
         !args.no_runtime_integrity_check,
         &args.runtime_path.unwrap_or_else(default_runtime_path),
         stable_memory_path,
