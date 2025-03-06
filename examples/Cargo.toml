@@ -1,7 +1,7 @@
 [package]
+edition = "2021"
 name = "example"
 version = "0.1.0"
-edition = "2021"
 
 [[bin]]
 name = "fibonacci"
@@ -14,5 +14,5 @@ path = "btreemap_vs_hashmap/src/main.rs"
 [dependencies]
 canbench-rs = { path = "../canbench-rs", optional = true }
 candid.workspace = true
-ic-cdk.workspace= true
+ic-cdk.workspace = true
 ic-cdk-macros.workspace = true
