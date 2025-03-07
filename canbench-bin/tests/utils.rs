@@ -44,6 +44,7 @@ pub struct BenchTest {
     base_dir: BaseDir,
     runtime_path: Option<PathBuf>,
     no_runtime_integrity_check: bool,
+    canister_output: bool,
     noise_threshold: Option<f64>,
 }
 
@@ -55,6 +56,7 @@ impl BenchTest {
             base_dir: BaseDir::Temp,
             runtime_path: None,
             no_runtime_integrity_check: false,
+            canister_output: false,
             noise_threshold: None,
         }
     }
@@ -66,6 +68,7 @@ impl BenchTest {
             base_dir: BaseDir::Temp,
             runtime_path: None,
             no_runtime_integrity_check: false,
+            canister_output: false,
             noise_threshold: None,
         }
     }
@@ -83,6 +86,7 @@ impl BenchTest {
             ),
             runtime_path: None,
             no_runtime_integrity_check: false,
+            canister_output: false,
             noise_threshold: None,
         }
     }
@@ -104,6 +108,13 @@ impl BenchTest {
     pub fn with_no_runtime_integrity_check(self) -> Self {
         Self {
             no_runtime_integrity_check: true,
+            ..self
+        }
+    }
+
+    pub fn with_canister_output(self) -> Self {
+        Self {
+            canister_output: true,
             ..self
         }
     }
@@ -147,6 +158,10 @@ impl BenchTest {
 
         if self.no_runtime_integrity_check {
             cmd_args.push("--no-runtime-integrity-check".to_string());
+        }
+
+        if self.canister_output {
+            cmd_args.push("--show-canister-output".to_string());
         }
 
         if let Some(noise_threshold) = self.noise_threshold {

@@ -453,3 +453,13 @@ Error: No such file or directory"
         );
     });
 }
+
+#[test]
+fn shows_canister_output() {
+    BenchTest::canister("debug_print")
+        .with_canister_output()
+        .run(|output| {
+            let err_output = String::from_utf8_lossy(&output.stderr);
+            assert!(err_output.contains("Hello from tests!"));
+        });
+}
