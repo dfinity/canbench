@@ -459,7 +459,7 @@
 //! variables (not constants), both the arguments and the result
 //! of the benchmarked function must be wrapped in `black_box` calls.
 //!
-//! Refer the [Rust documentation](https://doc.rust-lang.org/std/hint/fn.black_box.html)
+//! Refer to the [Rust documentation](https://doc.rust-lang.org/std/hint/fn.black_box.html)
 //! for more details.
 //!
 pub use canbench_rs_macros::bench;
