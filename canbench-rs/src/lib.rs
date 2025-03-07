@@ -432,7 +432,7 @@
 //! [...]
 //! ```
 //!
-//! Refer the [Internet Computer specification](https://internetcomputer.org/docs/references/ic-interface-spec#debugging-aids) for more details.
+//! Refer to the [Internet Computer specification](https://internetcomputer.org/docs/references/ic-interface-spec#debugging-aids) for more details.
 //!
 //! ### Preventing Compiler Optimizations
 //!
