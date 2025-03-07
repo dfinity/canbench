@@ -28,6 +28,7 @@ pub fn run_benchmarks(
     persist: bool,
     results_file: &PathBuf,
     verbose: bool,
+    show_canister_output: bool,
     integrity_check: bool,
     runtime_path: &PathBuf,
     stable_memory_path: Option<PathBuf>,
@@ -55,6 +56,7 @@ pub fn run_benchmarks(
         canister_wasm_path,
         stable_memory_path,
         init_args,
+        show_canister_output,
     );
 
     // Run the benchmarks
@@ -261,11 +263,14 @@ fn init_pocket_ic(
     canister_wasm_path: &PathBuf,
     stable_memory_path: Option<PathBuf>,
     init_args: Vec<u8>,
+    show_canister_output: bool,
 ) -> (PocketIc, Principal) {
     // PocketIC is used for running the benchmark.
     // Set the appropriate ENV variables
     std::env::set_var("POCKET_IC_BIN", path);
-    set_env_var_if_unset("POCKET_IC_MUTE_SERVER", "1");
+    if !show_canister_output {
+        set_env_var_if_unset("POCKET_IC_MUTE_SERVER", "1");
+    }
     let pocket_ic = PocketIcBuilder::new()
         .with_max_request_time_ms(None)
         .with_benchmarking_application_subnet()
