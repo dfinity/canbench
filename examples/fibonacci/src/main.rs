@@ -39,14 +39,31 @@ mod benches {
 
     #[bench]
     fn fibonacci_20() {
-        // NOTE: the result is printed to prevent the compiler from optimizing the call away.
-        println!("{:?}", fibonacci(20));
+        // Prevent the compiler from optimizing the call and propagating constants.
+        std::hint::black_box(fibonacci(std::hint::black_box(20)));
+    }
+
+    // Note how the results of the following three functions differ:
+    #[bench]
+    fn fibonacci_8a() {
+        // this takes 454 instructions,
+        std::hint::black_box(fibonacci(std::hint::black_box(8)));
+    }
+    #[bench]
+    fn fibonacci_8b() {
+        // this takes 207 instructions,
+        std::hint::black_box(fibonacci(8));
+    }
+    #[bench]
+    fn fibonacci_8c() {
+        // and this takes 395 instructions.
+        fibonacci(std::hint::black_box(8));
     }
 
     #[bench]
     fn fibonacci_45() {
-        // NOTE: the result is printed to prevent the compiler from optimizing the call away.
-        println!("{:?}", fibonacci(45));
+        // Prevent the compiler from optimizing the call and propagating constants.
+        std::hint::black_box(fibonacci(std::hint::black_box(45)));
     }
 }
 

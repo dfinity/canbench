@@ -96,14 +96,14 @@
 //!
 //!     #[bench]
 //!     fn fibonacci_20() {
-//!         // NOTE: the result is printed to prevent the compiler from optimizing the call away.
-//!         println!("{:?}", fibonacci(20));
+//!         // Prevent the compiler from optimizing the call and propagating constants.
+//!         std::hint::black_box(fibonacci(std::hint::black_box(20)));
 //!     }
 //!
 //!     #[bench]
 //!     fn fibonacci_45() {
-//!         // NOTE: the result is printed to prevent the compiler from optimizing the call away.
-//!         println!("{:?}", fibonacci(45));
+//!         // Prevent the compiler from optimizing the call and propagating constants.
+//!         std::hint::black_box(fibonacci(std::hint::black_box(45)));
 //!     }
 //! }
 //! ```
@@ -402,6 +402,66 @@
 //!
 //! Executed 1 of 1 benchmarks.
 //! ```
+//!
+//! ### Debugging
+//!
+//! The `ic_cdk::eprintln!()` macro facilitates tracing canister and benchmark execution.
+//! Output is displayed on the console when `canbench` is executed with
+//! the `--show-canister-output` option.
+//!
+//! ```rust
+//! # #[cfg(feature = "canbench-rs")]
+//! # mod benches {
+//! #     use super::*;
+//! #     use canbench_rs::bench;
+//! #
+//!     #[bench]
+//!     fn bench_with_debug_print() {
+//!         // Run `canbench --show-canister-output` to see the output.
+//!         ic_cdk::eprintln!("Hello from {}!", env!("CARGO_PKG_NAME"));
+//!     }
+//! # }
+//! ```
+//!
+//! Example output:
+//!
+//! ```bash
+//! $ canbench bench_with_debug_print --show-canister-output
+//! [...]
+//! 2021-05-06 19:17:10.000000003 UTC: [Canister lxzze-o7777-77777-aaaaa-cai] Hello from example!
+//! [...]
+//! ```
+//!
+//! Refer to the [Internet Computer specification](https://internetcomputer.org/docs/references/ic-interface-spec#debugging-aids) for more details.
+//!
+//! ### Preventing Compiler Optimizations
+//!
+//! If benchmark results appear suspiciously low and remain consistent
+//! despite increased benchmarked function complexity, the `std::hint::black_box`
+//! function helps prevent compiler optimizations.
+//!
+//! ```rust
+//! # #[cfg(feature = "canbench-rs")]
+//! # mod benches {
+//! #     use super::*;
+//! #     use canbench_rs::bench;
+//! #
+//!     #[bench]
+//!     fn fibonacci_20() {
+//!         // Prevent the compiler from optimizing the call and propagating constants.
+//!         std::hint::black_box(fibonacci(std::hint::black_box(20)));
+//!     }
+//! # }
+//! ```
+//!
+//! Note that passing constant values as function arguments can also
+//! trigger compiler optimizations. If the actual code uses
+//! variables (not constants), both the arguments and the result
+//! of the benchmarked function must be wrapped in `black_box` calls.
+//!
+//! Refer to the [Rust documentation](https://doc.rust-lang.org/std/hint/fn.black_box.html)
+//! for more details.
+//!
 pub use canbench_rs_macros::bench;
 use candid::CandidType;
 use serde::{Deserialize, Serialize};
