@@ -29,6 +29,7 @@ pub fn bench(arg_tokens: TokenStream, item: TokenStream) -> TokenStream {
     // that it should run.
     let renamed_func_name =
         syn::Ident::new(&format!("__canbench__{}", func_name), func_name.span());
+    let tracing_func_name = syn::Ident::new(&format!("__tracing__{}", func_name), func_name.span());
 
     // Validate the argument and generate code accordingly
     let expanded = match args.as_slice() {
@@ -59,6 +60,13 @@ pub fn bench(arg_tokens: TokenStream, item: TokenStream) -> TokenStream {
                 fn #renamed_func_name() -> canbench_rs::BenchResult {
                     #func_name()
                 }
+
+                #[ic_cdk::query]
+                #[allow(non_snake_case)]
+                fn #tracing_func_name(bench_instructions: u64) -> Result<Vec<(i32, i64)>, String> {
+                    #func_name();
+                    canbench_rs::get_traces(bench_instructions)
+                }
             }
         }
         [] => {
@@ -79,6 +87,15 @@ pub fn bench(arg_tokens: TokenStream, item: TokenStream) -> TokenStream {
                     canbench_rs::bench_fn(|| {
                         #func_name();
                     })
+                }
+
+                #[ic_cdk::query]
+                #[allow(non_snake_case)]
+                fn #tracing_func_name(bench_instructions: u64) -> Result<Vec<(i32, i64)>, String> {
+                    canbench_rs::bench_fn(|| {
+                        #func_name();
+                    });
+                    canbench_rs::get_traces(bench_instructions)
                 }
             }
         }

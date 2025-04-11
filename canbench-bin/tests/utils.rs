@@ -46,6 +46,7 @@ pub struct BenchTest {
     no_runtime_integrity_check: bool,
     canister_output: bool,
     noise_threshold: Option<f64>,
+    instruction_tracing: bool,
 }
 
 impl BenchTest {
@@ -58,6 +59,7 @@ impl BenchTest {
             no_runtime_integrity_check: false,
             canister_output: false,
             noise_threshold: None,
+            instruction_tracing: false,
         }
     }
 
@@ -70,6 +72,7 @@ impl BenchTest {
             no_runtime_integrity_check: false,
             canister_output: false,
             noise_threshold: None,
+            instruction_tracing: false,
         }
     }
 
@@ -88,6 +91,7 @@ impl BenchTest {
             no_runtime_integrity_check: false,
             canister_output: false,
             noise_threshold: None,
+            instruction_tracing: false,
         }
     }
 
@@ -122,6 +126,13 @@ impl BenchTest {
     pub fn with_noise_threshold(self, noise_threshold: f64) -> Self {
         Self {
             noise_threshold: Some(noise_threshold),
+            ..self
+        }
+    }
+
+    pub fn with_instruction_tracing(self) -> Self {
+        Self {
+            instruction_tracing: true,
             ..self
         }
     }
@@ -167,6 +178,10 @@ impl BenchTest {
         if let Some(noise_threshold) = self.noise_threshold {
             cmd_args.push("--noise-threshold".to_string());
             cmd_args.push(noise_threshold.to_string());
+        }
+
+        if self.instruction_tracing {
+            cmd_args.push("--instruction-tracing".to_string());
         }
 
         let output = Command::new(canbench)
