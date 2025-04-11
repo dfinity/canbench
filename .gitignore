@@ -6,3 +6,5 @@
 .vscode/
 .idea/
 **/*~
+tests/**/*.svg
+examples/**/*.svg

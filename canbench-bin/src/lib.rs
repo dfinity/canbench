@@ -1,14 +1,23 @@
 //! A module for running benchmarks.
+mod instruction_tracing;
 mod print_benchmark;
 mod results_file;
 use canbench_rs::BenchResult;
-use candid::Principal;
+use candid::{Encode, Principal};
 use flate2::read::GzDecoder;
+use instruction_tracing::{prepare_instruction_tracing, write_traces_to_file};
 use pocket_ic::common::rest::BlobCompression;
 use pocket_ic::{PocketIc, PocketIcBuilder, WasmResult};
 use print_benchmark::print_benchmark;
 use results_file::VersionError;
-use std::{collections::BTreeMap, env, fs::File, io::Read, path::PathBuf, process::Command};
+use std::{
+    collections::BTreeMap,
+    env,
+    fs::File,
+    io::Read,
+    path::{Path, PathBuf},
+    process::Command,
+};
 use wasmparser::Parser as WasmParser;
 
 // The prefix benchmarks are expected to have in their name.
@@ -30,6 +39,7 @@ pub fn run_benchmarks(
     verbose: bool,
     show_canister_output: bool,
     integrity_check: bool,
+    instruction_tracing: bool,
     runtime_path: &PathBuf,
     stable_memory_path: Option<PathBuf>,
     noise_threshold: f64,
@@ -47,13 +57,24 @@ pub fn run_benchmarks(
         }
     };
 
+    let benchmark_wasm = read_wasm(canister_wasm_path);
+
     // Extract the benchmark functions in the Wasm.
-    let benchmark_fns = extract_benchmark_fns(canister_wasm_path);
+    let benchmark_fns = extract_benchmark_fns(&benchmark_wasm);
+
+    let (instruction_tracing_wasm, function_names_mapping) = if instruction_tracing {
+        let (instruction_tracing_wasm, function_names_mapping) =
+            prepare_instruction_tracing(&benchmark_wasm);
+        (Some(instruction_tracing_wasm), Some(function_names_mapping))
+    } else {
+        (None, None)
+    };
 
     // Initialize PocketIC
-    let (pocket_ic, canister_id) = init_pocket_ic(
+    let (pocket_ic, benchmark_canister_id, instruction_tracing_canister_id) = init_pocket_ic(
         runtime_path,
-        canister_wasm_path,
+        benchmark_wasm,
+        instruction_tracing_wasm,
         stable_memory_path,
         init_args,
         show_canister_output,
@@ -73,13 +94,24 @@ pub fn run_benchmarks(
         println!("---------------------------------------------------");
         println!();
 
-        let result = run_benchmark(&pocket_ic, canister_id, bench_fn);
+        let result = run_benchmark(&pocket_ic, benchmark_canister_id, bench_fn);
         print_benchmark(
             bench_fn,
             &result,
             current_results.get(bench_fn),
             noise_threshold,
         );
+
+        if let Some(instruction_tracing_canister_id) = instruction_tracing_canister_id {
+            run_instruction_tracing(
+                &pocket_ic,
+                instruction_tracing_canister_id,
+                bench_fn,
+                function_names_mapping.as_ref().unwrap(),
+                results_file,
+                result.total.instructions,
+            );
+        }
 
         results.insert(bench_fn.to_string(), result);
         num_executed_bench_fns += 1;
@@ -170,7 +202,7 @@ fn run_benchmark(pocket_ic: &PocketIc, canister_id: Principal, bench_fn: &str) -
         canister_id,
         Principal::anonymous(),
         &format!("{}{}", BENCH_PREFIX, bench_fn),
-        b"DIDL\x00\x00".to_vec(),
+        Encode!(&()).unwrap(),
     ) {
         Ok(wasm_res) => match wasm_res {
             WasmResult::Reply(res) => {
@@ -193,8 +225,54 @@ fn run_benchmark(pocket_ic: &PocketIc, canister_id: Principal, bench_fn: &str) -
     }
 }
 
-// Extract the benchmarks that need to be run.
-fn extract_benchmark_fns(canister_wasm_path: &PathBuf) -> Vec<String> {
+fn run_instruction_tracing(
+    pocket_ic: &PocketIc,
+    canister_id: Principal,
+    bench_fn: &str,
+    names_mapping: &BTreeMap<i32, String>,
+    results_file: &Path,
+    bench_instructions: u64,
+) {
+    let traces: Result<Vec<(i32, i64)>, String> = match pocket_ic.query_call(
+        canister_id,
+        Principal::anonymous(),
+        &format!("__tracing__{bench_fn}"),
+        Encode!(&bench_instructions).unwrap(),
+    ) {
+        Ok(wasm_res) => match wasm_res {
+            WasmResult::Reply(res) => {
+                let res: Result<Vec<(i32, i64)>, String> =
+                    candid::decode_one(&res).expect("error decoding tracing result");
+                res
+            }
+            WasmResult::Reject(output_str) => {
+                eprintln!(
+                    "Error tracing benchmark {}. Error:\n{}",
+                    bench_fn, output_str
+                );
+                std::process::exit(1);
+            }
+        },
+        Err(e) => {
+            eprintln!("Error tracing benchmark {}. Error:\n{}", bench_fn, e);
+            std::process::exit(1);
+        }
+    };
+    match traces {
+        Ok(traces) => write_traces_to_file(
+            traces,
+            names_mapping,
+            bench_fn,
+            results_file.with_file_name(format!("{bench_fn}.svg")),
+        )
+        .expect("failed to write tracing results"),
+        Err(e) => {
+            eprint!("Error tracing benchmark {}. Error:\n{}", bench_fn, e);
+        }
+    }
+}
+
+fn read_wasm(canister_wasm_path: &PathBuf) -> Vec<u8> {
     // Parse the canister's wasm.
     let wasm = std::fs::read(canister_wasm_path).unwrap_or_else(|_| {
         eprintln!(
@@ -205,7 +283,7 @@ fn extract_benchmark_fns(canister_wasm_path: &PathBuf) -> Vec<String> {
     });
 
     // Decompress the wasm if it's gzipped.
-    let wasm = match canister_wasm_path.extension().unwrap().to_str() {
+    match canister_wasm_path.extension().unwrap().to_str() {
         Some("gz") => {
             // Decompress the wasm if it's gzipped.
             let mut decoder = GzDecoder::new(&wasm[..]);
@@ -214,12 +292,15 @@ fn extract_benchmark_fns(canister_wasm_path: &PathBuf) -> Vec<String> {
             decompressed_wasm
         }
         _ => wasm,
-    };
+    }
+}
 
+// Extract the benchmarks that need to be run.
+fn extract_benchmark_fns(wasm: &[u8]) -> Vec<String> {
     let prefix = format!("canister_query {BENCH_PREFIX}");
 
     WasmParser::new(0)
-        .parse_all(&wasm)
+        .parse_all(wasm)
         .filter_map(|section| match section {
             Ok(wasmparser::Payload::ExportSection(export_section)) => {
                 let queries: Vec<_> = export_section
@@ -260,11 +341,12 @@ fn set_env_var_if_unset(key: &str, target_value: &str) {
 // Initializes PocketIC and installs the canister to benchmark.
 fn init_pocket_ic(
     path: &PathBuf,
-    canister_wasm_path: &PathBuf,
+    benchmark_wasm: Vec<u8>,
+    instruction_tracing_wasm: Option<Vec<u8>>,
     stable_memory_path: Option<PathBuf>,
     init_args: Vec<u8>,
     show_canister_output: bool,
-) -> (PocketIc, Principal) {
+) -> (PocketIc, Principal, Option<Principal>) {
     // PocketIC is used for running the benchmark.
     // Set the appropriate ENV variables
     std::env::set_var("POCKET_IC_BIN", path);
@@ -275,37 +357,41 @@ fn init_pocket_ic(
         .with_max_request_time_ms(None)
         .with_benchmarking_application_subnet()
         .build();
+
+    let stable_memory = stable_memory_path.map(|path| match std::fs::read(&path) {
+        Ok(bytes) => bytes,
+        Err(err) => {
+            eprintln!("Error reading stable memory file {}", path.display());
+            eprintln!("Error: {}", err);
+            std::process::exit(1);
+        }
+    });
+
+    let instruction_tracing_canister_id = instruction_tracing_wasm
+        .map(|wasm| init_canister(&pocket_ic, wasm, init_args.clone(), stable_memory.clone()));
+    let benchmark_canister_id = init_canister(&pocket_ic, benchmark_wasm, init_args, stable_memory);
+
+    (
+        pocket_ic,
+        benchmark_canister_id,
+        instruction_tracing_canister_id,
+    )
+}
+
+fn init_canister(
+    pocket_ic: &PocketIc,
+    wasm: Vec<u8>,
+    init_args: Vec<u8>,
+    stable_memory: Option<Vec<u8>>,
+) -> Principal {
     let canister_id = pocket_ic.create_canister();
     pocket_ic.add_cycles(canister_id, 1_000_000_000_000_000);
-    pocket_ic.install_canister(
-        canister_id,
-        std::fs::read(canister_wasm_path).unwrap(),
-        init_args,
-        None,
-    );
-
-    // Load the canister's stable memory if a stable memory file is specified.
-    if let Some(stable_memory_path) = stable_memory_path {
-        let stable_memory_bytes = match std::fs::read(&stable_memory_path) {
-            Ok(bytes) => bytes,
-            Err(err) => {
-                eprintln!(
-                    "Error reading stable memory file {}",
-                    &stable_memory_path.display()
-                );
-                eprintln!("Error: {}", err);
-                std::process::exit(1);
-            }
-        };
-
-        pocket_ic.set_stable_memory(
-            canister_id,
-            stable_memory_bytes,
-            BlobCompression::NoCompression,
-        );
+    pocket_ic.install_canister(canister_id, wasm, init_args, None);
+    // Load the canister's stable memory if stable memory is specified.
+    if let Some(stable_memory) = stable_memory {
+        pocket_ic.set_stable_memory(canister_id, stable_memory, BlobCompression::NoCompression);
     }
-
-    (pocket_ic, canister_id)
+    canister_id
 }
 
 // Public only for tests.

@@ -279,17 +279,17 @@ fn reports_scopes_in_new_benchmark() {
 
 Benchmark: bench_scope_new (new)
   total:
-    instructions: 3165 (new)
+    instructions: 3500 (new)
     heap_increase: 0 pages (new)
     stable_memory_increase: 0 pages (new)
 
   scope_1 (scope):
-    instructions: 913 (new)
+    instructions: 1039 (new)
     heap_increase: 0 pages (new)
     stable_memory_increase: 0 pages (new)
 
   scope_2 (scope):
-    instructions: 714 (new)
+    instructions: 775 (new)
     heap_increase: 0 pages (new)
     stable_memory_increase: 0 pages (new)
 
@@ -356,17 +356,17 @@ fn reports_scopes_in_existing_benchmark() {
 
 Benchmark: bench_scope_exists
   total:
-    instructions: 3165 (regressed from 0)
+    instructions: 3500 (regressed from 0)
     heap_increase: 0 pages (no change)
     stable_memory_increase: 0 pages (no change)
 
   scope_1 (scope):
-    instructions: 913 (regressed by 14.12%)
+    instructions: 1039 (regressed by 29.88%)
     heap_increase: 0 pages (improved by 100.00%)
     stable_memory_increase: 0 pages (no change)
 
   scope_2 (scope):
-    instructions: 714 (new)
+    instructions: 775 (new)
     heap_increase: 0 pages (new)
     stable_memory_increase: 0 pages (new)
 
@@ -400,7 +400,7 @@ fn benchmark_works_with_init_args() {
 
 Benchmark: state_check
   total:
-    instructions: 872 (no change)
+    instructions: 841 (no change)
     heap_increase: 0 pages (no change)
     stable_memory_increase: 0 pages (no change)
 
@@ -423,7 +423,7 @@ fn benchmark_stable_writes() {
 
 Benchmark: write_stable_memory (new)
   total:
-    instructions: 49.12 K (new)
+    instructions: 49.17 K (new)
     heap_increase: 0 pages (new)
     stable_memory_increase: 1 pages (new)
 
@@ -461,5 +461,31 @@ fn shows_canister_output() {
         .run(|output| {
             let err_output = String::from_utf8_lossy(&output.stderr);
             assert!(err_output.contains("Hello from tests!"));
+        });
+}
+
+#[test]
+fn benchmark_instruction_tracing() {
+    // TODO: better end-to-end testing, since this test only makes sure there is no error in
+    // tracing.
+    BenchTest::canister("measurements_output")
+        .with_bench("write_stable_memory")
+        .with_instruction_tracing()
+        .run(|output| {
+            assert_success!(
+                output,
+                "
+---------------------------------------------------
+
+Benchmark: write_stable_memory (new)
+  total:
+    instructions: 49.17 K (new)
+    heap_increase: 0 pages (new)
+    stable_memory_increase: 1 pages (new)
+Instruction traces written to write_stable_memory.svg
+
+---------------------------------------------------
+"
+            );
         });
 }
