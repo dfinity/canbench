@@ -508,11 +508,11 @@ pub fn bench_fn<R>(f: impl FnOnce() -> R) -> BenchResult {
 
     if !is_tracing_enabled {
         let start_heap = heap_size();
-        let start_stable_memory = ic_cdk::api::stable::stable64_size();
+        let start_stable_memory = ic_cdk::stable::stable_size();
         let start_instructions = instruction_count();
         f();
         let instructions = instruction_count() - start_instructions;
-        let stable_memory_increase = ic_cdk::api::stable::stable64_size() - start_stable_memory;
+        let stable_memory_increase = ic_cdk::stable::stable_size() - start_stable_memory;
         let heap_increase = heap_size() - start_heap;
 
         let total = Measurement {
@@ -594,7 +594,7 @@ pub struct BenchScope {
 impl BenchScope {
     fn new(name: &'static str) -> Self {
         let start_heap = heap_size();
-        let start_stable_memory = ic_cdk::api::stable::stable64_size();
+        let start_stable_memory = ic_cdk::stable::stable_size();
         let start_instructions = instruction_count();
 
         Self {
@@ -609,8 +609,7 @@ impl BenchScope {
 impl Drop for BenchScope {
     fn drop(&mut self) {
         let instructions = instruction_count() - self.start_instructions;
-        let stable_memory_increase =
-            ic_cdk::api::stable::stable64_size() - self.start_stable_memory;
+        let stable_memory_increase = ic_cdk::stable::stable_size() - self.start_stable_memory;
         let heap_increase = heap_size() - self.start_heap;
 
         SCOPES.with(|p| {
