@@ -94,7 +94,7 @@ fn benchmark_reports_noisy_change_above_default_noise_threshold() {
 
 Benchmark: noisy_change_above_default_threshold_test
   total:
-    instructions: 3.39 M (improved by 4.36%)
+    instructions: 3.39 M (improved by 4.35%)
     heap_increase: 62 pages (improved by 4.62%)
     stable_memory_increase: 100 pages (improved by 3.85%)
 
@@ -117,7 +117,7 @@ fn benchmark_reports_noisy_change_within_custom_noise_threshold() {
 
 Benchmark: noisy_change_above_default_threshold_test
   total:
-    instructions: 3.39 M (-4.36%) (change within noise threshold)
+    instructions: 3.39 M (-4.35%) (change within noise threshold)
     heap_increase: 62 pages (-4.62%) (change within noise threshold)
     stable_memory_increase: 100 pages (-3.85%) (change within noise threshold)
 
@@ -279,17 +279,17 @@ fn reports_scopes_in_new_benchmark() {
 
 Benchmark: bench_scope_new (new)
   total:
-    instructions: 3500 (new)
-    heap_increase: 0 pages (new)
+    instructions: 3988 (new)
+    heap_increase: 1 pages (new)
     stable_memory_increase: 0 pages (new)
 
   scope_1 (scope):
-    instructions: 1039 (new)
-    heap_increase: 0 pages (new)
+    instructions: 1620 (new)
+    heap_increase: 1 pages (new)
     stable_memory_increase: 0 pages (new)
 
   scope_2 (scope):
-    instructions: 775 (new)
+    instructions: 786 (new)
     heap_increase: 0 pages (new)
     stable_memory_increase: 0 pages (new)
 
@@ -356,17 +356,17 @@ fn reports_scopes_in_existing_benchmark() {
 
 Benchmark: bench_scope_exists
   total:
-    instructions: 3500 (regressed from 0)
-    heap_increase: 0 pages (no change)
+    instructions: 3988 (regressed from 0)
+    heap_increase: 1 pages (no change)
     stable_memory_increase: 0 pages (no change)
 
   scope_1 (scope):
-    instructions: 1039 (regressed by 29.88%)
-    heap_increase: 0 pages (improved by 100.00%)
+    instructions: 1620 (regressed by 102.50%)
+    heap_increase: 1 pages (improved by 91.67%)
     stable_memory_increase: 0 pages (no change)
 
   scope_2 (scope):
-    instructions: 775 (new)
+    instructions: 786 (new)
     heap_increase: 0 pages (new)
     stable_memory_increase: 0 pages (new)
 
@@ -400,7 +400,7 @@ fn benchmark_works_with_init_args() {
 
 Benchmark: state_check
   total:
-    instructions: 841 (no change)
+    instructions: 872 (regressed)
     heap_increase: 0 pages (no change)
     stable_memory_increase: 0 pages (no change)
 
@@ -424,7 +424,7 @@ fn benchmark_stable_writes() {
 Benchmark: write_stable_memory (new)
   total:
     instructions: 49.17 K (new)
-    heap_increase: 0 pages (new)
+    heap_increase: 1 pages (new)
     stable_memory_increase: 1 pages (new)
 
 ---------------------------------------------------
