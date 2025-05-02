@@ -8,7 +8,7 @@ use flate2::read::GzDecoder;
 use instruction_tracing::{prepare_instruction_tracing, write_traces_to_file};
 use pocket_ic::common::rest::BlobCompression;
 use pocket_ic::{PocketIc, PocketIcBuilder};
-use print_benchmark::print_benchmark;
+use print_benchmark::print_benchmark_results;
 use results_file::VersionError;
 use std::{
     collections::BTreeMap,
@@ -91,35 +91,26 @@ pub fn run_benchmarks(
             }
         }
 
-        println!();
-        println!("---------------------------------------------------");
-        println!();
-
         let result = run_benchmark(&pocket_ic, benchmark_canister_id, bench_fn);
-        print_benchmark(
-            bench_fn,
-            &result,
-            current_results.get(bench_fn),
-            noise_threshold,
-        );
 
-        if let Some(instruction_tracing_canister_id) = instruction_tracing_canister_id {
-            run_instruction_tracing(
-                &pocket_ic,
-                instruction_tracing_canister_id,
-                bench_fn,
-                function_names_mapping.as_ref().unwrap(),
-                results_file,
-                result.total.instructions,
-            );
-        }
+        let filename = instruction_tracing_canister_id
+            .map(|instruction_tracing_canister_id| {
+                run_instruction_tracing(
+                    &pocket_ic,
+                    instruction_tracing_canister_id,
+                    bench_fn,
+                    function_names_mapping.as_ref().unwrap(),
+                    results_file,
+                    result.total.instructions,
+                )
+            })
+            .flatten();
 
-        results.insert(bench_fn.to_string(), result);
+        results.insert(bench_fn.to_string(), (result, filename));
         num_executed_bench_fns += 1;
     }
 
-    println!();
-    println!("---------------------------------------------------");
+    print_benchmark_results(&results, &current_results, noise_threshold);
 
     if verbose {
         println!();
@@ -131,7 +122,10 @@ pub fn run_benchmarks(
 
     // Persist the result if requested.
     if persist {
-        results_file::write(results_file, results);
+        results_file::write(
+            results_file,
+            results.into_iter().map(|(k, v)| (k, v.0)).collect(),
+        );
         println!(
             "Successfully persisted results to {}",
             results_file.display()
@@ -229,7 +223,7 @@ fn run_instruction_tracing(
     names_mapping: &BTreeMap<i32, String>,
     results_file: &Path,
     bench_instructions: u64,
-) {
+) -> Option<String> {
     let traces: Result<Vec<(i32, i64)>, String> = match pocket_ic.query_call(
         canister_id,
         Principal::anonymous(),
@@ -250,15 +244,20 @@ fn run_instruction_tracing(
         }
     };
     match traces {
-        Ok(traces) => write_traces_to_file(
-            traces,
-            names_mapping,
-            bench_fn,
-            results_file.with_file_name(format!("{bench_fn}.svg")),
-        )
-        .expect("failed to write tracing results"),
+        Ok(traces) => {
+            let filename = format!("{bench_fn}.svg");
+            write_traces_to_file(
+                traces,
+                names_mapping,
+                bench_fn,
+                results_file.with_file_name(filename.clone()),
+            )
+            .expect("failed to write tracing results");
+            Some(filename)
+        }
         Err(e) => {
             eprint!("Error tracing benchmark {}. Error:\n{}", bench_fn, e);
+            None
         }
     }
 }

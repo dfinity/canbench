@@ -375,7 +375,6 @@ pub(super) fn write_traces_to_file(
     let reader = std::io::Cursor::new(logs);
     let mut writer = std::fs::File::create(&filename).map_err(|e| e.to_string())?;
     from_reader(&mut opt, reader, &mut writer).map_err(|e| e.to_string())?;
-    println!("Instruction traces written to {}", filename.display());
     Ok(())
 }
 

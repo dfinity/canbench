@@ -1,34 +1,55 @@
+use std::collections::BTreeMap;
+
 use canbench_rs::{BenchResult, Measurement};
 use colored::Colorize;
 
-/// Prints a benchmark to stdout, comparing it to the previous result if available.
-pub(crate) fn print_benchmark(
-    name: &str,
-    new: &BenchResult,
-    old: Option<&BenchResult>,
+/// Prints all benchmarks to stdout, comparing them to the previous results if available.
+pub(crate) fn print_benchmark_results(
+    new_results: &BTreeMap<String, (BenchResult, Option<String>)>,
+    current_results: &BTreeMap<String, BenchResult>,
     noise_threshold: f64,
 ) {
-    // Print benchmark name.
-    if old.is_some() {
-        println!("Benchmark: {}", name.bold());
-    } else {
-        println!("Benchmark: {} {}", name.bold(), "(new)".blue().bold());
-    }
-
-    // Print totals.
-    println!("  total:");
-    print_measurement(&new.total, old.map(|m| &m.total), noise_threshold);
-
-    // Print scopes
-    for (scope, measurement) in &new.scopes {
+    for (name, (new_result, instructions_trace_filename)) in new_results {
         println!();
-        println!("  {} (scope):", scope);
+        println!("---------------------------------------------------");
+        println!();
+
+        let old_result = current_results.get(name);
+
+        // Print benchmark name.
+        if old_result.is_some() {
+            println!("Benchmark: {}", name.bold());
+        } else {
+            println!("Benchmark: {} {}", name.bold(), "(new)".blue().bold());
+        }
+
+        // Print totals.
+        println!("  total:");
         print_measurement(
-            measurement,
-            old.map(|m| &m.scopes).and_then(|m| m.get(scope)),
+            &new_result.total,
+            old_result.map(|m| &m.total),
             noise_threshold,
         );
+
+        // Print scopes
+        for (scope, measurement) in &new_result.scopes {
+            println!();
+            println!("  {} (scope):", scope);
+            print_measurement(
+                measurement,
+                old_result.map(|m| &m.scopes).and_then(|m| m.get(scope)),
+                noise_threshold,
+            );
+        }
+
+        // Print instructions trace filename if available.
+        instructions_trace_filename.as_ref().map(|filename| {
+            println!("Instruction traces written to {}", filename);
+        });
     }
+
+    println!();
+    println!("---------------------------------------------------");
 }
 
 // Prints a measurement along with a comparison with the old value if available.
