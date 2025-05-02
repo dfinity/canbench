@@ -54,4 +54,15 @@ benches:
       scope_1:
         heap_increase: 12
         instructions: 800
+  # A benchmark that is expected to return an increase of new repeated scope steps.
+  bench_repeated_scope_exists:
+    total:
+      heap_increase: 0
+      instructions: 0
+      stable_memory_increase: 0
+
+    scopes:
+      scope_1:
+        heap_increase: 12
+        instructions: 800
 version: 0.1.0

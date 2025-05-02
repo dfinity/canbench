@@ -99,6 +99,28 @@ fn bench_scope_exists() {
     }
 }
 
+// A benchmark that includes a repeated scope, but isn't persisted in the results.
+#[bench]
+fn bench_repeated_scope_new() {
+    {
+        for _ in 0..10 {
+            let _p = bench_scope("scope_1");
+            println!("do something");
+        }
+    }
+}
+
+// A benchmark that includes a repeated scope and is persisted in the results.
+#[bench]
+fn bench_repeated_scope_exists() {
+    {
+        for _ in 0..10 {
+            let _p = bench_scope("scope_1");
+            println!("do something");
+        }
+    }
+}
+
 #[export_name = "canister_query __canbench__broken_benchmark"]
 fn broken_benchmark() {
     // This benchmark doesn't reply, and will therefore fail.

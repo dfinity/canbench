@@ -465,11 +465,10 @@
 pub use canbench_rs_macros::bench;
 use candid::CandidType;
 use serde::{Deserialize, Serialize};
-use std::cell::RefCell;
-use std::collections::BTreeMap;
+use std::{cell::RefCell, collections::BTreeMap, ops::Add};
 
 thread_local! {
-    static SCOPES: RefCell<BTreeMap<&'static str, Measurement>> =
+    static SCOPES: RefCell<BTreeMap<&'static str, Vec<Measurement>>> =
         const { RefCell::new(BTreeMap::new()) };
 }
 
@@ -498,6 +497,18 @@ pub struct Measurement {
     /// The increase in stable memory (measured in pages).
     #[serde(default)]
     pub stable_memory_increase: u64,
+}
+
+impl Add for Measurement {
+    type Output = Self;
+
+    fn add(self, other: Self) -> Self::Output {
+        Self {
+            instructions: self.instructions + other.instructions,
+            heap_increase: self.heap_increase + other.heap_increase,
+            stable_memory_increase: self.stable_memory_increase + other.stable_memory_increase,
+        }
+    }
 }
 
 /// Benchmarks the given function.
@@ -614,20 +625,11 @@ impl Drop for BenchScope {
 
         SCOPES.with(|p| {
             let mut p = p.borrow_mut();
-            let prev_scope = p.insert(
-                self.name,
-                Measurement {
-                    instructions,
-                    heap_increase,
-                    stable_memory_increase,
-                },
-            );
-
-            assert!(
-                prev_scope.is_none(),
-                "scope {} cannot be specified multiple times.",
-                self.name
-            );
+            p.entry(self.name).or_default().push(Measurement {
+                instructions,
+                heap_increase,
+                stable_memory_increase,
+            });
         });
     }
 }
@@ -637,9 +639,20 @@ fn reset() {
     SCOPES.with(|p| p.borrow_mut().clear());
 }
 
-// Returns the measurements for any declared scopes.
+// Returns the measurements for any declared scopes,
+// aggregated by the scope name.
 fn get_scopes_measurements() -> std::collections::BTreeMap<&'static str, Measurement> {
-    SCOPES.with(|p| p.borrow().clone())
+    SCOPES
+        .with(|p| p.borrow().clone())
+        .into_iter()
+        .map(|(scope, measurements)| {
+            let mut total = Measurement::default();
+            for measurement in measurements {
+                total = total + measurement;
+            }
+            (scope, total)
+        })
+        .collect()
 }
 
 fn instruction_count() -> u64 {

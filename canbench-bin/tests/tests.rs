@@ -279,7 +279,7 @@ fn reports_scopes_in_new_benchmark() {
 
 Benchmark: bench_scope_new (new)
   total:
-    instructions: 3988 (new)
+    instructions: 4626 (new)
     heap_increase: 1 pages (new)
     stable_memory_increase: 0 pages (new)
 
@@ -356,7 +356,7 @@ fn reports_scopes_in_existing_benchmark() {
 
 Benchmark: bench_scope_exists
   total:
-    instructions: 3988 (regressed from 0)
+    instructions: 4626 (regressed from 0)
     heap_increase: 1 pages (regressed from 0)
     stable_memory_increase: 0 pages (no change)
 
@@ -483,6 +483,60 @@ Benchmark: write_stable_memory (new)
     heap_increase: 1 pages (new)
     stable_memory_increase: 1 pages (new)
 Instruction traces written to write_stable_memory.svg
+
+---------------------------------------------------
+"
+            );
+        });
+}
+
+#[test]
+fn reports_repeated_scope_in_new_benchmark() {
+    BenchTest::canister("measurements_output")
+        .with_bench("bench_repeated_scope_new")
+        .run(|output| {
+            assert_success!(
+                output,
+                "
+---------------------------------------------------
+
+Benchmark: bench_repeated_scope_new (new)
+  total:
+    instructions: 16.97 K (new)
+    heap_increase: 1 pages (new)
+    stable_memory_increase: 0 pages (new)
+
+  scope_1 (scope):
+    instructions: 8694 (new)
+    heap_increase: 1 pages (new)
+    stable_memory_increase: 0 pages (new)
+
+---------------------------------------------------
+"
+            );
+        });
+}
+
+#[test]
+fn reports_repeated_scope_in_existing_benchmark() {
+    BenchTest::canister("measurements_output")
+        .with_bench("bench_repeated_scope_exists")
+        .run(|output| {
+            assert_success!(
+                output,
+                "
+---------------------------------------------------
+
+Benchmark: bench_repeated_scope_exists
+  total:
+    instructions: 16.97 K (regressed from 0)
+    heap_increase: 1 pages (regressed from 0)
+    stable_memory_increase: 0 pages (no change)
+
+  scope_1 (scope):
+    instructions: 8694 (regressed by 986.75%)
+    heap_increase: 1 pages (improved by 91.67%)
+    stable_memory_increase: 0 pages (no change)
 
 ---------------------------------------------------
 "
