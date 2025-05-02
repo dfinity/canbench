@@ -7,7 +7,7 @@ use candid::{Encode, Principal};
 use flate2::read::GzDecoder;
 use instruction_tracing::{prepare_instruction_tracing, write_traces_to_file};
 use pocket_ic::common::rest::BlobCompression;
-use pocket_ic::{PocketIc, PocketIcBuilder, WasmResult};
+use pocket_ic::{PocketIc, PocketIcBuilder};
 use print_benchmark::print_benchmark;
 use results_file::VersionError;
 use std::{
@@ -24,9 +24,10 @@ use wasmparser::Parser as WasmParser;
 // Other queries exposed by the canister are ignored.
 const BENCH_PREFIX: &str = "__canbench__";
 
+const POCKET_IC_SERVER_VERSION: &str = "9.0.1";
 const POCKET_IC_LINUX_SHA: &str =
-    "95e3bb14977228efbb5173ea3e044e6b6c8420bb1b3342fa530e3c11f3e9f0cd";
-const POCKET_IC_MAC_SHA: &str = "87582439bf456221256c66e86b382a56f5df7a6a8da85738eaa233d2ada3ed47";
+    "327346b681f0c03f1eb12e8da17a1ab8d044f31b2a1cbaad4546db9dbf73caf4";
+const POCKET_IC_MAC_SHA: &str = "27bb9594e498171d2fffadf6e1e144e58ed3f5854d151ff8431d9dc298b7951e";
 
 /// Runs the benchmarks on the canister available in the provided `canister_wasm_path`.
 #[allow(clippy::too_many_arguments)]
@@ -165,8 +166,10 @@ fn maybe_download_pocket_ic(path: &PathBuf, verbose: bool, integrity_check: bool
 }
 
 fn download_pocket_ic(path: &PathBuf, verbose: bool) {
-    const POCKET_IC_URL_PREFIX: &str =
-        "https://github.com/dfinity/pocketic/releases/download/7.0.0/pocket-ic-x86_64-";
+    let pocket_ic_url_prefix: &str = &format!(
+        "https://github.com/dfinity/pocketic/releases/download/{}/pocket-ic-x86_64-",
+        POCKET_IC_SERVER_VERSION
+    );
     if verbose {
         println!("Downloading runtime (will be cached for future uses)...");
     }
@@ -182,7 +185,7 @@ fn download_pocket_ic(path: &PathBuf, verbose: bool) {
         panic!("Unsupported operating system");
     };
 
-    let url = format!("{}{}.gz", POCKET_IC_URL_PREFIX, os);
+    let url = format!("{}{}.gz", pocket_ic_url_prefix, os);
     let pocket_ic_compressed = reqwest::blocking::get(url)
         .unwrap()
         .bytes()
@@ -204,22 +207,16 @@ fn run_benchmark(pocket_ic: &PocketIc, canister_id: Principal, bench_fn: &str) -
         &format!("{}{}", BENCH_PREFIX, bench_fn),
         Encode!(&()).unwrap(),
     ) {
-        Ok(wasm_res) => match wasm_res {
-            WasmResult::Reply(res) => {
-                let res: BenchResult =
-                    candid::decode_one(&res).expect("error decoding benchmark result");
-                res
-            }
-            WasmResult::Reject(output_str) => {
-                eprintln!(
-                    "Error executing benchmark {}. Error:\n{}",
-                    bench_fn, output_str
-                );
-                std::process::exit(1);
-            }
-        },
-        Err(e) => {
-            eprintln!("Error executing benchmark {}. Error:\n{}", bench_fn, e);
+        Ok(reply) => {
+            let res: BenchResult =
+                candid::decode_one(&reply).expect("error decoding benchmark result");
+            res
+        }
+        Err(reject_response) => {
+            eprintln!(
+                "Error executing benchmark {}. Error:\n{}: {}",
+                bench_fn, reject_response.error_code, reject_response.reject_message
+            );
             std::process::exit(1);
         }
     }
@@ -239,22 +236,16 @@ fn run_instruction_tracing(
         &format!("__tracing__{bench_fn}"),
         Encode!(&bench_instructions).unwrap(),
     ) {
-        Ok(wasm_res) => match wasm_res {
-            WasmResult::Reply(res) => {
-                let res: Result<Vec<(i32, i64)>, String> =
-                    candid::decode_one(&res).expect("error decoding tracing result");
-                res
-            }
-            WasmResult::Reject(output_str) => {
-                eprintln!(
-                    "Error tracing benchmark {}. Error:\n{}",
-                    bench_fn, output_str
-                );
-                std::process::exit(1);
-            }
-        },
-        Err(e) => {
-            eprintln!("Error tracing benchmark {}. Error:\n{}", bench_fn, e);
+        Ok(reply) => {
+            let res: Result<Vec<(i32, i64)>, String> =
+                candid::decode_one(&reply).expect("error decoding tracing result");
+            res
+        }
+        Err(reject_response) => {
+            eprintln!(
+                "Error tracing benchmark {}. Error:\n{}: {}",
+                bench_fn, reject_response.error_code, reject_response.reject_message
+            );
             std::process::exit(1);
         }
     };
