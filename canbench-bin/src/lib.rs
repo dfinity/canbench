@@ -24,6 +24,7 @@ use wasmparser::Parser as WasmParser;
 // Other queries exposed by the canister are ignored.
 const BENCH_PREFIX: &str = "__canbench__";
 
+const POCKET_IC_SERVER_VERSION: &str = "9.0.1";
 const POCKET_IC_LINUX_SHA: &str =
     "327346b681f0c03f1eb12e8da17a1ab8d044f31b2a1cbaad4546db9dbf73caf4";
 const POCKET_IC_MAC_SHA: &str = "bb393ac65c1e36628eedbd85b08af9f0ebe4e326b74f303ee4f56b5d75a35cf8";
@@ -165,8 +166,10 @@ fn maybe_download_pocket_ic(path: &PathBuf, verbose: bool, integrity_check: bool
 }
 
 fn download_pocket_ic(path: &PathBuf, verbose: bool) {
-    const POCKET_IC_URL_PREFIX: &str =
-        "https://github.com/dfinity/pocketic/releases/download/9.0.1/pocket-ic-x86_64-";
+    let pocket_ic_url_prefix: &str = &format!(
+        "https://github.com/dfinity/pocketic/releases/download/{}/pocket-ic-x86_64-",
+        POCKET_IC_SERVER_VERSION
+    );
     if verbose {
         println!("Downloading runtime (will be cached for future uses)...");
     }
@@ -182,7 +185,7 @@ fn download_pocket_ic(path: &PathBuf, verbose: bool) {
         panic!("Unsupported operating system");
     };
 
-    let url = format!("{}{}.gz", POCKET_IC_URL_PREFIX, os);
+    let url = format!("{}{}.gz", pocket_ic_url_prefix, os);
     let pocket_ic_compressed = reqwest::blocking::get(url)
         .unwrap()
         .bytes()
