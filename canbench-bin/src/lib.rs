@@ -27,7 +27,7 @@ const BENCH_PREFIX: &str = "__canbench__";
 const POCKET_IC_SERVER_VERSION: &str = "9.0.1";
 const POCKET_IC_LINUX_SHA: &str =
     "327346b681f0c03f1eb12e8da17a1ab8d044f31b2a1cbaad4546db9dbf73caf4";
-const POCKET_IC_MAC_SHA: &str = "bb393ac65c1e36628eedbd85b08af9f0ebe4e326b74f303ee4f56b5d75a35cf8";
+const POCKET_IC_MAC_SHA: &str = "27bb9594e498171d2fffadf6e1e144e58ed3f5854d151ff8431d9dc298b7951e";
 
 /// Runs the benchmarks on the canister available in the provided `canister_wasm_path`.
 #[allow(clippy::too_many_arguments)]
