@@ -279,7 +279,7 @@ fn reports_scopes_in_new_benchmark() {
 
 Benchmark: bench_scope_new (new)
   total:
-    instructions: 4660 (new)
+    instructions: 4626 (new)
     heap_increase: 1 pages (new)
     stable_memory_increase: 0 pages (new)
 
@@ -356,7 +356,7 @@ fn reports_scopes_in_existing_benchmark() {
 
 Benchmark: bench_scope_exists
   total:
-    instructions: 4660 (regressed from 0)
+    instructions: 4626 (regressed from 0)
     heap_increase: 1 pages (regressed from 0)
     stable_memory_increase: 0 pages (no change)
 
@@ -502,7 +502,7 @@ fn reports_repeated_scope_in_new_benchmark() {
 
 Benchmark: bench_repeated_scope_new (new)
   total:
-    instructions: 17.12 K (new)
+    instructions: 16.97 K (new)
     heap_increase: 1 pages (new)
     stable_memory_increase: 0 pages (new)
 
@@ -529,7 +529,7 @@ fn reports_repeated_scope_in_existing_benchmark() {
 
 Benchmark: bench_repeated_scope_exists
   total:
-    instructions: 17.12 K (regressed from 0)
+    instructions: 16.97 K (regressed from 0)
     heap_increase: 1 pages (regressed from 0)
     stable_memory_increase: 0 pages (no change)
 
