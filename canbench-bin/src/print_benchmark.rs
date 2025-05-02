@@ -43,9 +43,9 @@ pub(crate) fn print_benchmark_results(
         }
 
         // Print instructions trace filename if available.
-        instructions_trace_filename.as_ref().map(|filename| {
+        if let Some(filename) = instructions_trace_filename {
             println!("Instruction traces written to {}", filename);
-        });
+        };
     }
 
     println!();

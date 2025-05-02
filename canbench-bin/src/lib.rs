@@ -93,8 +93,8 @@ pub fn run_benchmarks(
 
         let result = run_benchmark(&pocket_ic, benchmark_canister_id, bench_fn);
 
-        let filename = instruction_tracing_canister_id
-            .map(|instruction_tracing_canister_id| {
+        let filename =
+            instruction_tracing_canister_id.and_then(|instruction_tracing_canister_id| {
                 run_instruction_tracing(
                     &pocket_ic,
                     instruction_tracing_canister_id,
@@ -103,8 +103,7 @@ pub fn run_benchmarks(
                     results_file,
                     result.total.instructions,
                 )
-            })
-            .flatten();
+            });
 
         results.insert(bench_fn.to_string(), (result, filename));
         num_executed_bench_fns += 1;
