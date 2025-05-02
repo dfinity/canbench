@@ -625,7 +625,7 @@ impl Drop for BenchScope {
 
         SCOPES.with(|p| {
             let mut p = p.borrow_mut();
-            p.entry(self.name).or_insert(vec![]).push(Measurement {
+            p.entry(self.name).or_default().push(Measurement {
                 instructions,
                 heap_increase,
                 stable_memory_increase,
