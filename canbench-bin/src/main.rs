@@ -6,6 +6,7 @@ use std::{fs::File, io::Read, path::PathBuf, process::Command};
 
 const CFG_FILE_NAME: &str = "canbench.yml";
 const DEFAULT_RESULTS_FILE: &str = "canbench_results.yml";
+const DEFAULT_CSV_RESULTS_FILE: &str = "canbench_results.csv";
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -16,6 +17,10 @@ struct Args {
     /// Whether or not results should be persisted to disk.
     #[clap(long)]
     persist: bool,
+
+    /// Whether or not results should be written to CSV.
+    #[clap(long)]
+    csv: bool,
 
     /// Only print the benchmark results (and nothing else).
     #[clap(long)]
@@ -83,6 +88,10 @@ struct Config {
     // Otherwise, `canbench_results.yml` is used by default
     results_path: Option<String>,
 
+    // If provided, instructs canbench to store the results in this CSV file
+    // Otherwise, `canbench_results.csv` is used by default
+    csv_results_path: Option<String>,
+
     // If provided, the init arguments to pass to the canister
     init_args: Option<InitArgs>,
 
@@ -130,6 +139,11 @@ fn main() {
             .as_ref()
             .unwrap_or(&DEFAULT_RESULTS_FILE.to_string()),
     );
+    let csv_results_path = PathBuf::from(
+        cfg.csv_results_path
+            .as_ref()
+            .unwrap_or(&DEFAULT_CSV_RESULTS_FILE.to_string()),
+    );
 
     // Build the canister if a build command is specified.
     if let Some(build_cmd) = cfg.build_cmd {
@@ -158,6 +172,8 @@ fn main() {
         init_args,
         args.persist,
         &results_path,
+        args.csv,
+        &csv_results_path,
         !args.less_verbose,
         !args.hide_results,
         args.show_summary,
