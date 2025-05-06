@@ -473,7 +473,7 @@ thread_local! {
 }
 
 /// The results of a benchmark.
-#[derive(Debug, PartialEq, Serialize, Deserialize, CandidType, Default, Clone)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, CandidType, Default)]
 pub struct BenchResult {
     /// A measurement for the entire duration of the benchmark.
     pub total: Measurement,

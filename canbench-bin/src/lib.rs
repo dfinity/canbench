@@ -136,16 +136,16 @@ pub fn run_benchmarks(
 
     // Persist the result if requested.
     if persist {
-        results_file::write(results_file, new_results.clone());
-        println!(
-            "Successfully persisted results to {}",
-            results_file.display()
-        );
-
         csv_file::write(csv_results_file, &new_results, &old_results);
         println!(
             "Successfully saved CSV results to {}",
             csv_results_file.display()
+        );
+
+        results_file::write(results_file, new_results);
+        println!(
+            "Successfully persisted results to {}",
+            results_file.display()
         );
     }
 }
