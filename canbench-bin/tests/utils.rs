@@ -166,7 +166,7 @@ impl BenchTest {
             config_file.write_all(config.as_bytes()).unwrap()
         }
 
-        // Only show benchmarks with stats, skipping unrelated output like downloads.
+        // Show only benchmark results and summary, skip unrelated output like downloads.
         let mut cmd_args = vec!["--less-verbose".to_string(), "--show-summary".to_string()];
         if let Some(bench_name) = self.bench_name {
             cmd_args.push(bench_name.clone());
