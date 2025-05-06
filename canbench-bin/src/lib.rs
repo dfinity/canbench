@@ -2,6 +2,8 @@
 mod instruction_tracing;
 mod print_benchmark;
 mod results_file;
+mod summary;
+
 use canbench_rs::BenchResult;
 use candid::{Encode, Principal};
 use flate2::read::GzDecoder;
@@ -38,6 +40,8 @@ pub fn run_benchmarks(
     persist: bool,
     results_file: &PathBuf,
     verbose: bool,
+    show_results: bool,
+    show_summary: bool,
     show_canister_output: bool,
     integrity_check: bool,
     instruction_tracing: bool,
@@ -47,8 +51,8 @@ pub fn run_benchmarks(
 ) {
     maybe_download_pocket_ic(runtime_path, verbose, integrity_check);
 
-    let current_results = match results_file::read(results_file) {
-        Ok(current_results) => current_results,
+    let old_results = match results_file::read(results_file) {
+        Ok(old_results) => old_results,
         Err(VersionError {
             our_version,
             their_version,
@@ -82,8 +86,7 @@ pub fn run_benchmarks(
     );
 
     // Run the benchmarks
-    let mut results = BTreeMap::new();
-    let mut num_executed_bench_fns = 0;
+    let mut new_results = BTreeMap::new();
     for bench_fn in &benchmark_fns {
         if let Some(pattern) = &pattern {
             if !bench_fn.contains(pattern) {
@@ -91,17 +94,19 @@ pub fn run_benchmarks(
             }
         }
 
-        println!();
-        println!("---------------------------------------------------");
-        println!();
-
         let result = run_benchmark(&pocket_ic, benchmark_canister_id, bench_fn);
-        print_benchmark(
-            bench_fn,
-            &result,
-            current_results.get(bench_fn),
-            noise_threshold,
-        );
+
+        if show_results {
+            println!();
+            println!("---------------------------------------------------");
+            println!();
+            print_benchmark(
+                bench_fn,
+                &result,
+                old_results.get(bench_fn),
+                noise_threshold,
+            );
+        }
 
         if let Some(instruction_tracing_canister_id) = instruction_tracing_canister_id {
             run_instruction_tracing(
@@ -114,24 +119,22 @@ pub fn run_benchmarks(
             );
         }
 
-        results.insert(bench_fn.to_string(), result);
-        num_executed_bench_fns += 1;
+        new_results.insert(bench_fn.to_string(), result);
     }
 
     println!();
     println!("---------------------------------------------------");
 
-    if verbose {
+    if verbose || show_summary {
         println!();
-        println!(
-            "Executed {num_executed_bench_fns} of {} benchmarks.",
-            benchmark_fns.len()
-        );
+        summary::print_summary(&new_results, &old_results, noise_threshold);
+        println!();
+        println!("---------------------------------------------------");
     }
 
     // Persist the result if requested.
     if persist {
-        results_file::write(results_file, results);
+        results_file::write(results_file, new_results);
         println!(
             "Successfully persisted results to {}",
             results_file.display()

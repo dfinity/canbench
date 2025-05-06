@@ -47,6 +47,7 @@ pub struct BenchTest {
     canister_output: bool,
     noise_threshold: Option<f64>,
     instruction_tracing: bool,
+    hide_results: bool,
 }
 
 impl BenchTest {
@@ -60,6 +61,7 @@ impl BenchTest {
             canister_output: false,
             noise_threshold: None,
             instruction_tracing: false,
+            hide_results: false,
         }
     }
 
@@ -73,6 +75,7 @@ impl BenchTest {
             canister_output: false,
             noise_threshold: None,
             instruction_tracing: false,
+            hide_results: false,
         }
     }
 
@@ -92,6 +95,7 @@ impl BenchTest {
             canister_output: false,
             noise_threshold: None,
             instruction_tracing: false,
+            hide_results: false,
         }
     }
 
@@ -137,6 +141,13 @@ impl BenchTest {
         }
     }
 
+    pub fn with_hide_results(self) -> Self {
+        Self {
+            hide_results: true,
+            ..self
+        }
+    }
+
     pub fn run<R>(self, f: impl FnOnce(Output) -> R) {
         let canbench: &'static str = env!("CARGO_BIN_EXE_canbench");
 
@@ -155,9 +166,8 @@ impl BenchTest {
             config_file.write_all(config.as_bytes()).unwrap()
         }
 
-        // Only output the benchmarks so that the output isn't polluted by other
-        // statements (e.g. downloading runtime).
-        let mut cmd_args = vec!["--less-verbose".to_string()];
+        // Show only benchmark results and summary, skip unrelated output like downloads.
+        let mut cmd_args = vec!["--less-verbose".to_string(), "--show-summary".to_string()];
         if let Some(bench_name) = self.bench_name {
             cmd_args.push(bench_name.clone());
         }
@@ -182,6 +192,10 @@ impl BenchTest {
 
         if self.instruction_tracing {
             cmd_args.push("--instruction-tracing".to_string());
+        }
+
+        if self.hide_results {
+            cmd_args.push("--hide-results".to_string());
         }
 
         let output = Command::new(canbench)

@@ -21,6 +21,14 @@ struct Args {
     #[clap(long)]
     less_verbose: bool,
 
+    /// Hide individual benchmark outputs.
+    #[clap(long)]
+    hide_results: bool,
+
+    /// Show summary of the benchmark results.
+    #[clap(long)]
+    show_summary: bool,
+
     /// Show canister's `ic_cdk::eprintln!()` output.
     #[clap(long)]
     show_canister_output: bool,
@@ -151,6 +159,8 @@ fn main() {
         args.persist,
         &results_path,
         !args.less_verbose,
+        !args.hide_results,
+        args.show_summary,
         args.show_canister_output,
         !args.no_runtime_integrity_check,
         args.instruction_tracing,
