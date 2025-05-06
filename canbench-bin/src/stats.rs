@@ -1,18 +1,20 @@
 use canbench_rs::{BenchResult, Measurement};
 use std::collections::BTreeMap;
 
-pub(crate) fn print_stats(
+pub(crate) fn print_summary(
     new: &BTreeMap<String, BenchResult>,
     old: &BTreeMap<String, BenchResult>,
     noise_threshold: f64,
 ) {
-    println!("Stats:");
+    println!("Summary:");
     print_percentage_stats("instructions", new, old, noise_threshold, |m| {
         m.instructions
     });
+    println!();
     print_percentage_stats("heap_increase", new, old, noise_threshold, |m| {
         m.heap_increase
     });
+    println!();
     print_percentage_stats("stable_memory_increase", new, old, noise_threshold, |m| {
         m.stable_memory_increase
     });

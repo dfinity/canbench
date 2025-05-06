@@ -42,15 +42,17 @@ Benchmark: no_changes_test
 
 ---------------------------------------------------
 
-Stats:
+Summary:
   instructions:
     changed: 0, unchanged: 1, new: 0, total: 1
     change   : [min 0 | med 0 | max 0]
     change % : [min 0% | med 0% | max 0%]
+
   heap_increase:
     changed: 0, unchanged: 1, new: 0, total: 1
     change   : [min 0 | med 0 | max 0]
     change % : [min 0% | med 0% | max 0%]
+
   stable_memory_increase:
     changed: 0, unchanged: 1, new: 0, total: 1
     change   : [min 0 | med 0 | max 0]
@@ -73,15 +75,17 @@ fn benchmark_reports_no_changes_with_hide_results() {
                 "
 ---------------------------------------------------
 
-Stats:
+Summary:
   instructions:
     changed: 0, unchanged: 1, new: 0, total: 1
     change   : [min 0 | med 0 | max 0]
     change % : [min 0% | med 0% | max 0%]
+
   heap_increase:
     changed: 0, unchanged: 1, new: 0, total: 1
     change   : [min 0 | med 0 | max 0]
     change % : [min 0% | med 0% | max 0%]
+
   stable_memory_increase:
     changed: 0, unchanged: 1, new: 0, total: 1
     change   : [min 0 | med 0 | max 0]
@@ -125,15 +129,17 @@ Benchmark: noisy_change_test
 
 ---------------------------------------------------
 
-Stats:
+Summary:
   instructions:
     changed: 0, unchanged: 1, new: 0, total: 1
     change   : [min -3 | med -3 | max -3]
     change % : [min -1.43% | med -1.43% | max -1.43%]
+
   heap_increase:
     changed: 0, unchanged: 1, new: 0, total: 1
     change   : [min 0 | med 0 | max 0]
     change % : [min 0% | med 0% | max 0%]
+
   stable_memory_increase:
     changed: 0, unchanged: 1, new: 0, total: 1
     change   : [min 0 | med 0 | max 0]
@@ -163,15 +169,17 @@ Benchmark: noisy_change_above_default_threshold_test
 
 ---------------------------------------------------
 
-Stats:
+Summary:
   instructions:
     changed: 1, unchanged: 0, new: 0, total: 1
     change   : [min -154.07 K | med -154.07 K | max -154.07 K]
     change % : [min -4.35% | med -4.35% | max -4.35%]
+
   heap_increase:
     changed: 1, unchanged: 0, new: 0, total: 1
     change   : [min -3 | med -3 | max -3]
     change % : [min -4.62% | med -4.62% | max -4.62%]
+
   stable_memory_increase:
     changed: 1, unchanged: 0, new: 0, total: 1
     change   : [min -4 | med -4 | max -4]
@@ -202,15 +210,17 @@ Benchmark: noisy_change_above_default_threshold_test
 
 ---------------------------------------------------
 
-Stats:
+Summary:
   instructions:
     changed: 0, unchanged: 1, new: 0, total: 1
     change   : [min -154.07 K | med -154.07 K | max -154.07 K]
     change % : [min -4.35% | med -4.35% | max -4.35%]
+
   heap_increase:
     changed: 0, unchanged: 1, new: 0, total: 1
     change   : [min -3 | med -3 | max -3]
     change % : [min -4.62% | med -4.62% | max -4.62%]
+
   stable_memory_increase:
     changed: 0, unchanged: 1, new: 0, total: 1
     change   : [min -4 | med -4 | max -4]
@@ -240,15 +250,17 @@ Benchmark: regression_test
 
 ---------------------------------------------------
 
-Stats:
+Summary:
   instructions:
     changed: 1, unchanged: 0, new: 0, total: 1
     change   : [min 197 | med 197 | max 197]
     change % : [min +1970.00% | med +1970.00% | max +1970.00%]
+
   heap_increase:
     changed: 0, unchanged: 1, new: 0, total: 1
     change   : [min 0 | med 0 | max 0]
     change % : [min 0% | med 0% | max 0%]
+
   stable_memory_increase:
     changed: 0, unchanged: 1, new: 0, total: 1
     change   : [min 0 | med 0 | max 0]
@@ -278,15 +290,17 @@ Benchmark: improvement_test
 
 ---------------------------------------------------
 
-Stats:
+Summary:
   instructions:
     changed: 1, unchanged: 0, new: 0, total: 1
     change   : [min -2.89 K | med -2.89 K | max -2.89 K]
     change % : [min -93.32% | med -93.32% | max -93.32%]
+
   heap_increase:
     changed: 0, unchanged: 1, new: 0, total: 1
     change   : [min 0 | med 0 | max 0]
     change % : [min 0% | med 0% | max 0%]
+
   stable_memory_increase:
     changed: 0, unchanged: 1, new: 0, total: 1
     change   : [min 0 | med 0 | max 0]
@@ -316,15 +330,17 @@ Benchmark: stable_memory_increase_from_zero
 
 ---------------------------------------------------
 
-Stats:
+Summary:
   instructions:
     changed: 1, unchanged: 0, new: 0, total: 1
     change   : [min 307 | med 307 | max 307]
     change % : n/a
+
   heap_increase:
     changed: 0, unchanged: 1, new: 0, total: 1
     change   : [min 0 | med 0 | max 0]
     change % : [min 0% | med 0% | max 0%]
+
   stable_memory_increase:
     changed: 1, unchanged: 0, new: 0, total: 1
     change   : [min 123 | med 123 | max 123]
@@ -356,15 +372,17 @@ Benchmark: stable_memory_only_increase (new)
 
 ---------------------------------------------------
 
-Stats:
+Summary:
   instructions:
     changed: 0, unchanged: 0, new: 1, total: 1
     change   : [min 307 | med 307 | max 307]
     change % : n/a
+
   heap_increase:
     changed: 0, unchanged: 0, new: 1, total: 1
     change   : [min 0 | med 0 | max 0]
     change % : n/a
+
   stable_memory_increase:
     changed: 0, unchanged: 0, new: 1, total: 1
     change   : [min 456 | med 456 | max 456]
@@ -394,15 +412,17 @@ Benchmark: increase_heap_increase (new)
 
 ---------------------------------------------------
 
-Stats:
+Summary:
   instructions:
     changed: 0, unchanged: 0, new: 1, total: 1
     change   : [min 3.39 M | med 3.39 M | max 3.39 M]
     change % : n/a
+
   heap_increase:
     changed: 0, unchanged: 0, new: 1, total: 1
     change   : [min 62 | med 62 | max 62]
     change % : n/a
+
   stable_memory_increase:
     changed: 0, unchanged: 0, new: 1, total: 1
     change   : [min 0 | med 0 | max 0]
@@ -438,15 +458,17 @@ Benchmark: bench_2 (new)
 
 ---------------------------------------------------
 
-Stats:
+Summary:
   instructions:
     changed: 0, unchanged: 0, new: 2, total: 2
     change   : [min 207 | med 207 | max 207]
     change % : n/a
+
   heap_increase:
     changed: 0, unchanged: 0, new: 2, total: 2
     change   : [min 0 | med 0 | max 0]
     change % : n/a
+
   stable_memory_increase:
     changed: 0, unchanged: 0, new: 2, total: 2
     change   : [min 0 | med 0 | max 0]
@@ -486,15 +508,17 @@ Benchmark: bench_scope_new (new)
 
 ---------------------------------------------------
 
-Stats:
+Summary:
   instructions:
     changed: 0, unchanged: 0, new: 1, total: 1
     change   : [min 4.63 K | med 4.63 K | max 4.63 K]
     change % : n/a
+
   heap_increase:
     changed: 0, unchanged: 0, new: 1, total: 1
     change   : [min 1 | med 1 | max 1]
     change % : n/a
+
   stable_memory_increase:
     changed: 0, unchanged: 0, new: 1, total: 1
     change   : [min 0 | med 0 | max 0]
@@ -579,15 +603,17 @@ Benchmark: bench_scope_exists
 
 ---------------------------------------------------
 
-Stats:
+Summary:
   instructions:
     changed: 1, unchanged: 0, new: 0, total: 1
     change   : [min 4.63 K | med 4.63 K | max 4.63 K]
     change % : n/a
+
   heap_increase:
     changed: 1, unchanged: 0, new: 0, total: 1
     change   : [min 1 | med 1 | max 1]
     change % : n/a
+
   stable_memory_increase:
     changed: 0, unchanged: 1, new: 0, total: 1
     change   : [min 0 | med 0 | max 0]
@@ -629,15 +655,17 @@ Benchmark: state_check
 
 ---------------------------------------------------
 
-Stats:
+Summary:
   instructions:
     changed: 1, unchanged: 0, new: 0, total: 1
     change   : [min 31 | med 31 | max 31]
     change % : [min +3.69% | med +3.69% | max +3.69%]
+
   heap_increase:
     changed: 0, unchanged: 1, new: 0, total: 1
     change   : [min 0 | med 0 | max 0]
     change % : [min 0% | med 0% | max 0%]
+
   stable_memory_increase:
     changed: 0, unchanged: 1, new: 0, total: 1
     change   : [min 0 | med 0 | max 0]
@@ -668,15 +696,17 @@ Benchmark: write_stable_memory (new)
 
 ---------------------------------------------------
 
-Stats:
+Summary:
   instructions:
     changed: 0, unchanged: 0, new: 1, total: 1
     change   : [min 49.74 K | med 49.74 K | max 49.74 K]
     change % : n/a
+
   heap_increase:
     changed: 0, unchanged: 0, new: 1, total: 1
     change   : [min 1 | med 1 | max 1]
     change % : n/a
+
   stable_memory_increase:
     changed: 0, unchanged: 0, new: 1, total: 1
     change   : [min 1 | med 1 | max 1]
@@ -741,15 +771,17 @@ Instruction traces written to write_stable_memory.svg
 
 ---------------------------------------------------
 
-Stats:
+Summary:
   instructions:
     changed: 0, unchanged: 0, new: 1, total: 1
     change   : [min 49.74 K | med 49.74 K | max 49.74 K]
     change % : n/a
+
   heap_increase:
     changed: 0, unchanged: 0, new: 1, total: 1
     change   : [min 1 | med 1 | max 1]
     change % : n/a
+
   stable_memory_increase:
     changed: 0, unchanged: 0, new: 1, total: 1
     change   : [min 1 | med 1 | max 1]
@@ -784,15 +816,17 @@ Benchmark: bench_repeated_scope_new (new)
 
 ---------------------------------------------------
 
-Stats:
+Summary:
   instructions:
     changed: 0, unchanged: 0, new: 1, total: 1
     change   : [min 16.97 K | med 16.97 K | max 16.97 K]
     change % : n/a
+
   heap_increase:
     changed: 0, unchanged: 0, new: 1, total: 1
     change   : [min 1 | med 1 | max 1]
     change % : n/a
+
   stable_memory_increase:
     changed: 0, unchanged: 0, new: 1, total: 1
     change   : [min 0 | med 0 | max 0]
@@ -827,15 +861,17 @@ Benchmark: bench_repeated_scope_exists
 
 ---------------------------------------------------
 
-Stats:
+Summary:
   instructions:
     changed: 1, unchanged: 0, new: 0, total: 1
     change   : [min 16.97 K | med 16.97 K | max 16.97 K]
     change % : n/a
+
   heap_increase:
     changed: 1, unchanged: 0, new: 0, total: 1
     change   : [min 1 | med 1 | max 1]
     change % : n/a
+
   stable_memory_increase:
     changed: 0, unchanged: 1, new: 0, total: 1
     change   : [min 0 | med 0 | max 0]

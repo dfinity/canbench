@@ -167,7 +167,7 @@ impl BenchTest {
         }
 
         // Only show benchmarks with stats, skipping unrelated output like downloads.
-        let mut cmd_args = vec!["--less-verbose".to_string(), "--show-stats".to_string()];
+        let mut cmd_args = vec!["--less-verbose".to_string(), "--show-summary".to_string()];
         if let Some(bench_name) = self.bench_name {
             cmd_args.push(bench_name.clone());
         }

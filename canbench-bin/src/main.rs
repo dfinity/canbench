@@ -25,9 +25,9 @@ struct Args {
     #[clap(long)]
     hide_results: bool,
 
-    /// Show summary statistics after benchmarks.
+    /// Show summary of the benchmark results.
     #[clap(long)]
-    show_stats: bool,
+    show_summary: bool,
 
     /// Show canister's `ic_cdk::eprintln!()` output.
     #[clap(long)]
@@ -160,7 +160,7 @@ fn main() {
         &results_path,
         !args.less_verbose,
         !args.hide_results,
-        args.show_stats,
+        args.show_summary,
         args.show_canister_output,
         !args.no_runtime_integrity_check,
         args.instruction_tracing,
