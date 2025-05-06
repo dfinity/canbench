@@ -1,4 +1,5 @@
 //! A module for running benchmarks.
+mod csv_file;
 mod instruction_tracing;
 mod print_benchmark;
 mod results_file;
@@ -39,6 +40,7 @@ pub fn run_benchmarks(
     init_args: Vec<u8>,
     persist: bool,
     results_file: &PathBuf,
+    csv_results_file: &PathBuf,
     verbose: bool,
     show_results: bool,
     show_summary: bool,
@@ -134,6 +136,12 @@ pub fn run_benchmarks(
 
     // Persist the result if requested.
     if persist {
+        csv_file::write(csv_results_file, &new_results, &old_results);
+        println!(
+            "Successfully saved CSV results to {}",
+            csv_results_file.display()
+        );
+
         results_file::write(results_file, new_results);
         println!(
             "Successfully persisted results to {}",
