@@ -6,19 +6,16 @@ pub(crate) fn print_stats(
     old: &BTreeMap<String, BenchResult>,
     noise_threshold: f64,
 ) {
-    print_percentage_stats("Instructions", new, old, noise_threshold, |m| {
+    println!("Stats:");
+    print_percentage_stats("instructions", new, old, noise_threshold, |m| {
         m.instructions
     });
-    print_percentage_stats("Heap Increase (pages)", new, old, noise_threshold, |m| {
+    print_percentage_stats("heap_increase", new, old, noise_threshold, |m| {
         m.heap_increase
     });
-    print_percentage_stats(
-        "Stable Memory Increase (pages)",
-        new,
-        old,
-        noise_threshold,
-        |m| m.stable_memory_increase,
-    );
+    print_percentage_stats("stable_memory_increase", new, old, noise_threshold, |m| {
+        m.stable_memory_increase
+    });
 }
 
 fn print_percentage_stats<F>(
@@ -71,23 +68,21 @@ fn print_percentage_stats<F>(
 
     let total = changed + unchanged + new_only;
 
-    println!("=== {label} ===");
-    println!("Changed: {changed}, Unchanged: {unchanged}, New: {new_only}, Total: {total}");
+    println!("  {label}:");
+    println!("    changed: {changed}, unchanged: {unchanged}, new: {new_only}, total: {total}");
     //println!("Noise threshold: {:.1}%", noise_threshold);
 
     if !abs_deltas.is_empty() {
-        print_range("Change   ", &abs_deltas, fmt_human, percentile_i64);
+        print_range("    change   ", &abs_deltas, fmt_human, percentile_i64);
     } else {
-        println!("Change   : n/a");
+        println!("    change   : n/a");
     }
 
     if !percent_diffs.is_empty() {
-        print_range("Change % ", &percent_diffs, fmt_percent, percentile_f64);
+        print_range("    change % ", &percent_diffs, fmt_percent, percentile_f64);
     } else {
-        println!("Change % : n/a");
+        println!("    change % : n/a");
     }
-
-    println!();
 }
 
 fn print_range<T, F, P>(label: &str, values: &[T], format: F, percentile_fn: P)

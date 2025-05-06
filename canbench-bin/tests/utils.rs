@@ -155,9 +155,8 @@ impl BenchTest {
             config_file.write_all(config.as_bytes()).unwrap()
         }
 
-        // Only output the benchmarks so that the output isn't polluted by other
-        // statements (e.g. downloading runtime).
-        let mut cmd_args = vec!["--less-verbose".to_string()];
+        // Only show benchmarks with stats, skipping unrelated output like downloads.
+        let mut cmd_args = vec!["--less-verbose".to_string(), "--show-stats".to_string()];
         if let Some(bench_name) = self.bench_name {
             cmd_args.push(bench_name.clone());
         }

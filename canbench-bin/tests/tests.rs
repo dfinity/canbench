@@ -144,6 +144,20 @@ Benchmark: regression_test
     stable_memory_increase: 0 pages (no change)
 
 ---------------------------------------------------
+
+Stats:
+  instructions:
+    changed: 1, unchanged: 0, new: 0, total: 1
+    change   : [min 197 | med 197 | max 197]
+    change % : [min +1970.0% | med +1970.0% | max +1970.0%]
+  heap_increase:
+    changed: 0, unchanged: 1, new: 0, total: 1
+    change   : [min 0 | med 0 | max 0]
+    change % : [min 0% | med 0% | max 0%]
+  stable_memory_increase:
+    changed: 0, unchanged: 1, new: 0, total: 1
+    change   : [min 0 | med 0 | max 0]
+    change % : [min 0% | med 0% | max 0%]
 "
             );
         });
@@ -188,6 +202,20 @@ Benchmark: stable_memory_increase_from_zero
     stable_memory_increase: 123 pages (regressed from 0)
 
 ---------------------------------------------------
+
+Stats:
+  instructions:
+    changed: 1, unchanged: 0, new: 0, total: 1
+    change   : [min 307 | med 307 | max 307]
+    change % : n/a
+  heap_increase:
+    changed: 0, unchanged: 1, new: 0, total: 1
+    change   : [min 0 | med 0 | max 0]
+    change % : [min 0% | med 0% | max 0%]
+  stable_memory_increase:
+    changed: 1, unchanged: 0, new: 0, total: 1
+    change   : [min 123 | med 123 | max 123]
+    change % : n/a
 "
             );
         });

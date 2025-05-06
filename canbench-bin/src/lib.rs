@@ -40,6 +40,7 @@ pub fn run_benchmarks(
     persist: bool,
     results_file: &PathBuf,
     verbose: bool,
+    show_stats: bool,
     show_canister_output: bool,
     integrity_check: bool,
     instruction_tracing: bool,
@@ -121,7 +122,7 @@ pub fn run_benchmarks(
     println!();
     println!("---------------------------------------------------");
 
-    if verbose {
+    if verbose || show_stats {
         println!();
         stats::print_stats(&new_results, &old_results, noise_threshold);
     }
