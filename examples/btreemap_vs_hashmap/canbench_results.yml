@@ -7,7 +7,7 @@ benches:
     scopes: {}
   pre_upgrade_bench:
     total:
-      instructions: 438878344
+      instructions: 438878782
       heap_increase: 519
       stable_memory_increase: 184
     scopes:
