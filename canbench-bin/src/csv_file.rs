@@ -13,29 +13,29 @@ pub(crate) fn write(
     let mut file = File::create(results_file)
         .unwrap_or_else(|e| panic!("Failed to create results file {:?}: {}", results_file, e));
 
-    writeln!(
-        file,
-        "status{dp}name{dp}instructions{dp}instructions %{dp}heap_increase{dp}heap_increase %{dp}stable_memory_increase{dp}stable_memory_increase %",
-        dp=DELIMITER
-    ).expect("Failed to write CSV header");
+    let headers = [
+        "status",
+        "name",
+        "instructions",
+        "instructions %",
+        "heap_increase",
+        "heap_increase %",
+        "stable_memory_increase",
+        "stable_memory_increase %",
+    ];
+    writeln!(file, "{}", headers.join(&DELIMITER.to_string())).expect("Failed to write CSV header");
 
     for (name, new_bench) in new_results {
         let old_bench = old_results.get(name);
-
-        write_measurement_diff(
-            &mut file,
-            if old_bench.is_some() { "" } else { "new" },
-            name,
-            &new_bench.total,
-            old_bench.map(|b| &b.total),
-            DELIMITER,
-        );
+        let status = if old_bench.is_some() { "" } else { "new" };
+        let old = old_bench.map(|b| &b.total);
+        write_measurement_diff(&mut file, status, name, &new_bench.total, old, DELIMITER);
     }
 }
 
 fn write_measurement_diff(
     file: &mut File,
-    new: &str,
+    status: &str,
     name: &str,
     new_m: &Measurement,
     old_m: Option<&Measurement>,
@@ -52,8 +52,8 @@ fn write_measurement_diff(
 
     writeln!(
         file,
-        "{new}{d}{name}{d}{ins}{d}{ins_p}{d}{heap}{d}{heap_p}{d}{smi}{d}{smi_p}",
-        new = new,
+        "{status}{d}{name}{d}{ins}{d}{ins_p}{d}{heap}{d}{heap_p}{d}{smi}{d}{smi_p}",
+        status = status,
         name = name,
         ins = new_m.instructions,
         ins_p = instr_pct,
