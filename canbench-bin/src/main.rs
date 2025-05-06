@@ -21,6 +21,10 @@ struct Args {
     #[clap(long)]
     less_verbose: bool,
 
+    /// Does not print the benchmark results.
+    #[clap(long)]
+    hide_results: bool,
+
     /// Show statistics about the benchmarks.
     #[clap(long)]
     show_stats: bool,
@@ -155,6 +159,7 @@ fn main() {
         args.persist,
         &results_path,
         !args.less_verbose,
+        !args.hide_results,
         args.show_stats,
         args.show_canister_output,
         !args.no_runtime_integrity_check,

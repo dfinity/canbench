@@ -63,6 +63,37 @@ Stats:
 }
 
 #[test]
+fn benchmark_reports_no_changes_with_hide_results() {
+    BenchTest::canister("measurements_output")
+        .with_bench("no_changes_test")
+        .with_hide_results()
+        .run(|output| {
+            assert_success!(
+                output,
+                "
+---------------------------------------------------
+
+Stats:
+  instructions:
+    changed: 0, unchanged: 1, new: 0, total: 1
+    change   : [min 0 | med 0 | max 0]
+    change % : [min 0% | med 0% | max 0%]
+  heap_increase:
+    changed: 0, unchanged: 1, new: 0, total: 1
+    change   : [min 0 | med 0 | max 0]
+    change % : [min 0% | med 0% | max 0%]
+  stable_memory_increase:
+    changed: 0, unchanged: 1, new: 0, total: 1
+    change   : [min 0 | med 0 | max 0]
+    change % : [min 0% | med 0% | max 0%]
+
+---------------------------------------------------
+"
+            );
+        });
+}
+
+#[test]
 fn broken_benchmark_returns_full_error() {
     BenchTest::canister("measurements_output")
         .with_bench("broken_benchmark")

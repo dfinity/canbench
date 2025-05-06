@@ -40,6 +40,7 @@ pub fn run_benchmarks(
     persist: bool,
     results_file: &PathBuf,
     verbose: bool,
+    show_results: bool,
     show_stats: bool,
     show_canister_output: bool,
     integrity_check: bool,
@@ -93,17 +94,19 @@ pub fn run_benchmarks(
             }
         }
 
-        println!();
-        println!("---------------------------------------------------");
-        println!();
-
         let result = run_benchmark(&pocket_ic, benchmark_canister_id, bench_fn);
-        print_benchmark(
-            bench_fn,
-            &result,
-            old_results.get(bench_fn),
-            noise_threshold,
-        );
+
+        if show_results {
+            println!();
+            println!("---------------------------------------------------");
+            println!();
+            print_benchmark(
+                bench_fn,
+                &result,
+                old_results.get(bench_fn),
+                noise_threshold,
+            );
+        }
 
         if let Some(instruction_tracing_canister_id) = instruction_tracing_canister_id {
             run_instruction_tracing(
