@@ -130,6 +130,7 @@ pub fn run_benchmarks(
     // Persist the result if requested.
     if persist {
         results_file::write(results_file, new_results);
+        println!();
         println!(
             "Successfully persisted results to {}",
             results_file.display()
