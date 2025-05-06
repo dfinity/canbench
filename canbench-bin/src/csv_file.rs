@@ -4,7 +4,7 @@ use std::{collections::BTreeMap, fs::File, io::Write, path::PathBuf};
 /// Delimiter used in the CSV file.
 const DELIMITER: char = '\t';
 
-/// Write benchmark results to CSV file.
+/// Write benchmark results to a CSV file.
 pub(crate) fn write(
     results_file: &PathBuf,
     new_results: &BTreeMap<String, BenchResult>,
@@ -23,13 +23,14 @@ pub(crate) fn write(
         "stable_memory_increase",
         "stable_memory_increase %",
     ];
+
     writeln!(file, "{}", headers.join(&DELIMITER.to_string())).expect("Failed to write CSV header");
 
     for (name, new_bench) in new_results {
         let old_bench = old_results.get(name);
         let status = if old_bench.is_some() { "" } else { "new" };
         let old = old_bench.map(|b| &b.total);
-        write_measurement_diff(&mut file, status, name, &new_bench.total, old, DELIMITER);
+        write_measurement_diff(&mut file, status, name, &new_bench.total, old);
     }
 }
 
@@ -37,39 +38,38 @@ fn write_measurement_diff(
     file: &mut File,
     status: &str,
     name: &str,
-    new_m: &Measurement,
-    old_m: Option<&Measurement>,
-    delimiter: char,
+    new: &Measurement,
+    old: Option<&Measurement>,
 ) {
-    let (instr_pct, heap_pct, stable_pct) = match old_m {
+    let format_number = |n: u64| n.to_string();
+    let format_percent = |new, old| {
+        if old == 0 {
+            String::new()
+        } else {
+            format!("{:.2}%", (new as f64 - old as f64) / old as f64 * 100.0)
+        }
+    };
+
+    let (instructions_p, heap_increase_p, stable_memory_increase_p) = match old {
         Some(old) => (
-            percent_diff(new_m.instructions, old.instructions),
-            percent_diff(new_m.heap_increase, old.heap_increase),
-            percent_diff(new_m.stable_memory_increase, old.stable_memory_increase),
+            format_percent(new.instructions, old.instructions),
+            format_percent(new.heap_increase, old.heap_increase),
+            format_percent(new.stable_memory_increase, old.stable_memory_increase),
         ),
         None => (String::new(), String::new(), String::new()),
     };
 
-    writeln!(
-        file,
-        "{status}{d}{name}{d}{ins}{d}{ins_p}{d}{heap}{d}{heap_p}{d}{smi}{d}{smi_p}",
-        status = status,
-        name = name,
-        ins = new_m.instructions,
-        ins_p = instr_pct,
-        heap = new_m.heap_increase,
-        heap_p = heap_pct,
-        smi = new_m.stable_memory_increase,
-        smi_p = stable_pct,
-        d = delimiter
-    )
-    .unwrap_or_else(|e| panic!("Failed to write row for {}: {}", name, e));
-}
+    let row = [
+        status,
+        name,
+        &format_number(new.instructions),
+        &instructions_p,
+        &format_number(new.heap_increase),
+        &heap_increase_p,
+        &format_number(new.stable_memory_increase),
+        &stable_memory_increase_p,
+    ];
 
-fn percent_diff(new: u64, old: u64) -> String {
-    if old == 0 {
-        return String::new();
-    }
-    let diff = (new as f64 - old as f64) / old as f64 * 100.0;
-    format!("{:.2}%", diff)
+    writeln!(file, "{}", row.join(&DELIMITER.to_string()))
+        .unwrap_or_else(|e| panic!("Failed to write row for {}: {}", name, e));
 }
