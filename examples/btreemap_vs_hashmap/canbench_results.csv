@@ -1,4 +1,4 @@
-new	name	instructions	instructions %	heap_increase	heap_increase %	stable_memory_increase	stable_memory_increase %
-old	insert_users	2558172740	0.00%	872	0.00%	0	
-old	pre_upgrade_bench	438878782	0.00%	519	0.00%	184	0.00%
-old	remove_users	2109060849	0.00%	0		0	
+status	name	instructions	instructions %	heap_increase	heap_increase %	stable_memory_increase	stable_memory_increase %
+	insert_users	2558172740	0.00%	872	0.00%	0	
+	pre_upgrade_bench	438878782	0.00%	519	0.00%	184	0.00%
+	remove_users	2109060849	0.00%	0		0	

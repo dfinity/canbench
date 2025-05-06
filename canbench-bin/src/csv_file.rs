@@ -13,7 +13,7 @@ pub(crate) fn write(
 
     writeln!(
         file,
-        "new{dp}name{dp}instructions{dp}instructions %{dp}heap_increase{dp}heap_increase %{dp}stable_memory_increase{dp}stable_memory_increase %",
+        "status{dp}name{dp}instructions{dp}instructions %{dp}heap_increase{dp}heap_increase %{dp}stable_memory_increase{dp}stable_memory_increase %",
         dp=delimiter
     ).expect("Failed to write CSV header");
 
@@ -22,7 +22,7 @@ pub(crate) fn write(
 
         write_measurement_diff(
             &mut file,
-            if old_bench.is_some() { "old" } else { "new" },
+            if old_bench.is_some() { "" } else { "new" },
             name,
             &new_bench.total,
             old_bench.map(|b| &b.total),
