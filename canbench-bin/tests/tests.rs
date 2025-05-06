@@ -41,6 +41,20 @@ Benchmark: no_changes_test
     stable_memory_increase: 0 pages (no change)
 
 ---------------------------------------------------
+
+Stats:
+  instructions:
+    changed: 0, unchanged: 1, new: 0, total: 1
+    change   : [min 0 | med 0 | max 0]
+    change % : [min 0% | med 0% | max 0%]
+  heap_increase:
+    changed: 0, unchanged: 1, new: 0, total: 1
+    change   : [min 0 | med 0 | max 0]
+    change % : [min 0% | med 0% | max 0%]
+  stable_memory_increase:
+    changed: 0, unchanged: 1, new: 0, total: 1
+    change   : [min 0 | med 0 | max 0]
+    change % : [min 0% | med 0% | max 0%]
 "
             );
         });
@@ -77,6 +91,20 @@ Benchmark: noisy_change_test
     stable_memory_increase: 0 pages (no change)
 
 ---------------------------------------------------
+
+Stats:
+  instructions:
+    changed: 0, unchanged: 1, new: 0, total: 1
+    change   : [min -3 | med -3 | max -3]
+    change % : [min -1.4% | med -1.4% | max -1.4%]
+  heap_increase:
+    changed: 0, unchanged: 1, new: 0, total: 1
+    change   : [min 0 | med 0 | max 0]
+    change % : [min 0% | med 0% | max 0%]
+  stable_memory_increase:
+    changed: 0, unchanged: 1, new: 0, total: 1
+    change   : [min 0 | med 0 | max 0]
+    change % : [min 0% | med 0% | max 0%]
 "
             );
         });
@@ -99,6 +127,20 @@ Benchmark: noisy_change_above_default_threshold_test
     stable_memory_increase: 100 pages (improved by 3.85%)
 
 ---------------------------------------------------
+
+Stats:
+  instructions:
+    changed: 1, unchanged: 0, new: 0, total: 1
+    change   : [min -154.07 K | med -154.07 K | max -154.07 K]
+    change % : [min -4.4% | med -4.4% | max -4.4%]
+  heap_increase:
+    changed: 1, unchanged: 0, new: 0, total: 1
+    change   : [min -3 | med -3 | max -3]
+    change % : [min -4.6% | med -4.6% | max -4.6%]
+  stable_memory_increase:
+    changed: 1, unchanged: 0, new: 0, total: 1
+    change   : [min -4 | med -4 | max -4]
+    change % : [min -3.8% | med -3.8% | max -3.8%]
 "
             );
         });
@@ -122,6 +164,20 @@ Benchmark: noisy_change_above_default_threshold_test
     stable_memory_increase: 100 pages (-3.85%) (change within noise threshold)
 
 ---------------------------------------------------
+
+Stats:
+  instructions:
+    changed: 0, unchanged: 1, new: 0, total: 1
+    change   : [min -154.07 K | med -154.07 K | max -154.07 K]
+    change % : [min -4.4% | med -4.4% | max -4.4%]
+  heap_increase:
+    changed: 0, unchanged: 1, new: 0, total: 1
+    change   : [min -3 | med -3 | max -3]
+    change % : [min -4.6% | med -4.6% | max -4.6%]
+  stable_memory_increase:
+    changed: 0, unchanged: 1, new: 0, total: 1
+    change   : [min -4 | med -4 | max -4]
+    change % : [min -3.8% | med -3.8% | max -3.8%]
 "
             );
         });
@@ -180,6 +236,20 @@ Benchmark: improvement_test
     stable_memory_increase: 0 pages (no change)
 
 ---------------------------------------------------
+
+Stats:
+  instructions:
+    changed: 1, unchanged: 0, new: 0, total: 1
+    change   : [min -2.89 K | med -2.89 K | max -2.89 K]
+    change % : [min -93.3% | med -93.3% | max -93.3%]
+  heap_increase:
+    changed: 0, unchanged: 1, new: 0, total: 1
+    change   : [min 0 | med 0 | max 0]
+    change % : [min 0% | med 0% | max 0%]
+  stable_memory_increase:
+    changed: 0, unchanged: 1, new: 0, total: 1
+    change   : [min 0 | med 0 | max 0]
+    change % : [min 0% | med 0% | max 0%]
 "
             );
         });
