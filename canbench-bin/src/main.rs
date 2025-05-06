@@ -18,10 +18,6 @@ struct Args {
     #[clap(long)]
     persist: bool,
 
-    /// Write results to a CSV file.
-    #[clap(long)]
-    csv: bool,
-
     /// Only print the benchmark results (and nothing else).
     #[clap(long)]
     less_verbose: bool,
@@ -172,7 +168,6 @@ fn main() {
         init_args,
         args.persist,
         &results_path,
-        args.csv,
         &csv_results_path,
         !args.less_verbose,
         !args.hide_results,
