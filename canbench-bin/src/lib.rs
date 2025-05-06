@@ -2,7 +2,7 @@
 mod instruction_tracing;
 mod print_benchmark;
 mod results_file;
-mod stats;
+mod summary;
 
 use canbench_rs::BenchResult;
 use candid::{Encode, Principal};
@@ -127,7 +127,7 @@ pub fn run_benchmarks(
 
     if verbose || show_summary {
         println!();
-        stats::print_summary(&new_results, &old_results, noise_threshold);
+        summary::print_summary(&new_results, &old_results, noise_threshold);
         println!();
         println!("---------------------------------------------------");
     }
