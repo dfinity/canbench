@@ -39,6 +39,7 @@ pub fn run_benchmarks(
     pattern: Option<String>,
     init_args: Vec<u8>,
     persist: bool,
+    csv: bool,
     results_file: &PathBuf,
     csv_results_file: &PathBuf,
     verbose: bool,
@@ -134,14 +135,16 @@ pub fn run_benchmarks(
         println!("---------------------------------------------------");
     }
 
-    // Persist the result if requested.
-    if persist {
+    if csv {
         csv_file::write(csv_results_file, &new_results, &old_results);
         println!(
             "Successfully saved CSV results to {}",
             csv_results_file.display()
         );
+    }
 
+    // Persist the result if requested.
+    if persist {
         results_file::write(results_file, new_results);
         println!(
             "Successfully persisted results to {}",
