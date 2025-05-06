@@ -73,7 +73,7 @@ fn print_percentage_stats<F>(
 
     println!("=== {label} ===");
     println!("Changed: {changed}, Unchanged: {unchanged}, New: {new_only}, Total: {total}");
-    println!("Noise threshold: {:.1}%", noise_threshold);
+    //println!("Noise threshold: {:.1}%", noise_threshold);
 
     if !abs_deltas.is_empty() {
         print_range("Change   ", &abs_deltas, fmt_human, percentile_i64);
@@ -82,12 +82,7 @@ fn print_percentage_stats<F>(
     }
 
     if !percent_diffs.is_empty() {
-        print_range(
-            "Change % ",
-            &percent_diffs,
-            |v| format!("{:+.1}%", v),
-            percentile_f64,
-        );
+        print_range("Change % ", &percent_diffs, fmt_percent, percentile_f64);
     } else {
         println!("Change % : n/a");
     }
@@ -153,4 +148,12 @@ fn fmt_human(val: i64) -> String {
         }
     }
     format!("{}", val)
+}
+
+fn fmt_percent(value: f64) -> String {
+    if value.abs() >= 0.1 {
+        format!("{:+.1}%", value) // Use sign for non-zero values only.
+    } else {
+        "0%".to_string()
+    }
 }
