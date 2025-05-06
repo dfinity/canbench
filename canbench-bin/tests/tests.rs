@@ -149,7 +149,7 @@ Stats:
   instructions:
     changed: 1, unchanged: 0, new: 0, total: 1
     change   : [min 197 | med 197 | max 197]
-    change % : [min +1970.0% | med +1970.0% | max +1970.0%]
+    change % : [min +1970% | med +1970% | max +1970%]
   heap_increase:
     changed: 0, unchanged: 1, new: 0, total: 1
     change   : [min 0 | med 0 | max 0]

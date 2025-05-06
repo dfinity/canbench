@@ -146,8 +146,11 @@ fn fmt_human(val: i64) -> String {
 
 fn fmt_percent(value: f64) -> String {
     if value.abs() >= 0.1 {
-        format!("{:+.1}%", value) // Use sign for non-zero values only.
+        if value.abs() >= 100.0 {
+            return format!("{:+.0}%", value);
+        }
+        format!("{:+.1}%", value)
     } else {
-        "0%".to_string()
+        "0%".to_string() // Use sign for non-zero values only.
     }
 }
