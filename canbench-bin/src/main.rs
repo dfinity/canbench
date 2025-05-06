@@ -21,11 +21,11 @@ struct Args {
     #[clap(long)]
     less_verbose: bool,
 
-    /// Does not print the benchmark results.
+    /// Hide individual benchmark outputs.
     #[clap(long)]
     hide_results: bool,
 
-    /// Show statistics about the benchmarks.
+    /// Show summary statistics after benchmarks.
     #[clap(long)]
     show_stats: bool,
 
