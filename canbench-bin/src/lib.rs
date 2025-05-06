@@ -125,12 +125,13 @@ pub fn run_benchmarks(
     if verbose || show_stats {
         println!();
         stats::print_stats(&new_results, &old_results, noise_threshold);
+        println!();
+        println!("---------------------------------------------------");
     }
 
     // Persist the result if requested.
     if persist {
         results_file::write(results_file, new_results);
-        println!();
         println!(
             "Successfully persisted results to {}",
             results_file.display()

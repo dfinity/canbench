@@ -55,6 +55,8 @@ Stats:
     changed: 0, unchanged: 1, new: 0, total: 1
     change   : [min 0 | med 0 | max 0]
     change % : [min 0% | med 0% | max 0%]
+
+---------------------------------------------------
 "
             );
         });
@@ -105,6 +107,8 @@ Stats:
     changed: 0, unchanged: 1, new: 0, total: 1
     change   : [min 0 | med 0 | max 0]
     change % : [min 0% | med 0% | max 0%]
+
+---------------------------------------------------
 "
             );
         });
@@ -141,6 +145,8 @@ Stats:
     changed: 1, unchanged: 0, new: 0, total: 1
     change   : [min -4 | med -4 | max -4]
     change % : [min -3.85% | med -3.85% | max -3.85%]
+
+---------------------------------------------------
 "
             );
         });
@@ -178,6 +184,8 @@ Stats:
     changed: 0, unchanged: 1, new: 0, total: 1
     change   : [min -4 | med -4 | max -4]
     change % : [min -3.85% | med -3.85% | max -3.85%]
+
+---------------------------------------------------
 "
             );
         });
@@ -214,6 +222,8 @@ Stats:
     changed: 0, unchanged: 1, new: 0, total: 1
     change   : [min 0 | med 0 | max 0]
     change % : [min 0% | med 0% | max 0%]
+
+---------------------------------------------------
 "
             );
         });
@@ -250,6 +260,8 @@ Stats:
     changed: 0, unchanged: 1, new: 0, total: 1
     change   : [min 0 | med 0 | max 0]
     change % : [min 0% | med 0% | max 0%]
+
+---------------------------------------------------
 "
             );
         });
@@ -286,6 +298,8 @@ Stats:
     changed: 1, unchanged: 0, new: 0, total: 1
     change   : [min 123 | med 123 | max 123]
     change % : n/a
+
+---------------------------------------------------
 "
             );
         });
@@ -324,6 +338,8 @@ Stats:
     changed: 0, unchanged: 0, new: 1, total: 1
     change   : [min 456 | med 456 | max 456]
     change % : n/a
+
+---------------------------------------------------
 "
             );
         });
@@ -360,6 +376,8 @@ Stats:
     changed: 0, unchanged: 0, new: 1, total: 1
     change   : [min 0 | med 0 | max 0]
     change % : n/a
+
+---------------------------------------------------
 "
             );
         });
@@ -402,6 +420,8 @@ Stats:
     changed: 0, unchanged: 0, new: 2, total: 2
     change   : [min 0 | med 0 | max 0]
     change % : n/a
+
+---------------------------------------------------
 "
         );
     });
@@ -448,6 +468,8 @@ Stats:
     changed: 0, unchanged: 0, new: 1, total: 1
     change   : [min 0 | med 0 | max 0]
     change % : n/a
+
+---------------------------------------------------
 "
             );
         });
@@ -539,6 +561,8 @@ Stats:
     changed: 0, unchanged: 1, new: 0, total: 1
     change   : [min 0 | med 0 | max 0]
     change % : [min 0% | med 0% | max 0%]
+
+---------------------------------------------------
 "
             );
         });
@@ -587,6 +611,8 @@ Stats:
     changed: 0, unchanged: 1, new: 0, total: 1
     change   : [min 0 | med 0 | max 0]
     change % : [min 0% | med 0% | max 0%]
+
+---------------------------------------------------
 "
             );
         });
@@ -624,6 +650,8 @@ Stats:
     changed: 0, unchanged: 0, new: 1, total: 1
     change   : [min 1 | med 1 | max 1]
     change % : n/a
+
+---------------------------------------------------
 "
             );
         });
@@ -695,6 +723,8 @@ Stats:
     changed: 0, unchanged: 0, new: 1, total: 1
     change   : [min 1 | med 1 | max 1]
     change % : n/a
+
+---------------------------------------------------
 "
             );
         });
@@ -736,6 +766,8 @@ Stats:
     changed: 0, unchanged: 0, new: 1, total: 1
     change   : [min 0 | med 0 | max 0]
     change % : n/a
+
+---------------------------------------------------
 "
             );
         });
@@ -777,6 +809,8 @@ Stats:
     changed: 0, unchanged: 1, new: 0, total: 1
     change   : [min 0 | med 0 | max 0]
     change % : [min 0% | med 0% | max 0%]
+
+---------------------------------------------------
 "
             );
         });
