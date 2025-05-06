@@ -135,6 +135,7 @@ pub fn run_benchmarks(
         println!("---------------------------------------------------");
     }
 
+    // Save benchmark results in CSV format if requested.
     if csv {
         csv_file::write(csv_results_file, &new_results, &old_results);
         println!(
