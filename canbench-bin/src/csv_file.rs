@@ -1,12 +1,14 @@
 use canbench_rs::{BenchResult, Measurement};
 use std::{collections::BTreeMap, fs::File, io::Write, path::PathBuf};
 
+/// Delimiter used in the CSV file.
+const DELIMITER: char = '\t';
+
 /// Write benchmark results to CSV file.
 pub(crate) fn write(
     results_file: &PathBuf,
     new_results: &BTreeMap<String, BenchResult>,
     old_results: &BTreeMap<String, BenchResult>,
-    delimiter: char,
 ) {
     let mut file = File::create(results_file)
         .unwrap_or_else(|e| panic!("Failed to create results file {:?}: {}", results_file, e));
@@ -14,7 +16,7 @@ pub(crate) fn write(
     writeln!(
         file,
         "status{dp}name{dp}instructions{dp}instructions %{dp}heap_increase{dp}heap_increase %{dp}stable_memory_increase{dp}stable_memory_increase %",
-        dp=delimiter
+        dp=DELIMITER
     ).expect("Failed to write CSV header");
 
     for (name, new_bench) in new_results {
@@ -26,7 +28,7 @@ pub(crate) fn write(
             name,
             &new_bench.total,
             old_bench.map(|b| &b.total),
-            delimiter,
+            DELIMITER,
         );
     }
 }

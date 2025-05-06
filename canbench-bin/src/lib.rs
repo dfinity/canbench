@@ -145,7 +145,7 @@ pub fn run_benchmarks(
     }
 
     if csv {
-        csv_file::write(csv_results_file, &new_results, &old_results, '\t');
+        csv_file::write(csv_results_file, &new_results, &old_results);
         println!(
             "Successfully saved CSV results to {}",
             csv_results_file.display()
