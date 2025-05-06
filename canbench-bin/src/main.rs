@@ -18,7 +18,7 @@ struct Args {
     #[clap(long)]
     persist: bool,
 
-    /// Whether or not results should be written to CSV.
+    /// Write results to a CSV file.
     #[clap(long)]
     csv: bool,
 
