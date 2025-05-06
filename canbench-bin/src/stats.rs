@@ -70,7 +70,6 @@ fn print_percentage_stats<F>(
 
     println!("  {label}:");
     println!("    changed: {changed}, unchanged: {unchanged}, new: {new_only}, total: {total}");
-    //println!("Noise threshold: {:.1}%", noise_threshold);
 
     if !abs_deltas.is_empty() {
         print_range("    change   ", &abs_deltas, fmt_human, percentile_i64);
