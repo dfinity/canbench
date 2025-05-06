@@ -7,12 +7,12 @@ const DELIMITER: char = '\t';
 
 /// Write benchmark results to a CSV file.
 pub(crate) fn write(
-    results_file: &PathBuf,
+    output_file: &PathBuf,
     new_results: &BTreeMap<String, BenchResult>,
     old_results: &BTreeMap<String, BenchResult>,
 ) {
-    let mut file = File::create(results_file)
-        .unwrap_or_else(|e| panic!("Failed to create results file {:?}: {}", results_file, e));
+    let mut file = File::create(output_file)
+        .unwrap_or_else(|e| panic!("Failed to create results file {:?}: {}", output_file, e));
 
     let headers = [
         "status",
