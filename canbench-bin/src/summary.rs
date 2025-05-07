@@ -29,7 +29,8 @@ fn print_metric_summary<F>(
 ) where
     F: Fn(&Measurement) -> u64,
 {
-    let mut changed = 0;
+    let mut improved = 0;
+    let mut regressed = 0;
     let mut unchanged = 0;
     let mut new_only = 0;
 
@@ -44,21 +45,25 @@ fn print_metric_summary<F>(
                 let abs_delta = new_val as i64 - old_val as i64;
                 abs_deltas.push(abs_delta);
 
-                match old_val {
-                    0 if abs_delta != 0 => changed += 1,
-                    0 => {
-                        unchanged += 1;
-                        percent_diffs.push(0.0);
-                    }
-                    _ => {
-                        let delta = abs_delta as f64 / old_val as f64 * 100.0;
-                        if delta.abs() >= noise_threshold {
-                            changed += 1;
-                        } else {
+                if old_val == 0 {
+                    match abs_delta {
+                        d if d < 0 => improved += 1,
+                        d if d > 0 => regressed += 1,
+                        _ => {
                             unchanged += 1;
+                            percent_diffs.push(0.0);
                         }
-                        percent_diffs.push(delta);
                     }
+                } else {
+                    let delta = abs_delta as f64 / old_val as f64 * 100.0;
+                    if delta.abs() < noise_threshold {
+                        unchanged += 1;
+                    } else if delta < 0.0 {
+                        improved += 1;
+                    } else {
+                        regressed += 1;
+                    }
+                    percent_diffs.push(delta);
                 }
             }
             None => {
@@ -68,10 +73,11 @@ fn print_metric_summary<F>(
         }
     }
 
-    let total = changed + unchanged + new_only;
+    let total = improved + regressed + unchanged + new_only;
+    debug_assert_eq!(total, new_results.len(), "total count mismatch");
 
     println!("  {label}:");
-    println!("    changed: {changed}, unchanged: {unchanged}, new: {new_only}, total: {total}");
+    println!("    improved: {improved}, regressed: {regressed}, unchanged: {unchanged}, new: {new_only}, total: {total}");
 
     if !abs_deltas.is_empty() {
         print_range("    change   ", &abs_deltas, fmt_human, percentile_i64);
