@@ -84,29 +84,24 @@ fn print_metric_summary<F>(
         _ => " 🟢🔴",
     };
     println!(
-        "    counts    : [total {} | new {} | improved {} | regressed {} | unchanged {}]{}",
+        "    counts:   [total {} | new {} | improved {} | regressed {} | unchanged {}]{}",
         total, new_only, improved, regressed, unchanged, emoji_status
     );
 
     if !abs_deltas.is_empty() {
-        print_range("    change    ", &abs_deltas, fmt_human, percentile_i64);
+        print_range("    change:  ", &abs_deltas, fmt_human, percentile_i64);
     } else {
-        println!("    change    : n/a");
+        println!("    change:   n/a");
     }
 
     if !percent_diffs.is_empty() {
-        print_range(
-            "    change %  ",
-            &percent_diffs,
-            fmt_percent,
-            percentile_f64,
-        );
+        print_range("    change %:", &percent_diffs, fmt_percent, percentile_f64);
     } else {
-        println!("    change %  : n/a");
+        println!("    change %: n/a");
     }
 }
 
-fn print_range<T, F, P>(label: &str, values: &[T], format: F, percentile_fn: P)
+fn print_range<T, F, P>(prefix: &str, values: &[T], format: F, percentile_fn: P)
 where
     T: PartialOrd + Copy,
     F: Fn(T) -> String,
@@ -119,7 +114,7 @@ where
     let max = sorted.last().copied().unwrap();
 
     println!(
-        "{label}: [min {} | med {} | max {}]",
+        "{prefix} [min {} | med {} | max {}]",
         format(min),
         format(med),
         format(max),
