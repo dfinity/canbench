@@ -4,6 +4,18 @@ use std::{fs, path::PathBuf, process::Output};
 use tempfile::NamedTempFile;
 use utils::BenchTest;
 
+/// Returns the name of the current function, intended to be used in tests.
+#[macro_export]
+macro_rules! current_test_name {
+    () => {{
+        fn f() {}
+        let full = std::any::type_name_of_val(&f);
+        full.strip_suffix("::f")
+            .and_then(|s| s.rsplit("::").next())
+            .unwrap_or(full)
+    }};
+}
+
 /// Loads the expected output for a given test case.
 /// Overwrites the expected output if the "overwrite" feature is enabled.
 ///
@@ -56,21 +68,23 @@ wasm_path:
 
 #[test]
 fn benchmark_reports_no_changes() {
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("no_changes_test")
         .run(|output| {
-            let expected = load_expected("benchmark_reports_no_changes", &output);
+            let expected = load_expected(name, &output);
             assert_success!(output, expected.as_str());
         });
 }
 
 #[test]
 fn benchmark_reports_no_changes_with_hide_results() {
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("no_changes_test")
         .with_hide_results()
         .run(|output| {
-            let expected = load_expected("benchmark_reports_no_changes_with_hide_results", &output);
+            let expected = load_expected(name, &output);
             assert_success!(output, expected.as_str());
         });
 }
@@ -91,67 +105,67 @@ IC0506: Canister lxzze-o7777-77777-aaaaa-cai did not produce a response
 
 #[test]
 fn benchmark_reports_noisy_change() {
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("noisy_change_test")
         .run(|output| {
-            let expected = load_expected("benchmark_reports_noisy_change", &output);
+            let expected = load_expected(name, &output);
             assert_success!(output, expected.as_str());
         });
 }
 
 #[test]
 fn benchmark_reports_noisy_change_above_default_noise_threshold() {
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("noisy_change_above_default_threshold_test")
         .run(|output| {
-            let expected = load_expected(
-                "benchmark_reports_noisy_change_above_default_noise_threshold",
-                &output,
-            );
+            let expected = load_expected(name, &output);
             assert_success!(output, expected.as_str());
         });
 }
 
 #[test]
 fn benchmark_reports_noisy_change_within_custom_noise_threshold() {
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("noisy_change_above_default_threshold_test")
         .with_noise_threshold(5.0)
         .run(|output| {
-            let expected = load_expected(
-                "benchmark_reports_noisy_change_within_custom_noise_threshold",
-                &output,
-            );
+            let expected = load_expected(name, &output);
             assert_success!(output, expected.as_str());
         });
 }
 
 #[test]
 fn benchmark_reports_regression() {
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("regression_test")
         .run(|output| {
-            let expected = load_expected("benchmark_reports_regression", &output);
+            let expected = load_expected(name, &output);
             assert_success!(output, expected.as_str());
         });
 }
 
 #[test]
 fn benchmark_reports_improvement() {
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("improvement_test")
         .run(|output| {
-            let expected = load_expected("benchmark_reports_improvement", &output);
+            let expected = load_expected(name, &output);
             assert_success!(output, expected.as_str());
         });
 }
 
 #[test]
 fn benchmark_reports_regression_from_zero() {
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("stable_memory_increase_from_zero")
         .run(|output| {
-            let expected = load_expected("benchmark_reports_regression_from_zero", &output);
+            let expected = load_expected(name, &output);
             assert_success!(output, expected.as_str());
         });
 }
@@ -160,38 +174,42 @@ fn benchmark_reports_regression_from_zero() {
 // stable memory usage.
 #[test]
 fn benchmark_stable_memory_increase() {
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("stable_memory_only_increase")
         .run(|output| {
-            let expected = load_expected("benchmark_stable_memory_increase", &output);
+            let expected = load_expected(name, &output);
             assert_success!(output, expected.as_str());
         });
 }
 
 #[test]
 fn benchmark_heap_increase() {
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("increase_heap_increase")
         .run(|output| {
-            let expected = load_expected("benchmark_heap_increase", &output);
+            let expected = load_expected(name, &output);
             assert_success!(output, expected.as_str());
         });
 }
 
 #[test]
 fn supports_gzipped_wasm() {
+    let name = current_test_name!();
     BenchTest::canister("gzipped_wasm").run(|output| {
-        let expected = load_expected("supports_gzipped_wasm", &output);
+        let expected = load_expected(name, &output);
         assert_success!(output, expected.as_str());
     });
 }
 
 #[test]
 fn reports_scopes_in_new_benchmark() {
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("bench_scope_new")
         .run(|output| {
-            let expected = load_expected("reports_scopes_in_new_benchmark", &output);
+            let expected = load_expected(name, &output);
             assert_success!(output, expected.as_str());
         });
 }
@@ -243,10 +261,11 @@ wasm_path:
 
 #[test]
 fn reports_scopes_in_existing_benchmark() {
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("bench_scope_exist")
         .run(|output| {
-            let expected = load_expected("reports_scopes_in_existing_benchmark", &output);
+            let expected = load_expected(name, &output);
             assert_success!(output, expected.as_str());
         });
 }
@@ -265,10 +284,11 @@ fn newer_version() {
 
 #[test]
 fn benchmark_works_with_init_args() {
+    let name = current_test_name!();
     BenchTest::canister("init_arg")
         .with_bench("state_check")
         .run(|output| {
-            let expected = load_expected("benchmark_works_with_init_args", &output);
+            let expected = load_expected(name, &output);
             assert_success!(output, expected.as_str());
         });
 }
@@ -276,10 +296,11 @@ fn benchmark_works_with_init_args() {
 // Ensures writes to stable memory are accounted for in the same way as application subnets.
 #[test]
 fn benchmark_stable_writes() {
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("write_stable_memory")
         .run(|output| {
-            let expected = load_expected("benchmark_stable_writes", &output);
+            let expected = load_expected(name, &output);
             assert_success!(output, expected.as_str());
         });
 }
@@ -319,31 +340,34 @@ fn shows_canister_output() {
 fn benchmark_instruction_tracing() {
     // TODO: better end-to-end testing, since this test only makes sure there is no error in
     // tracing.
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("write_stable_memory")
         .with_instruction_tracing()
         .run(|output| {
-            let expected = load_expected("benchmark_instruction_tracing", &output);
+            let expected = load_expected(name, &output);
             assert_success!(output, expected.as_str());
         });
 }
 
 #[test]
 fn reports_repeated_scope_in_new_benchmark() {
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("bench_repeated_scope_new")
         .run(|output| {
-            let expected = load_expected("reports_repeated_scope_in_new_benchmark", &output);
+            let expected = load_expected(name, &output);
             assert_success!(output, expected.as_str());
         });
 }
 
 #[test]
 fn reports_repeated_scope_in_existing_benchmark() {
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("bench_repeated_scope_exists")
         .run(|output| {
-            let expected = load_expected("reports_repeated_scope_in_existing_benchmark", &output);
+            let expected = load_expected(name, &output);
             assert_success!(output, expected.as_str());
         });
 }
