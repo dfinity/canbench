@@ -77,18 +77,26 @@ fn print_metric_summary<F>(
     debug_assert_eq!(total, new_results.len(), "total count mismatch");
 
     println!("  {label}:");
-    println!("    improved: {improved}, regressed: {regressed}, unchanged: {unchanged}, new: {new_only}, total: {total}");
+    println!(
+        "    counts    : [total {} | new {} | improved {} | regressed {} | unchanged {}]",
+        total, new_only, improved, regressed, unchanged
+    );
 
     if !abs_deltas.is_empty() {
-        print_range("    change   ", &abs_deltas, fmt_human, percentile_i64);
+        print_range("    change    ", &abs_deltas, fmt_human, percentile_i64);
     } else {
-        println!("    change   : n/a");
+        println!("    change    : n/a");
     }
 
     if !percent_diffs.is_empty() {
-        print_range("    change % ", &percent_diffs, fmt_percent, percentile_f64);
+        print_range(
+            "    change %  ",
+            &percent_diffs,
+            fmt_percent,
+            percentile_f64,
+        );
     } else {
-        println!("    change % : n/a");
+        println!("    change %  : n/a");
     }
 }
 
