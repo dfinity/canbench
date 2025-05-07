@@ -3,7 +3,7 @@ use std::{collections::BTreeMap, fs::File, io::Write, path::PathBuf};
 
 /// Delimiter used in the CSV file.
 /// Tab `\t` avoids issues with commas in numbers or text and is reliably parsed by Google Sheets.
-const DELIMITER: char = '\t';
+const DELIMITER: char = ',';
 
 /// Write benchmark results to a CSV file.
 pub(crate) fn write(
