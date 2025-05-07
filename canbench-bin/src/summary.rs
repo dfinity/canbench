@@ -79,8 +79,8 @@ fn print_metric_summary<F>(
     println!("  {label}:");
     let emoji_status = match (improved, regressed) {
         (0, 0) => "",    // No improvements or regressions
-        (0, _) => " 🔴", // Only regressions
         (_, 0) => " 🟢", // Only improvements
+        (0, _) => " 🔴", // Only regressions
         _ => " 🟢🔴",    // Both improvements and regressions
     };
     println!(
