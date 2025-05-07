@@ -1,0 +1,28 @@
+
+---------------------------------------------------
+
+Benchmark: noisy_change_test
+  total:
+    instructions: 207 (-1.43%) (change within noise threshold)
+    heap_increase: 0 pages (no change)
+    stable_memory_increase: 0 pages (no change)
+
+---------------------------------------------------
+
+Summary:
+  instructions:
+    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
+    change:   [min -3 | med -3 | max -3]
+    change %: [min -1.43% | med -1.43% | max -1.43%]
+
+  heap_increase:
+    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
+    change:   [min 0 | med 0 | max 0]
+    change %: [min 0% | med 0% | max 0%]
+
+  stable_memory_increase:
+    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
+    change:   [min 0 | med 0 | max 0]
+    change %: [min 0% | med 0% | max 0%]
+
+---------------------------------------------------

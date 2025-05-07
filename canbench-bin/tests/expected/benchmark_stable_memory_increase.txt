@@ -1,0 +1,28 @@
+
+---------------------------------------------------
+
+Benchmark: stable_memory_only_increase (new)
+  total:
+    instructions: 307 (new)
+    heap_increase: 0 pages (new)
+    stable_memory_increase: 456 pages (new)
+
+---------------------------------------------------
+
+Summary:
+  instructions:
+    counts:   [total 1 | new 1 | improved 0 | regressed 0 | unchanged 0]
+    change:   [min 307 | med 307 | max 307]
+    change %: n/a
+
+  heap_increase:
+    counts:   [total 1 | new 1 | improved 0 | regressed 0 | unchanged 0]
+    change:   [min 0 | med 0 | max 0]
+    change %: n/a
+
+  stable_memory_increase:
+    counts:   [total 1 | new 1 | improved 0 | regressed 0 | unchanged 0]
+    change:   [min 456 | med 456 | max 456]
+    change %: n/a
+
+---------------------------------------------------

@@ -1,0 +1,28 @@
+
+---------------------------------------------------
+
+Benchmark: state_check
+  total:
+    instructions: 872 (regressed by 3.69%)
+    heap_increase: 0 pages (no change)
+    stable_memory_increase: 0 pages (no change)
+
+---------------------------------------------------
+
+Summary:
+  instructions:
+    counts:   [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0] 🔴
+    change:   [min 31 | med 31 | max 31]
+    change %: [min +3.69% | med +3.69% | max +3.69%]
+
+  heap_increase:
+    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
+    change:   [min 0 | med 0 | max 0]
+    change %: [min 0% | med 0% | max 0%]
+
+  stable_memory_increase:
+    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
+    change:   [min 0 | med 0 | max 0]
+    change %: [min 0% | med 0% | max 0%]
+
+---------------------------------------------------

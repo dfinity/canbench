@@ -1,0 +1,33 @@
+
+---------------------------------------------------
+
+Benchmark: bench_repeated_scope_exists
+  total:
+    instructions: 16.97 K (regressed from 0)
+    heap_increase: 1 pages (regressed from 0)
+    stable_memory_increase: 0 pages (no change)
+
+  scope_1 (scope):
+    instructions: 8694 (regressed by 986.75%)
+    heap_increase: 1 pages (improved by 91.67%)
+    stable_memory_increase: 0 pages (no change)
+
+---------------------------------------------------
+
+Summary:
+  instructions:
+    counts:   [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0] 🔴
+    change:   [min 16.97 K | med 16.97 K | max 16.97 K]
+    change %: n/a
+
+  heap_increase:
+    counts:   [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0] 🔴
+    change:   [min 1 | med 1 | max 1]
+    change %: n/a
+
+  stable_memory_increase:
+    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
+    change:   [min 0 | med 0 | max 0]
+    change %: [min 0% | med 0% | max 0%]
+
+---------------------------------------------------
