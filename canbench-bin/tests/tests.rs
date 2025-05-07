@@ -171,17 +171,17 @@ Benchmark: noisy_change_above_default_threshold_test
 
 Summary:
   instructions:
-    counts    : [total 1 | new 0 | improved 1 | regressed 0 | unchanged 0]
+    counts    : [total 1 | new 0 | improved 1 | regressed 0 | unchanged 0] 🟢
     change    : [min -154.07 K | med -154.07 K | max -154.07 K]
     change %  : [min -4.35% | med -4.35% | max -4.35%]
 
   heap_increase:
-    counts    : [total 1 | new 0 | improved 1 | regressed 0 | unchanged 0]
+    counts    : [total 1 | new 0 | improved 1 | regressed 0 | unchanged 0] 🟢
     change    : [min -3 | med -3 | max -3]
     change %  : [min -4.62% | med -4.62% | max -4.62%]
 
   stable_memory_increase:
-    counts    : [total 1 | new 0 | improved 1 | regressed 0 | unchanged 0]
+    counts    : [total 1 | new 0 | improved 1 | regressed 0 | unchanged 0] 🟢
     change    : [min -4 | med -4 | max -4]
     change %  : [min -3.85% | med -3.85% | max -3.85%]
 
@@ -252,7 +252,7 @@ Benchmark: regression_test
 
 Summary:
   instructions:
-    counts    : [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0]
+    counts    : [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0] 🔴
     change    : [min 197 | med 197 | max 197]
     change %  : [min +1970.00% | med +1970.00% | max +1970.00%]
 
@@ -292,7 +292,7 @@ Benchmark: improvement_test
 
 Summary:
   instructions:
-    counts    : [total 1 | new 0 | improved 1 | regressed 0 | unchanged 0]
+    counts    : [total 1 | new 0 | improved 1 | regressed 0 | unchanged 0] 🟢
     change    : [min -2.89 K | med -2.89 K | max -2.89 K]
     change %  : [min -93.32% | med -93.32% | max -93.32%]
 
@@ -332,7 +332,7 @@ Benchmark: stable_memory_increase_from_zero
 
 Summary:
   instructions:
-    counts    : [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0]
+    counts    : [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0] 🔴
     change    : [min 307 | med 307 | max 307]
     change %  : n/a
 
@@ -342,7 +342,7 @@ Summary:
     change %  : [min 0% | med 0% | max 0%]
 
   stable_memory_increase:
-    counts    : [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0]
+    counts    : [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0] 🔴
     change    : [min 123 | med 123 | max 123]
     change %  : n/a
 
@@ -605,12 +605,12 @@ Benchmark: bench_scope_exists
 
 Summary:
   instructions:
-    counts    : [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0]
+    counts    : [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0] 🔴
     change    : [min 4.63 K | med 4.63 K | max 4.63 K]
     change %  : n/a
 
   heap_increase:
-    counts    : [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0]
+    counts    : [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0] 🔴
     change    : [min 1 | med 1 | max 1]
     change %  : n/a
 
@@ -657,7 +657,7 @@ Benchmark: state_check
 
 Summary:
   instructions:
-    counts    : [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0]
+    counts    : [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0] 🔴
     change    : [min 31 | med 31 | max 31]
     change %  : [min +3.69% | med +3.69% | max +3.69%]
 
@@ -863,12 +863,12 @@ Benchmark: bench_repeated_scope_exists
 
 Summary:
   instructions:
-    counts    : [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0]
+    counts    : [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0] 🔴
     change    : [min 16.97 K | med 16.97 K | max 16.97 K]
     change %  : n/a
 
   heap_increase:
-    counts    : [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0]
+    counts    : [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0] 🔴
     change    : [min 1 | med 1 | max 1]
     change %  : n/a
 

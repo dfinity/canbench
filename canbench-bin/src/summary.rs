@@ -77,9 +77,15 @@ fn print_metric_summary<F>(
     debug_assert_eq!(total, new_results.len(), "total count mismatch");
 
     println!("  {label}:");
+    let emoji_status = match (improved, regressed) {
+        (0, 0) => "",
+        (_, 0) => " 🟢",
+        (0, _) => " 🔴",
+        _ => " 🟢🔴",
+    };
     println!(
-        "    counts    : [total {} | new {} | improved {} | regressed {} | unchanged {}]",
-        total, new_only, improved, regressed, unchanged
+        "    counts    : [total {} | new {} | improved {} | regressed {} | unchanged {}]{}",
+        total, new_only, improved, regressed, unchanged, emoji_status
     );
 
     if !abs_deltas.is_empty() {
