@@ -2,7 +2,8 @@ use canbench_rs::{BenchResult, Measurement};
 use std::{collections::BTreeMap, fs::File, io::Write, path::PathBuf};
 
 /// Delimiter used in the CSV file.
-/// Tab `\t` avoids issues with commas in numbers or text and is reliably parsed by Google Sheets.
+/// Use `,` for GitHub/VSCode preview.
+/// Use `\t` for better compatibility with Google Sheets.
 const DELIMITER: char = ',';
 
 /// Write benchmark results to a CSV file.
