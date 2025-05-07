@@ -20,7 +20,7 @@ Benchmark: bench_2 (new)
 Summary:
   instructions:
     counts:   [total 2 | new 2 | improved 0 | regressed 0 | unchanged 0]
-    change:   [min 207 | med 207 | max 207]
+    change:   [min +207 | med +207 | max +207]
     change %: n/a
 
   heap_increase:

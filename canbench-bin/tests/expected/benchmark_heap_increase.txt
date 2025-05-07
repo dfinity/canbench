@@ -12,12 +12,12 @@ Benchmark: increase_heap_increase (new)
 Summary:
   instructions:
     counts:   [total 1 | new 1 | improved 0 | regressed 0 | unchanged 0]
-    change:   [min 3.39 M | med 3.39 M | max 3.39 M]
+    change:   [min +3.39 M | med +3.39 M | max +3.39 M]
     change %: n/a
 
   heap_increase:
     counts:   [total 1 | new 1 | improved 0 | regressed 0 | unchanged 0]
-    change:   [min 62 | med 62 | max 62]
+    change:   [min +62 | med +62 | max +62]
     change %: n/a
 
   stable_memory_increase:

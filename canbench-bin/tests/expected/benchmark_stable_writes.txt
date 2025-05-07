@@ -12,17 +12,17 @@ Benchmark: write_stable_memory (new)
 Summary:
   instructions:
     counts:   [total 1 | new 1 | improved 0 | regressed 0 | unchanged 0]
-    change:   [min 49.74 K | med 49.74 K | max 49.74 K]
+    change:   [min +49.74 K | med +49.74 K | max +49.74 K]
     change %: n/a
 
   heap_increase:
     counts:   [total 1 | new 1 | improved 0 | regressed 0 | unchanged 0]
-    change:   [min 1 | med 1 | max 1]
+    change:   [min +1 | med +1 | max +1]
     change %: n/a
 
   stable_memory_increase:
     counts:   [total 1 | new 1 | improved 0 | regressed 0 | unchanged 0]
-    change:   [min 1 | med 1 | max 1]
+    change:   [min +1 | med +1 | max +1]
     change %: n/a
 
 ---------------------------------------------------

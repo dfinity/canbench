@@ -5,16 +5,16 @@ Summary:
   instructions:
     counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
     change:   [min 0 | med 0 | max 0]
-    change %: [min 0% | med 0% | max 0%]
+    change %: [min 0.00% | med 0.00% | max 0.00%]
 
   heap_increase:
     counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
     change:   [min 0 | med 0 | max 0]
-    change %: [min 0% | med 0% | max 0%]
+    change %: [min 0.00% | med 0.00% | max 0.00%]
 
   stable_memory_increase:
     counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
     change:   [min 0 | med 0 | max 0]
-    change %: [min 0% | med 0% | max 0%]
+    change %: [min 0.00% | med 0.00% | max 0.00%]
 
 ---------------------------------------------------
