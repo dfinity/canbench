@@ -68,7 +68,6 @@ fn print_metric_summary<F>(
             }
             None => {
                 new_only += 1;
-                abs_deltas.push(new_val as i64);
             }
         }
     }
