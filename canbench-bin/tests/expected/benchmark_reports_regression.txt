@@ -1,0 +1,28 @@
+
+---------------------------------------------------
+
+Benchmark: regression_test
+  total:
+    instructions: 207 (regressed by 1970.00%)
+    heap_increase: 0 pages (no change)
+    stable_memory_increase: 0 pages (no change)
+
+---------------------------------------------------
+
+Summary:
+  instructions:
+    counts:   [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0] 🔴
+    change:   [min +197 | med +197 | max +197]
+    change %: [min +1970.00% | med +1970.00% | max +1970.00%]
+
+  heap_increase:
+    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
+    change:   [min 0 | med 0 | max 0]
+    change %: [min 0.00% | med 0.00% | max 0.00%]
+
+  stable_memory_increase:
+    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
+    change:   [min 0 | med 0 | max 0]
+    change %: [min 0.00% | med 0.00% | max 0.00%]
+
+---------------------------------------------------

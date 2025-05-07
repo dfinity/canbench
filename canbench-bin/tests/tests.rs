@@ -1,6 +1,48 @@
 mod utils;
+
+use std::{fs, path::PathBuf, process::Output};
 use tempfile::NamedTempFile;
 use utils::BenchTest;
+
+/// Returns the name of the current function, intended to be used in tests.
+#[macro_export]
+macro_rules! current_test_name {
+    () => {{
+        fn f() {}
+        let full = std::any::type_name_of_val(&f);
+        full.strip_suffix("::f")
+            .and_then(|s| s.rsplit("::").next())
+            .unwrap_or(full)
+    }};
+}
+
+/// Loads the expected output for a given test case.
+/// Overwrites the expected output if the "overwrite" feature is enabled.
+///
+/// $ cargo test --features overwrite
+fn load_expected(test_name: &str, output: &Output) -> String {
+    let result = String::from_utf8_lossy(&output.stdout).to_string();
+    let path = PathBuf::from(format!("./tests/expected/{test_name}.txt"));
+
+    if cfg!(feature = "overwrite") {
+        fs::write(&path, &result).unwrap_or_else(|err| {
+            panic!(
+                "Failed to write expected result to {}: {}",
+                path.display(),
+                err
+            );
+        });
+        println!("Updated expected result: {}", path.display());
+    }
+
+    fs::read_to_string(&path).unwrap_or_else(|err| {
+        panic!(
+            "Failed to read expected result from {}: {}",
+            path.display(),
+            err
+        );
+    })
+}
 
 #[test]
 fn no_config_prints_error() {
@@ -26,74 +68,24 @@ wasm_path:
 
 #[test]
 fn benchmark_reports_no_changes() {
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("no_changes_test")
         .run(|output| {
-            assert_success!(
-                output,
-                "
----------------------------------------------------
-
-Benchmark: no_changes_test
-  total:
-    instructions: 207 (no change)
-    heap_increase: 0 pages (no change)
-    stable_memory_increase: 0 pages (no change)
-
----------------------------------------------------
-
-Summary:
-  instructions:
-    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
-    change:   [min 0 | med 0 | max 0]
-    change %: [min 0% | med 0% | max 0%]
-
-  heap_increase:
-    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
-    change:   [min 0 | med 0 | max 0]
-    change %: [min 0% | med 0% | max 0%]
-
-  stable_memory_increase:
-    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
-    change:   [min 0 | med 0 | max 0]
-    change %: [min 0% | med 0% | max 0%]
-
----------------------------------------------------
-"
-            );
+            let expected = load_expected(name, &output);
+            assert_success!(output, expected.as_str());
         });
 }
 
 #[test]
 fn benchmark_reports_no_changes_with_hide_results() {
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("no_changes_test")
         .with_hide_results()
         .run(|output| {
-            assert_success!(
-                output,
-                "
----------------------------------------------------
-
-Summary:
-  instructions:
-    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
-    change:   [min 0 | med 0 | max 0]
-    change %: [min 0% | med 0% | max 0%]
-
-  heap_increase:
-    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
-    change:   [min 0 | med 0 | max 0]
-    change %: [min 0% | med 0% | max 0%]
-
-  stable_memory_increase:
-    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
-    change:   [min 0 | med 0 | max 0]
-    change %: [min 0% | med 0% | max 0%]
-
----------------------------------------------------
-"
-            );
+            let expected = load_expected(name, &output);
+            assert_success!(output, expected.as_str());
         });
 }
 
@@ -113,242 +105,68 @@ IC0506: Canister lxzze-o7777-77777-aaaaa-cai did not produce a response
 
 #[test]
 fn benchmark_reports_noisy_change() {
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("noisy_change_test")
         .run(|output| {
-            assert_success!(
-                output,
-                "
----------------------------------------------------
-
-Benchmark: noisy_change_test
-  total:
-    instructions: 207 (-1.43%) (change within noise threshold)
-    heap_increase: 0 pages (no change)
-    stable_memory_increase: 0 pages (no change)
-
----------------------------------------------------
-
-Summary:
-  instructions:
-    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
-    change:   [min -3 | med -3 | max -3]
-    change %: [min -1.43% | med -1.43% | max -1.43%]
-
-  heap_increase:
-    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
-    change:   [min 0 | med 0 | max 0]
-    change %: [min 0% | med 0% | max 0%]
-
-  stable_memory_increase:
-    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
-    change:   [min 0 | med 0 | max 0]
-    change %: [min 0% | med 0% | max 0%]
-
----------------------------------------------------
-"
-            );
+            let expected = load_expected(name, &output);
+            assert_success!(output, expected.as_str());
         });
 }
 
 #[test]
 fn benchmark_reports_noisy_change_above_default_noise_threshold() {
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("noisy_change_above_default_threshold_test")
         .run(|output| {
-            assert_success!(
-                output,
-                "
----------------------------------------------------
-
-Benchmark: noisy_change_above_default_threshold_test
-  total:
-    instructions: 3.39 M (improved by 4.35%)
-    heap_increase: 62 pages (improved by 4.62%)
-    stable_memory_increase: 100 pages (improved by 3.85%)
-
----------------------------------------------------
-
-Summary:
-  instructions:
-    counts:   [total 1 | new 0 | improved 1 | regressed 0 | unchanged 0] 🟢
-    change:   [min -154.07 K | med -154.07 K | max -154.07 K]
-    change %: [min -4.35% | med -4.35% | max -4.35%]
-
-  heap_increase:
-    counts:   [total 1 | new 0 | improved 1 | regressed 0 | unchanged 0] 🟢
-    change:   [min -3 | med -3 | max -3]
-    change %: [min -4.62% | med -4.62% | max -4.62%]
-
-  stable_memory_increase:
-    counts:   [total 1 | new 0 | improved 1 | regressed 0 | unchanged 0] 🟢
-    change:   [min -4 | med -4 | max -4]
-    change %: [min -3.85% | med -3.85% | max -3.85%]
-
----------------------------------------------------
-"
-            );
+            let expected = load_expected(name, &output);
+            assert_success!(output, expected.as_str());
         });
 }
 
 #[test]
 fn benchmark_reports_noisy_change_within_custom_noise_threshold() {
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("noisy_change_above_default_threshold_test")
         .with_noise_threshold(5.0)
         .run(|output| {
-            assert_success!(
-                output,
-                "
----------------------------------------------------
-
-Benchmark: noisy_change_above_default_threshold_test
-  total:
-    instructions: 3.39 M (-4.35%) (change within noise threshold)
-    heap_increase: 62 pages (-4.62%) (change within noise threshold)
-    stable_memory_increase: 100 pages (-3.85%) (change within noise threshold)
-
----------------------------------------------------
-
-Summary:
-  instructions:
-    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
-    change:   [min -154.07 K | med -154.07 K | max -154.07 K]
-    change %: [min -4.35% | med -4.35% | max -4.35%]
-
-  heap_increase:
-    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
-    change:   [min -3 | med -3 | max -3]
-    change %: [min -4.62% | med -4.62% | max -4.62%]
-
-  stable_memory_increase:
-    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
-    change:   [min -4 | med -4 | max -4]
-    change %: [min -3.85% | med -3.85% | max -3.85%]
-
----------------------------------------------------
-"
-            );
+            let expected = load_expected(name, &output);
+            assert_success!(output, expected.as_str());
         });
 }
 
 #[test]
 fn benchmark_reports_regression() {
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("regression_test")
         .run(|output| {
-            assert_success!(
-                output,
-                "
----------------------------------------------------
-
-Benchmark: regression_test
-  total:
-    instructions: 207 (regressed by 1970.00%)
-    heap_increase: 0 pages (no change)
-    stable_memory_increase: 0 pages (no change)
-
----------------------------------------------------
-
-Summary:
-  instructions:
-    counts:   [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0] 🔴
-    change:   [min 197 | med 197 | max 197]
-    change %: [min +1970.00% | med +1970.00% | max +1970.00%]
-
-  heap_increase:
-    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
-    change:   [min 0 | med 0 | max 0]
-    change %: [min 0% | med 0% | max 0%]
-
-  stable_memory_increase:
-    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
-    change:   [min 0 | med 0 | max 0]
-    change %: [min 0% | med 0% | max 0%]
-
----------------------------------------------------
-"
-            );
+            let expected = load_expected(name, &output);
+            assert_success!(output, expected.as_str());
         });
 }
 
 #[test]
 fn benchmark_reports_improvement() {
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("improvement_test")
         .run(|output| {
-            assert_success!(
-                output,
-                "
----------------------------------------------------
-
-Benchmark: improvement_test
-  total:
-    instructions: 207 (improved by 93.32%)
-    heap_increase: 0 pages (no change)
-    stable_memory_increase: 0 pages (no change)
-
----------------------------------------------------
-
-Summary:
-  instructions:
-    counts:   [total 1 | new 0 | improved 1 | regressed 0 | unchanged 0] 🟢
-    change:   [min -2.89 K | med -2.89 K | max -2.89 K]
-    change %: [min -93.32% | med -93.32% | max -93.32%]
-
-  heap_increase:
-    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
-    change:   [min 0 | med 0 | max 0]
-    change %: [min 0% | med 0% | max 0%]
-
-  stable_memory_increase:
-    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
-    change:   [min 0 | med 0 | max 0]
-    change %: [min 0% | med 0% | max 0%]
-
----------------------------------------------------
-"
-            );
+            let expected = load_expected(name, &output);
+            assert_success!(output, expected.as_str());
         });
 }
 
 #[test]
 fn benchmark_reports_regression_from_zero() {
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("stable_memory_increase_from_zero")
         .run(|output| {
-            assert_success!(
-                output,
-                "
----------------------------------------------------
-
-Benchmark: stable_memory_increase_from_zero
-  total:
-    instructions: 307 (regressed from 0)
-    heap_increase: 0 pages (no change)
-    stable_memory_increase: 123 pages (regressed from 0)
-
----------------------------------------------------
-
-Summary:
-  instructions:
-    counts:   [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0] 🔴
-    change:   [min 307 | med 307 | max 307]
-    change %: n/a
-
-  heap_increase:
-    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
-    change:   [min 0 | med 0 | max 0]
-    change %: [min 0% | med 0% | max 0%]
-
-  stable_memory_increase:
-    counts:   [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0] 🔴
-    change:   [min 123 | med 123 | max 123]
-    change %: n/a
-
----------------------------------------------------
-"
-            );
+            let expected = load_expected(name, &output);
+            assert_success!(output, expected.as_str());
         });
 }
 
@@ -356,177 +174,43 @@ Summary:
 // stable memory usage.
 #[test]
 fn benchmark_stable_memory_increase() {
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("stable_memory_only_increase")
         .run(|output| {
-            assert_success!(
-                output,
-                "
----------------------------------------------------
-
-Benchmark: stable_memory_only_increase (new)
-  total:
-    instructions: 307 (new)
-    heap_increase: 0 pages (new)
-    stable_memory_increase: 456 pages (new)
-
----------------------------------------------------
-
-Summary:
-  instructions:
-    counts:   [total 1 | new 1 | improved 0 | regressed 0 | unchanged 0]
-    change:   [min 307 | med 307 | max 307]
-    change %: n/a
-
-  heap_increase:
-    counts:   [total 1 | new 1 | improved 0 | regressed 0 | unchanged 0]
-    change:   [min 0 | med 0 | max 0]
-    change %: n/a
-
-  stable_memory_increase:
-    counts:   [total 1 | new 1 | improved 0 | regressed 0 | unchanged 0]
-    change:   [min 456 | med 456 | max 456]
-    change %: n/a
-
----------------------------------------------------
-"
-            );
+            let expected = load_expected(name, &output);
+            assert_success!(output, expected.as_str());
         });
 }
 
 #[test]
 fn benchmark_heap_increase() {
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("increase_heap_increase")
         .run(|output| {
-            assert_success!(
-                output,
-                "
----------------------------------------------------
-
-Benchmark: increase_heap_increase (new)
-  total:
-    instructions: 3.39 M (new)
-    heap_increase: 62 pages (new)
-    stable_memory_increase: 0 pages (new)
-
----------------------------------------------------
-
-Summary:
-  instructions:
-    counts:   [total 1 | new 1 | improved 0 | regressed 0 | unchanged 0]
-    change:   [min 3.39 M | med 3.39 M | max 3.39 M]
-    change %: n/a
-
-  heap_increase:
-    counts:   [total 1 | new 1 | improved 0 | regressed 0 | unchanged 0]
-    change:   [min 62 | med 62 | max 62]
-    change %: n/a
-
-  stable_memory_increase:
-    counts:   [total 1 | new 1 | improved 0 | regressed 0 | unchanged 0]
-    change:   [min 0 | med 0 | max 0]
-    change %: n/a
-
----------------------------------------------------
-"
-            );
+            let expected = load_expected(name, &output);
+            assert_success!(output, expected.as_str());
         });
 }
 
 #[test]
 fn supports_gzipped_wasm() {
+    let name = current_test_name!();
     BenchTest::canister("gzipped_wasm").run(|output| {
-        assert_success!(
-            output,
-            "
----------------------------------------------------
-
-Benchmark: bench_1 (new)
-  total:
-    instructions: 207 (new)
-    heap_increase: 0 pages (new)
-    stable_memory_increase: 0 pages (new)
-
----------------------------------------------------
-
-Benchmark: bench_2 (new)
-  total:
-    instructions: 207 (new)
-    heap_increase: 0 pages (new)
-    stable_memory_increase: 0 pages (new)
-
----------------------------------------------------
-
-Summary:
-  instructions:
-    counts:   [total 2 | new 2 | improved 0 | regressed 0 | unchanged 0]
-    change:   [min 207 | med 207 | max 207]
-    change %: n/a
-
-  heap_increase:
-    counts:   [total 2 | new 2 | improved 0 | regressed 0 | unchanged 0]
-    change:   [min 0 | med 0 | max 0]
-    change %: n/a
-
-  stable_memory_increase:
-    counts:   [total 2 | new 2 | improved 0 | regressed 0 | unchanged 0]
-    change:   [min 0 | med 0 | max 0]
-    change %: n/a
-
----------------------------------------------------
-"
-        );
+        let expected = load_expected(name, &output);
+        assert_success!(output, expected.as_str());
     });
 }
 
 #[test]
 fn reports_scopes_in_new_benchmark() {
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("bench_scope_new")
         .run(|output| {
-            assert_success!(
-                output,
-                "
----------------------------------------------------
-
-Benchmark: bench_scope_new (new)
-  total:
-    instructions: 4626 (new)
-    heap_increase: 1 pages (new)
-    stable_memory_increase: 0 pages (new)
-
-  scope_1 (scope):
-    instructions: 1620 (new)
-    heap_increase: 1 pages (new)
-    stable_memory_increase: 0 pages (new)
-
-  scope_2 (scope):
-    instructions: 786 (new)
-    heap_increase: 0 pages (new)
-    stable_memory_increase: 0 pages (new)
-
----------------------------------------------------
-
-Summary:
-  instructions:
-    counts:   [total 1 | new 1 | improved 0 | regressed 0 | unchanged 0]
-    change:   [min 4.63 K | med 4.63 K | max 4.63 K]
-    change %: n/a
-
-  heap_increase:
-    counts:   [total 1 | new 1 | improved 0 | regressed 0 | unchanged 0]
-    change:   [min 1 | med 1 | max 1]
-    change %: n/a
-
-  stable_memory_increase:
-    counts:   [total 1 | new 1 | improved 0 | regressed 0 | unchanged 0]
-    change:   [min 0 | med 0 | max 0]
-    change %: n/a
-
----------------------------------------------------
-"
-            );
+            let expected = load_expected(name, &output);
+            assert_success!(output, expected.as_str());
         });
 }
 
@@ -577,51 +261,12 @@ wasm_path:
 
 #[test]
 fn reports_scopes_in_existing_benchmark() {
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("bench_scope_exist")
         .run(|output| {
-            assert_success!(
-                output,
-                "
----------------------------------------------------
-
-Benchmark: bench_scope_exists
-  total:
-    instructions: 4626 (regressed from 0)
-    heap_increase: 1 pages (regressed from 0)
-    stable_memory_increase: 0 pages (no change)
-
-  scope_1 (scope):
-    instructions: 1620 (regressed by 102.50%)
-    heap_increase: 1 pages (improved by 91.67%)
-    stable_memory_increase: 0 pages (no change)
-
-  scope_2 (scope):
-    instructions: 786 (new)
-    heap_increase: 0 pages (new)
-    stable_memory_increase: 0 pages (new)
-
----------------------------------------------------
-
-Summary:
-  instructions:
-    counts:   [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0] 🔴
-    change:   [min 4.63 K | med 4.63 K | max 4.63 K]
-    change %: n/a
-
-  heap_increase:
-    counts:   [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0] 🔴
-    change:   [min 1 | med 1 | max 1]
-    change %: n/a
-
-  stable_memory_increase:
-    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
-    change:   [min 0 | med 0 | max 0]
-    change %: [min 0% | med 0% | max 0%]
-
----------------------------------------------------
-"
-            );
+            let expected = load_expected(name, &output);
+            assert_success!(output, expected.as_str());
         });
 }
 
@@ -639,82 +284,24 @@ fn newer_version() {
 
 #[test]
 fn benchmark_works_with_init_args() {
+    let name = current_test_name!();
     BenchTest::canister("init_arg")
         .with_bench("state_check")
         .run(|output| {
-            assert_success!(
-                output,
-                "
----------------------------------------------------
-
-Benchmark: state_check
-  total:
-    instructions: 872 (regressed by 3.69%)
-    heap_increase: 0 pages (no change)
-    stable_memory_increase: 0 pages (no change)
-
----------------------------------------------------
-
-Summary:
-  instructions:
-    counts:   [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0] 🔴
-    change:   [min 31 | med 31 | max 31]
-    change %: [min +3.69% | med +3.69% | max +3.69%]
-
-  heap_increase:
-    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
-    change:   [min 0 | med 0 | max 0]
-    change %: [min 0% | med 0% | max 0%]
-
-  stable_memory_increase:
-    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
-    change:   [min 0 | med 0 | max 0]
-    change %: [min 0% | med 0% | max 0%]
-
----------------------------------------------------
-"
-            );
+            let expected = load_expected(name, &output);
+            assert_success!(output, expected.as_str());
         });
 }
 
 // Ensures writes to stable memory are accounted for in the same way as application subnets.
 #[test]
 fn benchmark_stable_writes() {
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("write_stable_memory")
         .run(|output| {
-            assert_success!(
-                output,
-                "
----------------------------------------------------
-
-Benchmark: write_stable_memory (new)
-  total:
-    instructions: 49.74 K (new)
-    heap_increase: 1 pages (new)
-    stable_memory_increase: 1 pages (new)
-
----------------------------------------------------
-
-Summary:
-  instructions:
-    counts:   [total 1 | new 1 | improved 0 | regressed 0 | unchanged 0]
-    change:   [min 49.74 K | med 49.74 K | max 49.74 K]
-    change %: n/a
-
-  heap_increase:
-    counts:   [total 1 | new 1 | improved 0 | regressed 0 | unchanged 0]
-    change:   [min 1 | med 1 | max 1]
-    change %: n/a
-
-  stable_memory_increase:
-    counts:   [total 1 | new 1 | improved 0 | regressed 0 | unchanged 0]
-    change:   [min 1 | med 1 | max 1]
-    change %: n/a
-
----------------------------------------------------
-"
-            );
+            let expected = load_expected(name, &output);
+            assert_success!(output, expected.as_str());
         });
 }
 
@@ -753,132 +340,34 @@ fn shows_canister_output() {
 fn benchmark_instruction_tracing() {
     // TODO: better end-to-end testing, since this test only makes sure there is no error in
     // tracing.
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("write_stable_memory")
         .with_instruction_tracing()
         .run(|output| {
-            assert_success!(
-                output,
-                "
----------------------------------------------------
-
-Benchmark: write_stable_memory (new)
-  total:
-    instructions: 49.74 K (new)
-    heap_increase: 1 pages (new)
-    stable_memory_increase: 1 pages (new)
-Instruction traces written to write_stable_memory.svg
-
----------------------------------------------------
-
-Summary:
-  instructions:
-    counts:   [total 1 | new 1 | improved 0 | regressed 0 | unchanged 0]
-    change:   [min 49.74 K | med 49.74 K | max 49.74 K]
-    change %: n/a
-
-  heap_increase:
-    counts:   [total 1 | new 1 | improved 0 | regressed 0 | unchanged 0]
-    change:   [min 1 | med 1 | max 1]
-    change %: n/a
-
-  stable_memory_increase:
-    counts:   [total 1 | new 1 | improved 0 | regressed 0 | unchanged 0]
-    change:   [min 1 | med 1 | max 1]
-    change %: n/a
-
----------------------------------------------------
-"
-            );
+            let expected = load_expected(name, &output);
+            assert_success!(output, expected.as_str());
         });
 }
 
 #[test]
 fn reports_repeated_scope_in_new_benchmark() {
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("bench_repeated_scope_new")
         .run(|output| {
-            assert_success!(
-                output,
-                "
----------------------------------------------------
-
-Benchmark: bench_repeated_scope_new (new)
-  total:
-    instructions: 16.97 K (new)
-    heap_increase: 1 pages (new)
-    stable_memory_increase: 0 pages (new)
-
-  scope_1 (scope):
-    instructions: 8694 (new)
-    heap_increase: 1 pages (new)
-    stable_memory_increase: 0 pages (new)
-
----------------------------------------------------
-
-Summary:
-  instructions:
-    counts:   [total 1 | new 1 | improved 0 | regressed 0 | unchanged 0]
-    change:   [min 16.97 K | med 16.97 K | max 16.97 K]
-    change %: n/a
-
-  heap_increase:
-    counts:   [total 1 | new 1 | improved 0 | regressed 0 | unchanged 0]
-    change:   [min 1 | med 1 | max 1]
-    change %: n/a
-
-  stable_memory_increase:
-    counts:   [total 1 | new 1 | improved 0 | regressed 0 | unchanged 0]
-    change:   [min 0 | med 0 | max 0]
-    change %: n/a
-
----------------------------------------------------
-"
-            );
+            let expected = load_expected(name, &output);
+            assert_success!(output, expected.as_str());
         });
 }
 
 #[test]
 fn reports_repeated_scope_in_existing_benchmark() {
+    let name = current_test_name!();
     BenchTest::canister("measurements_output")
         .with_bench("bench_repeated_scope_exists")
         .run(|output| {
-            assert_success!(
-                output,
-                "
----------------------------------------------------
-
-Benchmark: bench_repeated_scope_exists
-  total:
-    instructions: 16.97 K (regressed from 0)
-    heap_increase: 1 pages (regressed from 0)
-    stable_memory_increase: 0 pages (no change)
-
-  scope_1 (scope):
-    instructions: 8694 (regressed by 986.75%)
-    heap_increase: 1 pages (improved by 91.67%)
-    stable_memory_increase: 0 pages (no change)
-
----------------------------------------------------
-
-Summary:
-  instructions:
-    counts:   [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0] 🔴
-    change:   [min 16.97 K | med 16.97 K | max 16.97 K]
-    change %: n/a
-
-  heap_increase:
-    counts:   [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0] 🔴
-    change:   [min 1 | med 1 | max 1]
-    change %: n/a
-
-  stable_memory_increase:
-    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
-    change:   [min 0 | med 0 | max 0]
-    change %: [min 0% | med 0% | max 0%]
-
----------------------------------------------------
-"
-            );
+            let expected = load_expected(name, &output);
+            assert_success!(output, expected.as_str());
         });
 }
