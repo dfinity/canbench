@@ -1,6 +1,6 @@
 mod utils;
 
-use std::process::Output;
+use std::{fs, path::PathBuf, process::Output};
 use tempfile::NamedTempFile;
 use utils::BenchTest;
 
@@ -9,25 +9,27 @@ use utils::BenchTest;
 ///
 /// $ cargo test --features overwrite
 fn load_expected(test_name: &str, output: &Output) -> String {
-    let result = String::from_utf8(output.stdout.clone()).unwrap();
-    let path = format!("./tests/expected/{test_name}.txt");
+    let result = String::from_utf8_lossy(&output.stdout).to_string();
+    let path = PathBuf::from(format!("./tests/expected/{test_name}.txt"));
+
     if cfg!(feature = "overwrite") {
-        save_text(&result, &path).unwrap_or_else(|err| {
-            panic!("Failed to save expected result to {path}: {err}");
+        fs::write(&path, &result).unwrap_or_else(|err| {
+            panic!(
+                "Failed to write expected result to {}: {}",
+                path.display(),
+                err
+            );
         });
-        println!("Updated expected result: {path}");
+        println!("Updated expected result: {}", path.display());
     }
-    read_text()(&path).unwrap_or_else(|err| {
-        panic!("Failed to read expected result from {path}: {err}");
+
+    fs::read_to_string(&path).unwrap_or_else(|err| {
+        panic!(
+            "Failed to read expected result from {}: {}",
+            path.display(),
+            err
+        );
     })
-}
-
-fn read_text() -> impl Fn(&str) -> std::io::Result<String> {
-    |path| std::fs::read_to_string(path)
-}
-
-fn save_text(content: &str, path: &str) -> std::io::Result<()> {
-    std::fs::write(path, content)
 }
 
 #[test]
