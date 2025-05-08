@@ -3,12 +3,14 @@ on: [pull_request]
 
 env:
   RUST_VERSION: 1.86.0
+  CARGO_TERM_COLOR: always # Force Cargo to use colors
+  TERM: xterm-256color
 
 jobs:
   build:
     strategy:
       matrix:
-        os: [ ubuntu-latest, macos-latest ]
+        os: [ubuntu-latest, macos-latest]
 
     runs-on: ${{ matrix.os }}
 
@@ -40,7 +42,7 @@ jobs:
         run: cargo clippy --tests --benches -- -D clippy::all
 
       - name: Test
-        run: cargo test --all-features -- --test-threads=1
+        run: cargo test --all-features --color always -- --color always --test-threads=1
         env:
           RUST_BACKTRACE: 1
 
@@ -132,11 +134,11 @@ jobs:
     name: ShellCheck
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Run ShellCheck
-      uses: ludeeus/action-shellcheck@master
-      env:
-        SHELLCHECK_OPTS: -e SC1090 -e SC2119 -e SC1091
+      - uses: actions/checkout@v4
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        env:
+          SHELLCHECK_OPTS: -e SC1090 -e SC2119 -e SC1091
 
   upload-pr-number:
     runs-on: ubuntu-latest
@@ -156,12 +158,13 @@ jobs:
   checks-pass:
     # Always run this job!
     if: always()
-    needs: [
-      build,
-      shell-checks,
-      benchmark-fibonacci-example,
-      benchmark-btreemap-vs-hashmap-example
-    ]
+    needs:
+      [
+        build,
+        shell-checks,
+        benchmark-fibonacci-example,
+        benchmark-btreemap-vs-hashmap-example,
+      ]
     runs-on: ubuntu-latest
     steps:
       - name: check build result
