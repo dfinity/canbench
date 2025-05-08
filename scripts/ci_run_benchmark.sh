@@ -58,7 +58,7 @@ if [ -f "$MAIN_BRANCH_RESULTS_FILE" ]; then
 
   # Run canbench to compare result to main branch.
   pushd "$CANISTER_PATH"
-  canbench --less-verbose > "$CANBENCH_OUTPUT"
+  canbench --less-verbose --show-summary > "$CANBENCH_OUTPUT"
   popd
 
   if grep -q "(regress\|(improved by" "${CANBENCH_OUTPUT}"; then
