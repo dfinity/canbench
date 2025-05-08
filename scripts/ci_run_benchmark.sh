@@ -35,20 +35,25 @@ fi
 pushd "$CANISTER_PATH"
 canbench --less-verbose > $CANBENCH_OUTPUT
 if grep -q "(regress\|(improved by \|(new)" "$CANBENCH_OUTPUT"; then
-  UPDATED_MSG="**\`$CANBENCH_RESULTS_FILE\` is not up to date ❌**
+  UPDATED_MSG="**❌ \`$CANBENCH_RESULTS_FILE\` is not up to date**
   If the performance change is expected, run \`canbench --persist\` to update the benchmark results."
 
   # Results are outdated; fail the job.
   echo "EXIT_STATUS=1" >> "$GITHUB_ENV"
 else
-  UPDATED_MSG="**\`$CANBENCH_RESULTS_FILE\` is up to date ✅**"
+  UPDATED_MSG="**✅ \`$CANBENCH_RESULTS_FILE\` is up to date**";
 
   # Results are up to date; job succeeds.
   echo "EXIT_STATUS=0" >> "$GITHUB_ENV"
 fi
 popd
 
-echo "# \`canbench\` 🏋 (dir: $CANISTER_PATH)" > "$COMMENT_MESSAGE_PATH"
+# Get the latest commit hash
+commit_hash=$(git rev-parse HEAD)
+time=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+
+# Print output with correct formatting
+echo "# \`canbench\` 🏋 (dir: $CANISTER_PATH) $commit_hash $time" > "$COMMENT_MESSAGE_PATH"
 
 # Check for performance changes relative to the main branch.
 if [ -f "$MAIN_BRANCH_RESULTS_FILE" ]; then
@@ -57,16 +62,22 @@ if [ -f "$MAIN_BRANCH_RESULTS_FILE" ]; then
 
   # Run canbench to compare results with the main branch.
   pushd "$CANISTER_PATH"
-  canbench --less-verbose > "$CANBENCH_OUTPUT"
+  canbench --less-verbose --show-summary > "$CANBENCH_OUTPUT"
   popd
 
-  if grep -q "(regress\|(improved by" "${CANBENCH_OUTPUT}"; then
-    echo "**Significant performance change detected! ⚠️**
-    " >> "$COMMENT_MESSAGE_PATH"
-  else
-    echo "**No significant performance changes detected ✅**
-    " >> "$COMMENT_MESSAGE_PATH"
-  fi
+  # Append markers to individual benchmark results
+  awk '
+  /\(improved / { print $0, "🟢"; next }
+  /\(regressed / { print $0, "🔴"; next }
+  /\(new\)/ { print $0, "🟡"; next }
+  { print }
+  ' "$CANBENCH_OUTPUT" > "${CANBENCH_OUTPUT}.tmp" && mv "${CANBENCH_OUTPUT}.tmp" "$CANBENCH_OUTPUT"
+
+  # Add a top-level summary of detected performance changes
+  MESSAGE=""
+  grep -q "(improved " "${CANBENCH_OUTPUT}" && MESSAGE+="**🟢 Performance improvements detected! 🎉**\n"
+  grep -q "(regressed " "${CANBENCH_OUTPUT}" && MESSAGE+="**🔴 Performance regressions detected! 😱**\n"
+  echo -e "${MESSAGE:-**ℹ️ No significant performance changes detected 👍**}" >> "$COMMENT_MESSAGE_PATH"
 fi
 
 # Append the update status and benchmark output to the comment.
