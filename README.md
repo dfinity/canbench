@@ -20,7 +20,7 @@ Since resources are finite, execution of a message (transaction) must remain wit
 2. **Dirty Pages**: The number of memory pages written to.
 
 If a message exceeds these limits, it is aborted.
-`canbench` gives developers insights into how their code consumes instructions and memory.  
+`canbench` gives developers insights into how their code consumes instructions and memory. 
 Support for reporting dirty pages will be added once the IC exposes that information.
 
 ## Use Cases
