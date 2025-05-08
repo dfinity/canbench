@@ -48,8 +48,12 @@ else
 fi
 popd
 
+# Get the latest commit hash
+commit_hash=$(git rev-parse HEAD)
+time=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
 
-echo "# \`canbench\` 🏋 (dir: $CANISTER_PATH)" > "$COMMENT_MESSAGE_PATH"
+# Print output with correct formatting
+echo "# \`canbench\` 🏋 (dir: $CANISTER_PATH) $commit_hash $time" > "$COMMENT_MESSAGE_PATH"
 
 # Detect if there are performance changes relative to the main branch.
 if [ -f "$MAIN_BRANCH_RESULTS_FILE" ]; then
@@ -61,13 +65,19 @@ if [ -f "$MAIN_BRANCH_RESULTS_FILE" ]; then
   canbench --less-verbose --show-summary > "$CANBENCH_OUTPUT"
   popd
 
-  if grep -q "(regress\|(improved by" "${CANBENCH_OUTPUT}"; then
-    echo "**Significant performance change detected! ⚠️**
-    " >> "$COMMENT_MESSAGE_PATH"
-  else
-    echo "**No significant performance changes detected ✅**
-    " >> "$COMMENT_MESSAGE_PATH"
-  fi
+  # Append markers to individual benchmark results
+  awk '
+  /\(improved / { print $0, "🟢"; next }
+  /\(regressed / { print $0, "🔴"; next }
+  /\(new\)/ { print $0, "🟡"; next }
+  { print }
+  ' "$CANBENCH_OUTPUT" > "${CANBENCH_OUTPUT}.tmp" && mv "${CANBENCH_OUTPUT}.tmp" "$CANBENCH_OUTPUT"
+
+  # Add a top-level summary of detected performance changes
+  MESSAGE=""
+  grep -q "(improved " "${CANBENCH_OUTPUT}" && MESSAGE+="**🟢 Performance improvements detected! 🎉**\n"
+  grep -q "(regressed " "${CANBENCH_OUTPUT}" && MESSAGE+="**🔴 Performance regressions detected! 😱**\n"
+  echo -e "${MESSAGE:-**ℹ️ No significant performance changes detected 👍**}" >> "$COMMENT_MESSAGE_PATH"
 fi
 
 ## Add the output of canbench to the file.
