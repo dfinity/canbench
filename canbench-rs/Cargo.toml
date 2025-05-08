@@ -6,7 +6,7 @@ keywords = ["benchmark", "canister", "ic", "internet-computer", "perf"]
 license = "Apache-2.0"
 readme = "../README.md"
 repository = "https://github.com/dfinity/canbench"
-# NOTE: whenever this is updated, canbench-rs-macros below should also be updated.
+# NOTE: Update `canbench-rs-macros` version below when this changes.
 version = "0.1.12"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
