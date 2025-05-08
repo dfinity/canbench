@@ -1,20 +1,20 @@
 [package]
 name = "canbench"
-# NOTE: whenever this version is updated, canbench-rs below should also be updated.
 description = "A benchmarking framework for canisters on the Internet Computer."
 edition = "2021"
 keywords = ["benchmark", "canister", "ic", "internet-computer", "perf"]
 license = "Apache-2.0"
 readme = "../README.md"
 repository = "https://github.com/dfinity/canbench"
-version = "0.1.11"
+# NOTE: whenever this version is updated, canbench-rs below should also be updated.
+version = "0.1.12"
 
 [[bin]]
 name = "canbench"
 path = "src/main.rs"
 
 [dependencies]
-canbench-rs = { path = "../canbench-rs", version = "0.1.11" }
+canbench-rs = { path = "../canbench-rs", version = "0.1.12" }
 candid.workspace = true
 clap.workspace = true
 colored.workspace = true
