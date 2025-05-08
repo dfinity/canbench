@@ -1,6 +1,6 @@
-status	name	instructions	instructions %	heap_increase	heap_increase %	stable_memory_increase	stable_memory_increase %
-	fibonacci_20	726	0.00%	0		0	
-	fibonacci_45	1301	0.00%	0		0	
-	fibonacci_8a	450	0.00%	0		0	
-	fibonacci_8b	207	0.00%	0		0	
-	fibonacci_8c	391	0.00%	0		0	
+status,name,instructions,instructions %,heap_increase,heap_increase %,stable_memory_increase,stable_memory_increase %
+,fibonacci_20,726,0.00%,0,,0,
+,fibonacci_45,1301,0.00%,0,,0,
+,fibonacci_8a,450,0.00%,0,,0,
+,fibonacci_8b,207,0.00%,0,,0,
+,fibonacci_8c,391,0.00%,0,,0,
