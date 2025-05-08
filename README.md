@@ -76,4 +76,4 @@ You’ll need:
 
 Once configured, the job will fail on regressions and pass otherwise.
 It will also leave a PR comment with detailed results.
-See this [this PR](https://github.com/dfinity/bench/pull/18) example.
+See [this PR](https://github.com/dfinity/bench/pull/18) example.
