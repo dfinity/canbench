@@ -1,6 +1,10 @@
 <p>
-  <a href="https://github.com/dfinity/canbench/blob/main/LICENSE"><img alt="Apache-2.0" src="https://img.shields.io/github/license/dfinity/bench"/></a>
-  <a href="https://forum.dfinity.org/"><img alt="Chat on the Forum" src="https://img.shields.io/badge/help-post%20on%20forum.dfinity.org-blue"></a>
+  <a href="https://github.com/dfinity/canbench/blob/main/LICENSE">
+    <img alt="Apache-2.0" src="https://img.shields.io/github/license/dfinity/bench"/>
+  </a>
+  <a href="https://forum.dfinity.org/">
+    <img alt="Chat on the Forum" src="https://img.shields.io/badge/help-post%20on%20forum.dfinity.org-blue">
+  </a>
 </p>
 
 # `canbench`
@@ -9,42 +13,42 @@
 
 ## Background
 
-Canister smart contracts on the Internet Computer consume compute and memory resources.
-Given that resources are finite, there are bounds in place when canisters execute a message (transaction):
+Canister smart contracts on the Internet Computer consume compute and memory resources.  
+Since resources are finite, execution of a message (transaction) must remain within specific bounds:
 
-1. __Instructions__: a monotonically increasing counter that's corelated with the amount of computation and memory accesses.
-2. __Dirty Pages__: the number of memory pages that are written to.
+1. **Instructions**: A monotonically increasing counter correlated with compute and memory usage.
+2. **Dirty Pages**: The number of memory pages written to.
 
-A single message execution must stay within the allowed bounds, otherwise it's terminated.
-`canbench` provides developers the tools and insights to understand how their code is using instructions and memory.
-Support for reporting dirty pages will be available once there's a way to retrieve dirty page information from the IC.
+If a message exceeds these limits, it is aborted.
+`canbench` gives developers insights into how their code consumes instructions and memory. 
+Support for reporting dirty pages will be added once the IC exposes that information.
 
 ## Use Cases
 
-* Understanding how a canister consumes instructions, heap memory, and stable memory.
-* Detecting performance regressions locally or on CI.
-* Analyzing where performance bottlenecks are present.
+- Analyze instruction, heap, and stable memory usage of canisters
+- Detect performance regressions in local or CI environments
+- Identify potential performance bottlenecks
 
 ## Features
 
-* __Metrics that are relevant__
+- **Relevant metrics**
 
-  Typically benchmarking tools run a benchmark multiple times and return the average time.
-  On the Internet Computer, where instrumentation is deterministic, this approach is neither ideal nor insightful.
-  Instead, `canbench` reports the number of instructions consumed, as well as changes to both heap and stable memories.
+  Traditional benchmarking tools rely on repeated runs and averaging time.  
+  On the deterministic Internet Computer, this is neither necessary nor insightful.  
+  `canbench` reports instruction count and memory changes directly.
 
-* __Easy detection of regressions__
+- **Regression detection**
 
-  `canbench` allows you to persist the benchmarking results in your canister's repository.
-  Storing the benchmarking results allows `canbench` to determine how the performance has changed relative to the past to detect regressions.
+  Persist benchmark results in your repo.  
+  `canbench` compares results over time to highlight performance regressions.
 
-* __Generous instruction limit__
+- **High instruction limits**
 
-  While messages on the Internet Computer are bound to a few billion instructions, `canbench` can run benchmarks that are up to 10 trillion instructions, giving you the freedom to write resource-intensive benchmarks as needed.
+  While regular messages are capped at a few billion instructions, `canbench` supports up to 10 trillion, allowing deep benchmarking.
 
-* __Language Agnostic__
+- **Language-agnostic**
 
-  `canbench` can, in theory, benchmark canisters written in any language. Initially support for only Rust exists, but support for additional languages can easily be introduced.
+  While currently Rust-focused, `canbench` is designed to support canisters written in any language.
 
 ## Installation
 
@@ -56,16 +60,20 @@ cargo install canbench
 
 See the [crate's documentation](https://docs.rs/canbench-rs).
 
-## Github CI Support
+## GitHub CI Support
 
-`canbench` can be included in Github CI to automatically detect performance changes.
-Have a look at the workflows in this repository for working examples.
-You'll need the following:
+You can integrate `canbench` into your GitHub CI pipeline to catch regressions automatically.
 
-1. Scripts for executing the benchmark, which can be found in the `scripts` directory.
-2. A workflow for `canbench` to post a comment with the benchmarking results. See `canbench-post-comment.yml`.
-3. A job for uploading the PR number to the artifacts. This is necessary for step #2 to work correctly. See `upload-pr-number` in `ci.yml`.
-4. The benchmarking job in CI. See `benchmark-fibonacci-example` in `ci.yml`.
+You’ll need:
 
-Once you have the CI workflow set up, the job will pass if there are no significant performance changes detected and fail otherwise.
-A comment is added to the PR to show the results. See [this PR](https://github.com/dfinity/bench/pull/18) for an example.
+1. Benchmark scripts (see `scripts/` directory)
+
+2. A workflow that posts benchmarking results as PR comments (`canbench-post-comment.yml`)
+
+3. A job to upload the PR number (see `upload-pr-number` in `ci.yml`)
+
+4. The benchmark job itself (e.g. `benchmark-fibonacci-example` in `ci.yml`)
+
+Once configured, the job will fail on regressions and pass otherwise.
+It will also leave a PR comment with detailed results.
+See [this PR](https://github.com/dfinity/bench/pull/18) example.
