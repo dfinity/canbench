@@ -20,6 +20,7 @@ CANBENCH_OUTPUT=/tmp/canbench_output.txt
 
 CANBENCH_RESULTS_FILE="$CANISTER_PATH/canbench_results.yml"
 MAIN_BRANCH_RESULTS_FILE="$MAIN_BRANCH_DIR/$CANBENCH_RESULTS_FILE"
+CANBENCH_CSV_RESULTS_FILE="$CANISTER_PATH/canbench_results.csv"
 
 # Install canbench.
 # NOTE: `canbench-bin` is installed from HEAD, not from crates.io.
@@ -41,7 +42,7 @@ if grep -q "(regress\|(improved by \|(new)" "$CANBENCH_OUTPUT"; then
   # Results are outdated; fail the job.
   echo "EXIT_STATUS=1" >> "$GITHUB_ENV"
 else
-  UPDATED_MSG="**✅ \`$CANBENCH_RESULTS_FILE\` is up to date**";
+  UPDATED_MSG="✅ \`$CANBENCH_RESULTS_FILE\` is up to date";
 
   # Results are up to date; job succeeds.
   echo "EXIT_STATUS=0" >> "$GITHUB_ENV"
@@ -62,13 +63,16 @@ if [ -f "$MAIN_BRANCH_RESULTS_FILE" ]; then
 
   # Run canbench to compare results with the main branch.
   pushd "$CANISTER_PATH"
-  canbench --less-verbose --show-summary > "$CANBENCH_OUTPUT"
+  canbench --less-verbose --hide-results --show-summary --csv > "$CANBENCH_OUTPUT"
   popd
+
+  CSV_RESULTS_FILE_MSG="📦 \`$CANBENCH_CSV_RESULTS_FILE\` available in [artifacts](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})"
 fi
 
 # Append the update status and benchmark output to the comment.
 {
   echo "$UPDATED_MSG"
+  echo "$CSV_RESULTS_FILE_MSG"
   echo ""
   echo "\`\`\`"
   cat "$CANBENCH_OUTPUT"
