@@ -11,16 +11,19 @@ Benchmark: noisy_change_above_default_threshold_test
 
 Summary:
   instructions:
+    status:  No significant changes detected 👍
     counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
     change:   [min -154.07 K | med -154.07 K | max -154.07 K]
     change %: [min -4.35% | med -4.35% | max -4.35%]
 
   heap_increase:
+    status:  No significant changes detected 👍
     counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
     change:   [min -3 | med -3 | max -3]
     change %: [min -4.62% | med -4.62% | max -4.62%]
 
   stable_memory_increase:
+    status:  No significant changes detected 👍
     counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
     change:   [min -4 | med -4 | max -4]
     change %: [min -3.85% | med -3.85% | max -3.85%]

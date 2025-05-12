@@ -1,5 +1,5 @@
 use canbench_rs::{BenchResult, Measurement};
-use std::collections::BTreeMap;
+use std::{collections::BTreeMap, f64};
 
 pub(crate) fn print_summary(
     new: &BTreeMap<String, BenchResult>,
@@ -47,8 +47,14 @@ fn print_metric_summary<F>(
 
                 if old_val == 0 {
                     match abs_delta {
-                        d if d < 0 => improved += 1,
-                        d if d > 0 => regressed += 1,
+                        d if d < 0 => {
+                            improved += 1;
+                            percent_diffs.push(f64::NEG_INFINITY);
+                        }
+                        d if d > 0 => {
+                            regressed += 1;
+                            percent_diffs.push(f64::INFINITY);
+                        }
                         _ => {
                             unchanged += 1;
                             percent_diffs.push(0.0);
@@ -76,15 +82,16 @@ fn print_metric_summary<F>(
     debug_assert_eq!(total, new_results.len(), "total count mismatch");
 
     println!("  {label}:");
-    let emoji_status = match (improved, regressed) {
-        (0, 0) => "",    // No improvements or regressions
-        (_, 0) => " 🟢", // Only improvements
-        (0, _) => " 🔴", // Only regressions
-        _ => " 🟢🔴",    // Both improvements and regressions
+    let status = match (improved, regressed) {
+        (0, 0) => "No significant changes detected 👍",
+        (_, 0) => "Improvements detected! 🟢",
+        (0, _) => "Regressions detected! 🔴",
+        _ => "Both improvements and regressions detected! 🟢🔴",
     };
+    println!("    status:  {status}");
     println!(
-        "    counts:   [total {} | new {} | improved {} | regressed {} | unchanged {}]{}",
-        total, new_only, improved, regressed, unchanged, emoji_status
+        "    counts:   [total {} | new {} | improved {} | regressed {} | unchanged {}]",
+        total, new_only, improved, regressed, unchanged
     );
 
     if !abs_deltas.is_empty() {
