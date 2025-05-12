@@ -64,20 +64,6 @@ if [ -f "$MAIN_BRANCH_RESULTS_FILE" ]; then
   pushd "$CANISTER_PATH"
   canbench --less-verbose --show-summary > "$CANBENCH_OUTPUT"
   popd
-
-  # Append markers to individual benchmark results
-  awk '
-  /\(improved / { print $0, "🟢"; next }
-  /\(regressed / { print $0, "🔴"; next }
-  /\(new\)/ { print $0, "🟡"; next }
-  { print }
-  ' "$CANBENCH_OUTPUT" > "${CANBENCH_OUTPUT}.tmp" && mv "${CANBENCH_OUTPUT}.tmp" "$CANBENCH_OUTPUT"
-
-  # Add a top-level summary of detected performance changes
-  MESSAGE=""
-  grep -q "(improved " "${CANBENCH_OUTPUT}" && MESSAGE+="**🟢 Performance improvements detected! 🎉**\n"
-  grep -q "(regressed " "${CANBENCH_OUTPUT}" && MESSAGE+="**🔴 Performance regressions detected! 😱**\n"
-  echo -e "${MESSAGE:-**ℹ️ No significant performance changes detected 👍**}" >> "$COMMENT_MESSAGE_PATH"
 fi
 
 # Append the update status and benchmark output to the comment.
