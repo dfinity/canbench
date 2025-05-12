@@ -84,6 +84,11 @@ jobs:
           name: canbench_result_${{github.job}}
           path: /tmp/canbench_result_${{ github.job }}
 
+      - uses: actions/upload-artifact@v4
+        with:
+          name: canbench_results_${{github.job}}_csv
+          path: ${{ env.PROJECT_DIR }}/canbench_results.csv
+
       - name: Pass or fail
         run: |
           bash ./scripts/ci_post_run_benchmark.sh
@@ -129,7 +134,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: canbench_results_${{github.job}}_csv
-          path: /tmp/canbench_results_${{ github.job }}.csv
+          path: ${{ env.PROJECT_DIR }}/canbench_results.csv
 
       - name: Pass or fail
         run: |
