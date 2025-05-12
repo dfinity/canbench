@@ -1,4 +1,3 @@
-
 ---------------------------------------------------
 
 Benchmark: increase_heap_increase (new)

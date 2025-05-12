@@ -1,4 +1,3 @@
-
 ---------------------------------------------------
 
 Benchmark: bench_repeated_scope_exists

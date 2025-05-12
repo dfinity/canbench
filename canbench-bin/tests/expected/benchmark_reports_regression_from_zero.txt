@@ -1,4 +1,3 @@
-
 ---------------------------------------------------
 
 Benchmark: stable_memory_increase_from_zero

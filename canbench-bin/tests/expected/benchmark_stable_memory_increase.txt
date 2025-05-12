@@ -1,4 +1,3 @@
-
 ---------------------------------------------------
 
 Benchmark: stable_memory_only_increase (new)
