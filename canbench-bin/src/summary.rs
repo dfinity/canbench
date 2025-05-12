@@ -88,7 +88,7 @@ fn print_metric_summary<F>(
         (0, _) => "Regressions detected! 🔴",
         _ => "Both improvements and regressions detected! 🟢🔴",
     };
-    println!("    status:  {status}");
+    println!("    status:   {status}");
     println!(
         "    counts:   [total {} | new {} | improved {} | regressed {} | unchanged {}]",
         total, new_only, improved, regressed, unchanged
