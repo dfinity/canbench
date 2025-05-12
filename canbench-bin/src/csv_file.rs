@@ -45,15 +45,15 @@ fn write_measurement_diff(
 ) {
     let format_number = |n: u64| n.to_string();
     let format_percent = |new, old| {
-        let abs_delta = new as f64 - old as f64;
+        let delta = new as f64 - old as f64;
         if old == 0 {
-            match abs_delta {
+            match delta {
                 d if d < 0.0 => String::from("-inf%"),
                 d if d > 0.0 => String::from("+inf%"),
                 _ => String::from("0.00%"),
             }
         } else {
-            format!("{:.2}%", abs_delta / old as f64 * 100.0)
+            format!("{:.2}%", delta / old as f64 * 100.0)
         }
     };
 
