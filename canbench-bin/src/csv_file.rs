@@ -29,10 +29,19 @@ pub(crate) fn write(
     writeln!(file, "{}", headers.join(&DELIMITER.to_string())).expect("Failed to write CSV header");
 
     for (name, new_bench) in new_results {
+        // Process total measurements.
         let old_bench = old_results.get(name);
-        let status = if old_bench.is_some() { "" } else { "new" };
         let old = old_bench.map(|b| &b.total);
+        let status = if old.is_some() { "" } else { "new" };
         write_measurement_diff(&mut file, status, name, &new_bench.total, old);
+
+        // Process scope measurements.
+        for (scope, new) in new_bench.scopes.iter() {
+            let old = old_bench.and_then(|b| b.scopes.get(scope));
+            let status = if old.is_some() { "" } else { "new" };
+            let full_name = format!("{}::{}", name, scope);
+            write_measurement_diff(&mut file, status, &full_name, new, old);
+        }
     }
 }
 
