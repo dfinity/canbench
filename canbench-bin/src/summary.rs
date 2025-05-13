@@ -25,11 +25,13 @@ where
     let mut abs_deltas = Vec::new();
     let mut percent_diffs = Vec::new();
 
+    let mut processed_entries = 0;
     for entry in data {
         // In summary only show the total measurements.
         if entry.has_scope() {
             continue;
         }
+        processed_entries += 1;
 
         let values = extractor(entry);
         if let Some(delta) = values.abs_delta() {
@@ -55,7 +57,7 @@ where
     }
 
     let total = new + improved + regressed + unchanged;
-    debug_assert_eq!(total, data.len(), "total count mismatch");
+    debug_assert_eq!(total, processed_entries, "total count mismatch");
 
     println!("  {label}:");
     let status = match (improved, regressed) {
