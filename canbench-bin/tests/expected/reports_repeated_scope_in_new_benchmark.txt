@@ -15,19 +15,19 @@ Benchmark: bench_repeated_scope_new (new)
 
 Summary:
   instructions:
-    status:  No significant changes detected 👍
+    status:   No significant changes detected 👍
     counts:   [total 1 | new 1 | improved 0 | regressed 0 | unchanged 0]
     change:   n/a
     change %: n/a
 
   heap_increase:
-    status:  No significant changes detected 👍
+    status:   No significant changes detected 👍
     counts:   [total 1 | new 1 | improved 0 | regressed 0 | unchanged 0]
     change:   n/a
     change %: n/a
 
   stable_memory_increase:
-    status:  No significant changes detected 👍
+    status:   No significant changes detected 👍
     counts:   [total 1 | new 1 | improved 0 | regressed 0 | unchanged 0]
     change:   n/a
     change %: n/a

@@ -10,19 +10,19 @@ Benchmark: state_check
 
 Summary:
   instructions:
-    status:  Regressions detected! 🔴
+    status:   Regressions detected! 🔴
     counts:   [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0]
     change:   [min +31 | med +31 | max +31]
     change %: [min +3.69% | med +3.69% | max +3.69%]
 
   heap_increase:
-    status:  No significant changes detected 👍
+    status:   No significant changes detected 👍
     counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
     change:   [min 0 | med 0 | max 0]
     change %: [min 0.00% | med 0.00% | max 0.00%]
 
   stable_memory_increase:
-    status:  No significant changes detected 👍
+    status:   No significant changes detected 👍
     counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
     change:   [min 0 | med 0 | max 0]
     change %: [min 0.00% | med 0.00% | max 0.00%]
