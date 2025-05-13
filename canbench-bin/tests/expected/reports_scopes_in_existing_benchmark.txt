@@ -22,7 +22,7 @@ Summary:
   instructions:
     status:   Regressions detected! 🔴
     counts:   [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0]
-    change:   [min +4.63 K | med +4.63 K | max +4.63 K]
+    change:   [min +4.63K | med +4.63K | max +4.63K]
     change %: [min +inf% | med +inf% | max +inf%]
 
   heap_increase:

@@ -1,4 +1,5 @@
 use crate::data::{Change, Entry, Values};
+use crate::fmt::{fmt_change, fmt_percent};
 use std::f64;
 
 pub(crate) fn print_summary(data: &Vec<Entry>, noise_threshold: f64) {
@@ -64,7 +65,7 @@ where
     );
 
     if !abs_deltas.is_empty() {
-        print_range("    change:  ", &abs_deltas, fmt_human, percentile_i64);
+        print_range("    change:  ", &abs_deltas, fmt_change, percentile_i64);
     } else {
         println!("    change:   n/a");
     }
@@ -124,24 +125,4 @@ fn percentile_i64(sorted: &[i64], pct: usize) -> i64 {
         let weight = rank - lower as f64;
         (sorted[lower] as f64 * (1.0 - weight) + sorted[upper] as f64 * weight).round() as i64
     }
-}
-
-fn fmt_human(val: i64) -> String {
-    if val == 0 {
-        return "0".to_string(); // Don't show sign for zero values.
-    }
-    let val = val as f64;
-    for (divisor, suffix) in &[(1e12, "T"), (1e9, "B"), (1e6, "M"), (1e3, "K")] {
-        if val.abs() >= *divisor {
-            return format!("{:+.2} {}", val / divisor, suffix);
-        }
-    }
-    format!("{:+.0}", val)
-}
-
-fn fmt_percent(value: f64) -> String {
-    if value.abs() < 0.01 {
-        return format!("{:.2}%", value); // Don't show sign for zero values.
-    }
-    format!("{:+.2}%", value)
 }

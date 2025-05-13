@@ -1,6 +1,7 @@
 //! A module for running benchmarks.
 mod csv_file;
 mod data;
+mod fmt;
 mod instruction_tracing;
 mod print_benchmark;
 mod results_file;

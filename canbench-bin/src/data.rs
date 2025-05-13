@@ -1,3 +1,4 @@
+use crate::fmt::{fmt_change, fmt_current, fmt_percent};
 use canbench_rs::{BenchResult, Measurement};
 use std::collections::BTreeMap;
 
@@ -74,6 +75,19 @@ impl Values {
         } else {
             delta as f64 / old as f64 * 100.0
         })
+    }
+
+    pub(crate) fn fmt_current(&self) -> String {
+        self.current().map_or_else(|| "".to_string(), fmt_current)
+    }
+
+    pub(crate) fn fmt_change(&self) -> String {
+        self.abs_delta().map_or_else(|| "".to_string(), fmt_change)
+    }
+
+    pub(crate) fn fmt_percent(&self) -> String {
+        self.percent_diff()
+            .map_or_else(|| "".to_string(), fmt_percent)
     }
 
     pub(crate) fn status(&self, noise_threshold: f64) -> Change {

@@ -12,7 +12,7 @@ Summary:
   instructions:
     status:   No significant changes detected 👍
     counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
-    change:   [min -154.07 K | med -154.07 K | max -154.07 K]
+    change:   [min -154.07K | med -154.07K | max -154.07K]
     change %: [min -4.35% | med -4.35% | max -4.35%]
 
   heap_increase:
