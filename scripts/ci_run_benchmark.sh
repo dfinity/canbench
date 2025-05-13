@@ -29,7 +29,7 @@ cargo install --path canbench-bin
 
 # Verify that the canbench results file exists.
 if [ ! -f "$CANBENCH_RESULTS_FILE" ]; then
-    echo "$CANBENCH_RESULTS_FILE not found. Did you forget to run \`canbench --persist\`?"
+    echo "$CANBENCH_RESULTS_FILE not found. Did you forget to run \`canbench --persist [--csv]\`?"
     exit 1
 fi
 
@@ -38,7 +38,7 @@ pushd "$CANISTER_PATH"
 canbench --less-verbose > $CANBENCH_OUTPUT
 if grep -q "(regress\|(improved by \|(new)" "$CANBENCH_OUTPUT"; then
   UPDATED_MSG="**❌ \`$CANBENCH_RESULTS_FILE\` is not up to date**
-  If the performance change is expected, run \`canbench --persist\` to update the benchmark results."
+  If the performance change is expected, run \`canbench --persist [--csv]\` to update the benchmark results."
 
   # Results are outdated; fail the job.
   echo "EXIT_STATUS=1" >> "$GITHUB_ENV"

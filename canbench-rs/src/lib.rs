@@ -144,6 +144,8 @@
 //!
 //! ```txt
 //! $ canbench --persist
+//! # optionally add `--csv` to generate a CSV report
+//! $ canbench --persist --csv
 //! ...
 //! ---------------------------------------------------
 //!
