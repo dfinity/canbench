@@ -37,7 +37,7 @@ pub(crate) fn write(
 
         // Process scope measurements.
         for (scope, new) in new_bench.scopes.iter() {
-            let old = old_bench.map(|b| b.scopes.get(scope)).and_then(|o| o);
+            let old = old_bench.and_then(|b| b.scopes.get(scope));
             let status = if old.is_some() { "" } else { "new" };
             let full_name = format!("{}::{}", name, scope);
             write_measurement_diff(&mut file, status, &full_name, new, old);
