@@ -1,7 +1,5 @@
 use crate::data::Entry;
 
-const DELIMITER: &str = " | ";
-
 pub(crate) fn print_table(data: &[Entry]) {
     let columns = [
         "status", "name", "ins", "ins Δ%", "HI", "HI Δ%", "SMI", "SMI Δ%",
@@ -35,30 +33,17 @@ pub(crate) fn print_table(data: &[Entry]) {
         }
     }
 
-    // Helper to print a row with correct alignment
+    // Helper to print a row with correct alignment and separators
     let print_row = |row: &[String]| {
+        print!("|");
         for (i, cell) in row.iter().enumerate() {
             let width = col_widths[i];
             match i {
-                0 => print!(
-                    "{:^width$}{}",
-                    cell,
-                    if i != row.len() - 1 { DELIMITER } else { "" },
-                    width = width
-                ), // Center status
-                1 => print!(
-                    "{:<width$}{}",
-                    cell,
-                    if i != row.len() - 1 { DELIMITER } else { "" },
-                    width = width
-                ), // Left-align name
-                _ => print!(
-                    "{:>width$}{}",
-                    cell,
-                    if i != row.len() - 1 { DELIMITER } else { "" },
-                    width = width
-                ), // Right-align numbers
+                0 => print!(" {:^width$} ", cell, width = width), // Center status
+                1 => print!(" {:<width$} ", cell, width = width), // Left-align name
+                _ => print!(" {:>width$} ", cell, width = width), // Right-align numbers
             }
+            print!("|");
         }
         println!();
     };
@@ -67,11 +52,13 @@ pub(crate) fn print_table(data: &[Entry]) {
     print_row(&columns.iter().map(|s| s.to_string()).collect::<Vec<_>>());
 
     // Print separator line
-    let total_width: usize =
-        col_widths.iter().sum::<usize>() + DELIMITER.len() * (columns.len() - 1);
-    println!("{}", "-".repeat(total_width));
+    print!("|");
+    for (i, width) in col_widths.iter().enumerate() {
+        print!("{}|", "-".repeat(width + 2));
+    }
+    println!();
 
-    // Print rows
+    // Print data rows
     for row in &rows {
         print_row(row);
     }

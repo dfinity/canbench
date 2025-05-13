@@ -38,3 +38,9 @@ Summary:
     change %: n/a
 
 ---------------------------------------------------
+
+| status | name                     |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|--------------------------|-------|---------|----|--------|-----|---------|
+|  new   | bench_scope_new          | 4.63K |         |  1 |        |   0 |         |
+|  new   | bench_scope_new::scope_1 | 1.62K |         |  1 |        |   0 |         |
+|  new   | bench_scope_new::scope_2 |   786 |         |  0 |        |   0 |         |
