@@ -1,6 +1,38 @@
 use crate::data::Entry;
 
-pub(crate) fn print_table(data: &[Entry]) {
+pub(crate) fn filter_entries(data: &[Entry], noise_threshold: f64) -> Vec<&Entry> {
+    let mut filtered: Vec<_> = data
+        .iter()
+        .filter(|entry| {
+            [
+                &entry.instructions,
+                &entry.heap_increase,
+                &entry.stable_memory_increase,
+            ]
+            .iter()
+            .any(|values| {
+                matches!(
+                    values.status(noise_threshold),
+                    crate::data::Change::New
+                        | crate::data::Change::Improved
+                        | crate::data::Change::Regressed
+                )
+            })
+        })
+        .collect();
+
+    filtered.sort_by(|a, b| {
+        a.instructions
+            .percent_diff()
+            .unwrap_or(0.0)
+            .partial_cmp(&b.instructions.percent_diff().unwrap_or(0.0))
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
+
+    filtered
+}
+
+pub(crate) fn print_table(data: &[&Entry]) {
     let columns = [
         "status", "name", "ins", "ins Δ%", "HI", "HI Δ%", "SMI", "SMI Δ%",
     ];

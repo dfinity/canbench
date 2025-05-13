@@ -139,8 +139,15 @@ pub fn run_benchmarks(
         summary::print_summary(&data, noise_threshold);
         println!();
         println!("---------------------------------------------------");
-        println!();
-        table::print_table(&data);
+
+        let filtered = table::filter_entries(&data, noise_threshold);
+        if !filtered.is_empty() {
+            println!();
+            println!("Only significant changes:");
+            table::print_table(&filtered);
+            println!();
+            println!("---------------------------------------------------");
+        }
     }
 
     // Save benchmark results in CSV format if requested.
