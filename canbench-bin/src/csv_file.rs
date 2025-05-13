@@ -19,11 +19,11 @@ pub(crate) fn write(
         "status",
         "name",
         "instructions",
-        "instructions %",
+        "instructions change %",
         "heap_increase",
-        "heap_increase %",
+        "heap_increase change %",
         "stable_memory_increase",
-        "stable_memory_increase %",
+        "stable_memory_increase change %",
     ];
 
     writeln!(file, "{}", headers.join(&DELIMITER.to_string())).expect("Failed to write CSV header");
@@ -45,10 +45,15 @@ fn write_measurement_diff(
 ) {
     let format_number = |n: u64| n.to_string();
     let format_percent = |new, old| {
+        let delta = new as f64 - old as f64;
         if old == 0 {
-            String::new()
+            match delta {
+                d if d < 0.0 => String::from("-inf%"),
+                d if d > 0.0 => String::from("+inf%"),
+                _ => String::from("0.00%"),
+            }
         } else {
-            format!("{:.2}%", (new as f64 - old as f64) / old as f64 * 100.0)
+            format!("{:.2}%", delta / old as f64 * 100.0)
         }
     };
 
