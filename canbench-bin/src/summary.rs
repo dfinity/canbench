@@ -40,18 +40,10 @@ where
             percent_diffs.push(percent);
         }
         match values.status(noise_threshold) {
-            Change::New => {
-                new += 1;
-            }
-            Change::Improved => {
-                improved += 1;
-            }
-            Change::Regressed => {
-                regressed += 1;
-            }
-            Change::Unchanged => {
-                unchanged += 1;
-            }
+            Change::New => new += 1,
+            Change::Improved => improved += 1,
+            Change::Regressed => regressed += 1,
+            Change::Unchanged => unchanged += 1,
         }
     }
 
