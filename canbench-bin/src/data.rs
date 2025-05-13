@@ -78,16 +78,15 @@ impl Values {
     }
 
     pub(crate) fn fmt_current(&self) -> String {
-        self.current().map_or_else(|| "".to_string(), fmt_current)
+        self.current().map_or_else(String::new, fmt_current)
     }
 
     pub(crate) fn fmt_change(&self) -> String {
-        self.abs_delta().map_or_else(|| "".to_string(), fmt_change)
+        self.abs_delta().map_or_else(String::new, fmt_change)
     }
 
     pub(crate) fn fmt_percent(&self) -> String {
-        self.percent_diff()
-            .map_or_else(|| "".to_string(), fmt_percent)
+        self.percent_diff().map_or_else(String::new, fmt_percent)
     }
 
     pub(crate) fn status(&self, noise_threshold: f64) -> Change {
@@ -110,47 +109,53 @@ pub(crate) fn extract(
 ) -> Vec<Entry> {
     let mut results = Vec::new();
 
-    let compute_status = |old_present: bool| if old_present { "" } else { "new" };
-
-    let mut push_entry = |status: &str,
-                          benchmark: Benchmark,
-                          new_m: Option<&Measurement>,
-                          old_m: Option<&Measurement>| {
-        let extract_values = |f: fn(&Measurement) -> u64| Values {
-            new: new_m.map(f),
-            old: old_m.map(f),
-        };
-
-        results.push(Entry {
-            status: status.to_string(),
-            benchmark,
-            instructions: extract_values(|m| m.instructions),
-            heap_increase: extract_values(|m| m.heap_increase),
-            stable_memory_increase: extract_values(|m| m.stable_memory_increase),
-        });
-    };
-
     for (name, new_bench) in new_results {
         let old_bench = old_results.get(name);
 
-        push_entry(
-            compute_status(old_bench.is_some()),
+        // Process total
+        results.push(build_entry(
+            old_bench.is_some(),
             Benchmark::new(name, None),
             Some(&new_bench.total),
             old_bench.map(|b| &b.total),
-        );
+        ));
 
+        // Process scopes
         for (scope, new_m) in &new_bench.scopes {
             let old_m = old_bench.and_then(|b| b.scopes.get(scope));
 
-            push_entry(
-                compute_status(old_m.is_some()),
+            results.push(build_entry(
+                old_m.is_some(),
                 Benchmark::new(name, Some(scope)),
                 Some(new_m),
                 old_m,
-            );
+            ));
         }
     }
 
     results
+}
+
+fn build_entry(
+    old_present: bool,
+    benchmark: Benchmark,
+    new_m: Option<&Measurement>,
+    old_m: Option<&Measurement>,
+) -> Entry {
+    let extract_values = |f: fn(&Measurement) -> u64| Values {
+        new: new_m.map(f),
+        old: old_m.map(f),
+    };
+
+    Entry {
+        status: if old_present {
+            "".to_string()
+        } else {
+            "new".to_string()
+        },
+        benchmark,
+        instructions: extract_values(|m| m.instructions),
+        heap_increase: extract_values(|m| m.heap_increase),
+        stable_memory_increase: extract_values(|m| m.stable_memory_increase),
+    }
 }
