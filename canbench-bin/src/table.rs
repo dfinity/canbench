@@ -21,12 +21,14 @@ pub(crate) fn filter_entries(data: &[Entry], noise_threshold: f64) -> Vec<&Entry
         })
         .collect();
 
+    // Sort by instructions percent diff, descending.
     filtered.sort_by(|a, b| {
         a.instructions
             .percent_diff()
             .unwrap_or(0.0)
             .partial_cmp(&b.instructions.percent_diff().unwrap_or(0.0))
             .unwrap_or(std::cmp::Ordering::Equal)
+            .reverse()
     });
 
     filtered
