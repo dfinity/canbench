@@ -7,11 +7,11 @@ use std::{fs::File, io::Write, path::PathBuf};
 const DELIMITER: char = ',';
 
 /// Write benchmark results to a CSV file.
-pub(crate) fn write(output_file: &PathBuf, data: &Vec<Entry>) {
+pub(crate) fn write(output_file: &PathBuf, data: &[Entry]) {
     let mut file = File::create(output_file)
         .unwrap_or_else(|e| panic!("Failed to create results file {:?}: {}", output_file, e));
 
-    let headers = [
+    const HEADERS: &[&str] = &[
         "status",
         "name",
         "instructions",
@@ -22,7 +22,7 @@ pub(crate) fn write(output_file: &PathBuf, data: &Vec<Entry>) {
         "stable_memory_increase change %",
     ];
 
-    writeln!(file, "{}", headers.join(&DELIMITER.to_string())).expect("Failed to write CSV header");
+    writeln!(file, "{}", HEADERS.join(&DELIMITER.to_string())).expect("Failed to write CSV header");
 
     for entry in data {
         let name = entry.benchmark.full_name();
