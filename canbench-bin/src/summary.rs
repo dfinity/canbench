@@ -26,6 +26,11 @@ where
     let mut percent_diffs = Vec::new();
 
     for entry in data {
+        // In summary only show the total measurements.
+        if entry.has_scope() {
+            continue;
+        }
+
         let values = extractor(entry);
         if let Some(delta) = values.abs_delta() {
             abs_deltas.push(delta);

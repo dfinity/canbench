@@ -14,22 +14,3 @@ Benchmark: bench_repeated_scope_exists
 ---------------------------------------------------
 
 Summary:
-  instructions:
-    status:   Regressions detected! 🔴
-    counts:   [total 2 | new 0 | improved 0 | regressed 2 | unchanged 0]
-    change:   [min +7.89 K | med +12.43 K | max +16.97 K]
-    change %: [min +986.75% | med +inf% | max +inf%]
-
-  heap_increase:
-    status:   Both improvements and regressions detected! 🟢🔴
-    counts:   [total 2 | new 0 | improved 1 | regressed 1 | unchanged 0]
-    change:   [min -11 | med -5 | max +1]
-    change %: [min -91.67% | med +inf% | max +inf%]
-
-  stable_memory_increase:
-    status:   No significant changes detected 👍
-    counts:   [total 2 | new 0 | improved 0 | regressed 0 | unchanged 2]
-    change:   [min 0 | med 0 | max 0]
-    change %: [min 0.00% | med 0.00% | max 0.00%]
-
----------------------------------------------------

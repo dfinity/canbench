@@ -10,6 +10,12 @@ pub(crate) struct Entry {
     pub(crate) stable_memory_increase: Values,
 }
 
+impl Entry {
+    pub(crate) fn has_scope(&self) -> bool {
+        self.benchmark.scope.is_some()
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct Benchmark {
     name: String,
