@@ -8,6 +8,14 @@ fn format_with_unit(val: f64) -> (f64, &'static str) {
     (val, "")
 }
 
+pub(crate) fn fmt_human_u64(value: u64) -> String {
+    let (scaled, unit) = format_with_unit(value as f64);
+    match unit {
+        "" => format!("{scaled}"),
+        _ => format!("{scaled:.2}{unit}"),
+    }
+}
+
 pub(crate) fn fmt_human_i64(value: i64) -> String {
     if value == 0 {
         return "0".to_string(); // No sign for zero values.

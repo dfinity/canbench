@@ -1,4 +1,4 @@
-use crate::fmt::fmt_human_percent;
+use crate::fmt::{fmt_human_percent, fmt_human_u64};
 use canbench_rs::{BenchResult, Measurement};
 use std::collections::BTreeMap;
 
@@ -79,6 +79,10 @@ impl Values {
 
     pub(crate) fn fmt_current(&self) -> String {
         self.current().map_or_else(String::new, |v| v.to_string())
+    }
+
+    pub(crate) fn fmt_human_current(&self) -> String {
+        self.current().map_or_else(String::new, fmt_human_u64)
     }
 
     pub(crate) fn fmt_human_percent(&self) -> String {
