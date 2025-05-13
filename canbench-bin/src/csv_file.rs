@@ -1,5 +1,4 @@
-use crate::data::{Change, Entry, Values};
-use canbench_rs::{BenchResult, Measurement};
+use crate::data::Entry;
 use std::{fs::File, io::Write, path::PathBuf};
 
 /// Delimiter used in the CSV file.
