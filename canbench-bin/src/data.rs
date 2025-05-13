@@ -31,10 +31,10 @@ impl Benchmark {
     }
 
     pub(crate) fn full_name(&self) -> String {
-        match &self.scope {
-            Some(scope) => format!("{}::{}", self.name, scope),
-            None => self.name.clone(),
-        }
+        self.scope
+            .as_ref()
+            .map(|s| format!("{}::{}", self.name, s))
+            .unwrap_or_else(|| self.name.clone())
     }
 }
 
@@ -58,34 +58,30 @@ impl Values {
     }
 
     pub(crate) fn abs_delta(&self) -> Option<i64> {
-        match (self.new, self.old) {
-            (Some(new), Some(old)) => Some(new as i64 - old as i64),
-            _ => None,
-        }
+        Some(self.new? as i64 - self.old? as i64)
     }
 
     pub(crate) fn percent_diff(&self) -> Option<f64> {
-        if let Some(delta) = self.abs_delta() {
-            if let Some(old) = self.old {
-                if old == 0 {
-                    return match delta {
-                        d if d < 0 => Some(f64::NEG_INFINITY),
-                        d if d > 0 => Some(f64::INFINITY),
-                        _ => Some(0.0),
-                    };
-                }
-                return Some(delta as f64 / old as f64 * 100.0);
+        let delta = self.abs_delta()?;
+        let old = self.old?;
+
+        Some(if old == 0 {
+            match delta {
+                d if d < 0 => f64::NEG_INFINITY,
+                d if d > 0 => f64::INFINITY,
+                _ => 0.0,
             }
-        }
-        None
+        } else {
+            delta as f64 / old as f64 * 100.0
+        })
     }
 
     pub(crate) fn status(&self, noise_threshold: f64) -> Change {
         match (self.new, self.old) {
-            (Some(_new), Some(_old)) => match self.percent_diff() {
-                Some(percent) if percent.abs() < noise_threshold => Change::Unchanged,
-                Some(percent) if percent < 0.0 => Change::Improved,
-                Some(percent) if percent > 0.0 => Change::Regressed,
+            (Some(_), Some(_)) => match self.percent_diff() {
+                Some(p) if p.abs() < noise_threshold => Change::Unchanged,
+                Some(p) if p < 0.0 => Change::Improved,
+                Some(_) => Change::Regressed,
                 _ => unreachable!(),
             },
             (Some(_), None) => Change::New,
@@ -100,39 +96,45 @@ pub(crate) fn extract(
 ) -> Vec<Entry> {
     let mut results = Vec::new();
 
+    let compute_status = |old_present: bool| if old_present { "" } else { "new" };
+
     let mut push_entry = |status: &str,
                           benchmark: Benchmark,
                           new_m: Option<&Measurement>,
                           old_m: Option<&Measurement>| {
-        let to_values = |f: fn(&Measurement) -> u64| Values {
+        let extract_values = |f: fn(&Measurement) -> u64| Values {
             new: new_m.map(f),
             old: old_m.map(f),
         };
+
         results.push(Entry {
             status: status.to_string(),
             benchmark,
-            instructions: to_values(|m| m.instructions),
-            heap_increase: to_values(|m| m.heap_increase),
-            stable_memory_increase: to_values(|m| m.stable_memory_increase),
+            instructions: extract_values(|m| m.instructions),
+            heap_increase: extract_values(|m| m.heap_increase),
+            stable_memory_increase: extract_values(|m| m.stable_memory_increase),
         });
     };
 
-    for (new_name, new_bench) in new_results {
-        let old_bench = old_results.get(new_name);
-        let status = if old_bench.is_some() { "" } else { "new" };
-        let benchmark = Benchmark::new(new_name, None);
+    for (name, new_bench) in new_results {
+        let old_bench = old_results.get(name);
+
         push_entry(
-            status,
-            benchmark,
+            compute_status(old_bench.is_some()),
+            Benchmark::new(name, None),
             Some(&new_bench.total),
             old_bench.map(|b| &b.total),
         );
 
         for (scope, new_m) in &new_bench.scopes {
             let old_m = old_bench.and_then(|b| b.scopes.get(scope));
-            let status = if old_m.is_some() { "" } else { "new" };
-            let benchmark = Benchmark::new(new_name, Some(scope));
-            push_entry(status, benchmark, Some(new_m), old_m);
+
+            push_entry(
+                compute_status(old_m.is_some()),
+                Benchmark::new(name, Some(scope)),
+                Some(new_m),
+                old_m,
+            );
         }
     }
 

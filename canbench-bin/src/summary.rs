@@ -1,6 +1,5 @@
 use crate::data::{Change, Entry, Values};
-use canbench_rs::{BenchResult, Measurement};
-use std::{collections::BTreeMap, f64};
+use std::f64;
 
 pub(crate) fn print_summary(data: &Vec<Entry>, noise_threshold: f64) {
     println!("Summary:");
