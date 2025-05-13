@@ -9,27 +9,28 @@ fn format_with_unit(val: f64) -> (f64, &'static str) {
 }
 
 pub(crate) fn fmt_current(value: u64) -> String {
-    let (value, unit) = format_with_unit(value as f64);
-    if unit.is_empty() {
-        return format!("{value}");
+    let (scaled, unit) = format_with_unit(value as f64);
+    match unit {
+        "" => format!("{scaled}"),
+        _ => format!("{scaled:.2}{unit}"),
     }
-    format!("{value:.2}{unit}")
 }
 
 pub(crate) fn fmt_change(value: i64) -> String {
     if value == 0 {
-        return String::from("0"); // Don't show sign for zero values.
+        return "0".to_string(); // No sign for zero values.
     }
-    let (value, unit) = format_with_unit(value as f64);
-    if unit.is_empty() {
-        return format!("{value:+.0}");
+    let (scaled, unit) = format_with_unit(value as f64);
+    match unit {
+        "" => format!("{scaled:+.0}"),
+        _ => format!("{scaled:+.2}{unit}"),
     }
-    format!("{value:+.2}{unit}")
 }
 
 pub(crate) fn fmt_percent(value: f64) -> String {
     if value.abs() < 0.01 {
-        return format!("{:.2}%", value); // Don't show sign for zero values.
+        format!("{:.2}%", value)
+    } else {
+        format!("{:+.2}%", value)
     }
-    format!("{:+.2}%", value)
 }
