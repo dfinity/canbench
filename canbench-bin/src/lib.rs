@@ -6,6 +6,7 @@ mod instruction_tracing;
 mod print_benchmark;
 mod results_file;
 mod summary;
+mod table;
 
 use canbench_rs::BenchResult;
 use candid::{Encode, Principal};
@@ -138,6 +139,8 @@ pub fn run_benchmarks(
         summary::print_summary(&data, noise_threshold);
         println!();
         println!("---------------------------------------------------");
+        println!();
+        table::print_table(&data);
     }
 
     // Save benchmark results in CSV format if requested.
