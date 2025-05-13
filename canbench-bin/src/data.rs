@@ -22,11 +22,48 @@ impl Benchmark {
             scope: scope.map(str::to_string),
         }
     }
+
+    pub(crate) fn full_name(&self) -> String {
+        match &self.scope {
+            Some(scope) => format!("{}::{}", self.name, scope),
+            None => self.name.clone(),
+        }
+    }
 }
 
 pub(crate) struct Data {
     new: Option<u64>,
     old: Option<u64>,
+}
+
+impl Data {
+    pub(crate) fn value(&self) -> Option<u64> {
+        self.new
+    }
+
+    pub(crate) fn abs_delta(&self) -> Option<i64> {
+        match (self.new, self.old) {
+            (Some(new), Some(old)) => Some(new as i64 - old as i64),
+            _ => None,
+        }
+    }
+
+    pub(crate) fn percent_diff(&self) -> Option<f64> {
+        match (self.new, self.old) {
+            (Some(new), Some(old)) => {
+                if old == 0 {
+                    match new {
+                        0 => Some(0.0),
+                        _ if new > 0 => Some(f64::INFINITY),
+                        _ => Some(f64::NEG_INFINITY),
+                    }
+                } else {
+                    Some((new as f64 - old as f64) / old as f64 * 100.0)
+                }
+            }
+            _ => None,
+        }
+    }
 }
 
 pub(crate) fn extract(
