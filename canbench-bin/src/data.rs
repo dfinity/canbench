@@ -59,43 +59,29 @@ impl Values {
     }
 
     pub(crate) fn percent_diff(&self) -> Option<f64> {
-        match (self.new, self.old) {
-            (Some(new), Some(old)) => {
+        if let Some(delta) = self.abs_delta() {
+            if let Some(old) = self.old {
                 if old == 0 {
-                    match new {
-                        0 => Some(0.0),
-                        _ if new > 0 => Some(f64::INFINITY),
-                        _ => Some(f64::NEG_INFINITY),
-                    }
-                } else {
-                    Some((new as f64 - old as f64) / old as f64 * 100.0)
+                    return match delta {
+                        d if d < 0 => Some(f64::NEG_INFINITY),
+                        d if d > 0 => Some(f64::INFINITY),
+                        _ => Some(0.0),
+                    };
                 }
+                return Some(delta as f64 / old as f64 * 100.0);
             }
-            _ => None,
         }
+        None
     }
 
     pub(crate) fn status(&self, noise_threshold: f64) -> Status {
         match (self.new, self.old) {
-            (Some(new), Some(old)) => {
-                let abs_delta = new as i64 - old as i64;
-                if old == 0 {
-                    match abs_delta {
-                        d if d < 0 => Status::Improved,
-                        d if d > 0 => Status::Regressed,
-                        _ => Status::Unchanged,
-                    }
-                } else {
-                    let delta = abs_delta as f64 / old as f64 * 100.0;
-                    if delta.abs() < noise_threshold {
-                        Status::Unchanged
-                    } else if delta < 0.0 {
-                        Status::Improved
-                    } else {
-                        Status::Regressed
-                    }
-                }
-            }
+            (Some(_new), Some(_old)) => match self.percent_diff() {
+                Some(percent) if percent.abs() < noise_threshold => Status::Unchanged,
+                Some(percent) if percent < 0.0 => Status::Improved,
+                Some(percent) if percent > 0.0 => Status::Regressed,
+                _ => unreachable!(),
+            },
             (Some(_), None) => Status::New,
             _ => unreachable!(),
         }

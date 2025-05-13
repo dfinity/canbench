@@ -27,32 +27,25 @@ where
 
     for entry in data {
         let values = extractor(entry);
+        if let Some(delta) = values.abs_delta() {
+            abs_deltas.push(delta);
+        }
+        if let Some(percent) = values.percent_diff() {
+            percent_diffs.push(percent);
+        }
         match values.status(noise_threshold) {
             Status::New => {
                 new += 1;
             }
             Status::Improved => {
                 improved += 1;
-                if let Some(delta) = values.abs_delta() {
-                    abs_deltas.push(delta);
-                }
-                if let Some(percent) = values.percent_diff() {
-                    percent_diffs.push(percent);
-                }
             }
             Status::Regressed => {
                 regressed += 1;
-                if let Some(delta) = values.abs_delta() {
-                    abs_deltas.push(delta);
-                }
-                if let Some(percent) = values.percent_diff() {
-                    percent_diffs.push(percent);
-                }
             }
             Status::Unchanged => {
                 unchanged += 1;
             }
-            _ => {}
         }
     }
 
