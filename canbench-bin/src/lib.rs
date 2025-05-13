@@ -131,9 +131,10 @@ pub fn run_benchmarks(
 
     println!("---------------------------------------------------");
 
+    let data = data::extract(&new_results, &old_results);
     if verbose || show_summary {
         println!();
-        summary::print_summary(&new_results, &old_results, noise_threshold);
+        summary::print_summary(&data, noise_threshold);
         println!();
         println!("---------------------------------------------------");
     }
