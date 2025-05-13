@@ -1,5 +1,4 @@
 use canbench_rs::{BenchResult, Measurement};
-use candid::de;
 use std::collections::{BTreeMap, BTreeSet};
 
 pub(crate) struct Entry {
@@ -20,7 +19,7 @@ impl Benchmark {
     pub(crate) fn new(name: &str, scope: Option<&str>) -> Self {
         Self {
             name: name.to_string(),
-            scope: scope.map(|s| s.to_string()),
+            scope: scope.map(str::to_string),
         }
     }
 }
@@ -37,76 +36,54 @@ pub(crate) fn extract(
     let mut results = Vec::new();
     let mut processed = BTreeSet::new();
 
-    // Process new or modified benchmarks.
-    for (new_name, new_bench) in new_results {
-        // Process total measurements.
-        let old_bench = old_results.get(new_name);
-        let old = old_bench.map(|b| &b.total);
-        let status = if old.is_some() { "" } else { "new" }.to_string();
-        let benchmark = Benchmark::new(new_name, None);
-        processed.insert(benchmark.clone());
-        let make_data = |extract: fn(&Measurement) -> u64| Data {
-            new: Some(extract(&new_bench.total)),
-            old: old.map(extract),
+    let mut push_entry = |status: &str,
+                          benchmark: Benchmark,
+                          new_m: Option<&Measurement>,
+                          old_m: Option<&Measurement>| {
+        let make_data = |f: fn(&Measurement) -> u64| Data {
+            new: new_m.map(f),
+            old: old_m.map(f),
         };
         results.push(Entry {
-            status,
+            status: status.to_string(),
             benchmark,
             instructions: make_data(|m| m.instructions),
             heap_increase: make_data(|m| m.heap_increase),
             stable_memory_increase: make_data(|m| m.stable_memory_increase),
         });
+    };
 
-        // Process scope measurements.
-        for (scope, new) in new_bench.scopes.iter() {
-            let old = old_bench.and_then(|b| b.scopes.get(scope));
-            let status = if old.is_some() { "" } else { "new" }.to_string();
+    for (new_name, new_bench) in new_results {
+        let old_bench = old_results.get(new_name);
+        let status = if old_bench.is_some() { "" } else { "new" };
+        let benchmark = Benchmark::new(new_name, None);
+        processed.insert(benchmark.clone());
+        push_entry(
+            status,
+            benchmark,
+            Some(&new_bench.total),
+            old_bench.map(|b| &b.total),
+        );
+
+        for (scope, new_m) in &new_bench.scopes {
+            let old_m = old_bench.and_then(|b| b.scopes.get(scope));
+            let status = if old_m.is_some() { "" } else { "new" };
             let benchmark = Benchmark::new(new_name, Some(scope));
             processed.insert(benchmark.clone());
-            let make_data = |extract: fn(&Measurement) -> u64| Data {
-                new: Some(extract(new)),
-                old: old.map(extract),
-            };
-            results.push(Entry {
-                status,
-                benchmark,
-                instructions: make_data(|m| m.instructions),
-                heap_increase: make_data(|m| m.heap_increase),
-                stable_memory_increase: make_data(|m| m.stable_memory_increase),
-            });
+            push_entry(status, benchmark, Some(new_m), old_m);
         }
     }
 
-    // Process removed benchmarks.
     for (old_name, old_bench) in old_results {
         let benchmark = Benchmark::new(old_name, None);
         if !processed.contains(&benchmark) {
-            let make_data = |extract: fn(&Measurement) -> u64| Data {
-                new: None,
-                old: Some(extract(&old_bench.total)),
-            };
-            results.push(Entry {
-                status: "removed".to_string(),
-                benchmark,
-                instructions: make_data(|m| m.instructions),
-                heap_increase: make_data(|m| m.heap_increase),
-                stable_memory_increase: make_data(|m| m.stable_memory_increase),
-            });
+            push_entry("removed", benchmark, None, Some(&old_bench.total));
         }
-        for (scope, old) in old_bench.scopes.iter() {
+
+        for (scope, old_m) in &old_bench.scopes {
             let benchmark = Benchmark::new(old_name, Some(scope));
             if !processed.contains(&benchmark) {
-                let make_data = |extract: fn(&Measurement) -> u64| Data {
-                    new: None,
-                    old: Some(extract(old)),
-                };
-                results.push(Entry {
-                    status: "removed".to_string(),
-                    benchmark,
-                    instructions: make_data(|m| m.instructions),
-                    heap_increase: make_data(|m| m.heap_increase),
-                    stable_memory_increase: make_data(|m| m.stable_memory_increase),
-                });
+                push_entry("removed", benchmark, None, Some(old_m));
             }
         }
     }
