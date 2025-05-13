@@ -8,15 +8,7 @@ fn format_with_unit(val: f64) -> (f64, &'static str) {
     (val, "")
 }
 
-pub(crate) fn fmt_current(value: u64) -> String {
-    let (scaled, unit) = format_with_unit(value as f64);
-    match unit {
-        "" => format!("{scaled}"),
-        _ => format!("{scaled:.2}{unit}"),
-    }
-}
-
-pub(crate) fn fmt_change(value: i64) -> String {
+pub(crate) fn fmt_human_i64(value: i64) -> String {
     if value == 0 {
         return "0".to_string(); // No sign for zero values.
     }
@@ -27,7 +19,7 @@ pub(crate) fn fmt_change(value: i64) -> String {
     }
 }
 
-pub(crate) fn fmt_percent(value: f64) -> String {
+pub(crate) fn fmt_human_percent(value: f64) -> String {
     if value.abs() < 0.01 {
         format!("{:.2}%", value)
     } else {

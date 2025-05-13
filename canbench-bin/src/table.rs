@@ -44,11 +44,11 @@ pub(crate) fn print_table(data: &[&Entry]) {
             entry.status.clone(),
             name,
             entry.instructions.fmt_current(),
-            entry.instructions.fmt_percent(),
+            entry.instructions.fmt_human_percent(),
             entry.heap_increase.fmt_current(),
-            entry.heap_increase.fmt_percent(),
+            entry.heap_increase.fmt_human_percent(),
             entry.stable_memory_increase.fmt_current(),
-            entry.stable_memory_increase.fmt_percent(),
+            entry.stable_memory_increase.fmt_human_percent(),
         ];
         rows.push(row);
     }
@@ -85,7 +85,7 @@ pub(crate) fn print_table(data: &[&Entry]) {
 
     // Print separator line
     print!("|");
-    for (i, width) in col_widths.iter().enumerate() {
+    for width in &col_widths {
         print!("{}|", "-".repeat(width + 2));
     }
     println!();

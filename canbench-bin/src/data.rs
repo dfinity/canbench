@@ -1,4 +1,4 @@
-use crate::fmt::{fmt_change, fmt_current, fmt_percent};
+use crate::fmt::fmt_human_percent;
 use canbench_rs::{BenchResult, Measurement};
 use std::collections::BTreeMap;
 
@@ -78,15 +78,12 @@ impl Values {
     }
 
     pub(crate) fn fmt_current(&self) -> String {
-        self.current().map_or_else(String::new, fmt_current)
+        self.current().map_or_else(String::new, |v| v.to_string())
     }
 
-    pub(crate) fn fmt_change(&self) -> String {
-        self.abs_delta().map_or_else(String::new, fmt_change)
-    }
-
-    pub(crate) fn fmt_percent(&self) -> String {
-        self.percent_diff().map_or_else(String::new, fmt_percent)
+    pub(crate) fn fmt_human_percent(&self) -> String {
+        self.percent_diff()
+            .map_or_else(String::new, fmt_human_percent)
     }
 
     pub(crate) fn status(&self, noise_threshold: f64) -> Change {

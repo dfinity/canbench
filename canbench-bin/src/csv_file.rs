@@ -30,11 +30,11 @@ pub(crate) fn write(output_file: &PathBuf, data: &[Entry]) {
             entry.status.clone(),
             name.clone(),
             entry.instructions.fmt_current(),
-            entry.instructions.fmt_percent(),
+            entry.instructions.fmt_human_percent(),
             entry.heap_increase.fmt_current(),
-            entry.heap_increase.fmt_percent(),
+            entry.heap_increase.fmt_human_percent(),
             entry.stable_memory_increase.fmt_current(),
-            entry.stable_memory_increase.fmt_percent(),
+            entry.stable_memory_increase.fmt_human_percent(),
         ];
 
         writeln!(file, "{}", row.join(&DELIMITER.to_string()))
