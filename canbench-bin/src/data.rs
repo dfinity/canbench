@@ -1,5 +1,5 @@
 use canbench_rs::{BenchResult, Measurement};
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct Entry {
@@ -39,7 +39,7 @@ impl Benchmark {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
-pub(crate) enum Status {
+pub(crate) enum Change {
     Unchanged,
     New,
     Improved,
@@ -80,15 +80,15 @@ impl Values {
         None
     }
 
-    pub(crate) fn status(&self, noise_threshold: f64) -> Status {
+    pub(crate) fn status(&self, noise_threshold: f64) -> Change {
         match (self.new, self.old) {
             (Some(_new), Some(_old)) => match self.percent_diff() {
-                Some(percent) if percent.abs() < noise_threshold => Status::Unchanged,
-                Some(percent) if percent < 0.0 => Status::Improved,
-                Some(percent) if percent > 0.0 => Status::Regressed,
+                Some(percent) if percent.abs() < noise_threshold => Change::Unchanged,
+                Some(percent) if percent < 0.0 => Change::Improved,
+                Some(percent) if percent > 0.0 => Change::Regressed,
                 _ => unreachable!(),
             },
-            (Some(_), None) => Status::New,
+            (Some(_), None) => Change::New,
             _ => unreachable!(),
         }
     }

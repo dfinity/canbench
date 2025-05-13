@@ -1,4 +1,4 @@
-use crate::data::{Entry, Status, Values};
+use crate::data::{Change, Entry, Values};
 use canbench_rs::{BenchResult, Measurement};
 use std::{collections::BTreeMap, f64};
 
@@ -41,16 +41,16 @@ where
             percent_diffs.push(percent);
         }
         match values.status(noise_threshold) {
-            Status::New => {
+            Change::New => {
                 new += 1;
             }
-            Status::Improved => {
+            Change::Improved => {
                 improved += 1;
             }
-            Status::Regressed => {
+            Change::Regressed => {
                 regressed += 1;
             }
-            Status::Unchanged => {
+            Change::Unchanged => {
                 unchanged += 1;
             }
         }
