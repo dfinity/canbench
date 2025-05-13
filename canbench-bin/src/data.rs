@@ -4,8 +4,8 @@ use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct Entry {
-    status: String,
-    benchmark: Benchmark,
+    pub(crate) status: String,
+    pub(crate) benchmark: Benchmark,
     pub(crate) instructions: Values,
     pub(crate) heap_increase: Values,
     pub(crate) stable_memory_increase: Values,

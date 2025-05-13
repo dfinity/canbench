@@ -142,7 +142,7 @@ pub fn run_benchmarks(
 
     // Save benchmark results in CSV format if requested.
     if csv {
-        csv_file::write(csv_results_file, &new_results, &old_results);
+        csv_file::write(csv_results_file, &data);
         println!(
             "Successfully saved CSV results to {}",
             csv_results_file.display()
