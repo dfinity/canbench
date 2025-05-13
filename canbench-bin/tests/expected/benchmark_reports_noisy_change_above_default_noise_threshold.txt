@@ -2,7 +2,7 @@
 
 Benchmark: noisy_change_above_default_threshold_test
   total:
-    instructions: 3.39 M (improved by 4.35%)
+    instructions: 3.39 M (improved by 4.36%)
     heap_increase: 62 pages (improved by 4.62%)
     stable_memory_increase: 100 pages (improved by 3.85%)
 
@@ -12,8 +12,8 @@ Summary:
   instructions:
     status:   Improvements detected! 🟢
     counts:   [total 1 | new 0 | improved 1 | regressed 0 | unchanged 0]
-    change:   [min -154.07K | med -154.07K | max -154.07K]
-    change %: [min -4.35% | med -4.35% | max -4.35%]
+    change:   [min -154.17K | med -154.17K | max -154.17K]
+    change %: [min -4.36% | med -4.36% | max -4.36%]
 
   heap_increase:
     status:   Improvements detected! 🟢
@@ -32,6 +32,6 @@ Summary:
 Only significant changes:
 | status | name                                      |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
 |--------|-------------------------------------------|-------|---------|----|--------|-----|---------|
-|        | noisy_change_above_default_threshold_test | 3.39M |  -4.35% | 62 | -4.62% | 100 |  -3.85% |
+|   -    | noisy_change_above_default_threshold_test | 3.39M |  -4.36% | 62 | -4.62% | 100 |  -3.85% |
 
 ---------------------------------------------------

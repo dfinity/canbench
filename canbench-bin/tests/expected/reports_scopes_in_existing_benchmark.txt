@@ -2,13 +2,13 @@
 
 Benchmark: bench_scope_exists
   total:
-    instructions: 4626 (regressed from 0)
-    heap_increase: 1 pages (regressed from 0)
+    instructions: 4138 (regressed from 0)
+    heap_increase: 0 pages (no change)
     stable_memory_increase: 0 pages (no change)
 
   scope_1 (scope):
-    instructions: 1620 (regressed by 102.50%)
-    heap_increase: 1 pages (improved by 91.67%)
+    instructions: 1050 (regressed by 31.25%)
+    heap_increase: 0 pages (improved by 100.00%)
     stable_memory_increase: 0 pages (no change)
 
   scope_2 (scope):
@@ -22,14 +22,14 @@ Summary:
   instructions:
     status:   Regressions detected! 🔴
     counts:   [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0]
-    change:   [min +4.63K | med +4.63K | max +4.63K]
+    change:   [min +4.14K | med +4.14K | max +4.14K]
     change %: [min +inf% | med +inf% | max +inf%]
 
   heap_increase:
-    status:   Regressions detected! 🔴
-    counts:   [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0]
-    change:   [min +1 | med +1 | max +1]
-    change %: [min +inf% | med +inf% | max +inf%]
+    status:   No significant changes detected 👍
+    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
+    change:   [min 0 | med 0 | max 0]
+    change %: [min 0.00% | med 0.00% | max 0.00%]
 
   stable_memory_increase:
     status:   No significant changes detected 👍
@@ -40,10 +40,10 @@ Summary:
 ---------------------------------------------------
 
 Only significant changes:
-| status | name                        |   ins |   ins Δ% | HI |   HI Δ% | SMI |  SMI Δ% |
-|--------|-----------------------------|-------|----------|----|---------|-----|---------|
-|  new   | bench_scope_exists::scope_2 |   786 |          |  0 |         |   0 |         |
-|        | bench_scope_exists::scope_1 | 1.62K | +102.50% |  1 | -91.67% |   0 |   0.00% |
-|        | bench_scope_exists          | 4.63K |    +inf% |  1 |   +inf% |   0 |   0.00% |
+| status | name                        |   ins |  ins Δ% | HI |    HI Δ% | SMI |  SMI Δ% |
+|--------|-----------------------------|-------|---------|----|----------|-----|---------|
+|   +    | bench_scope_exists          | 4.14K |   +inf% |  0 |    0.00% |   0 |   0.00% |
+|   -+   | bench_scope_exists::scope_1 | 1.05K | +31.25% |  0 | -100.00% |   0 |   0.00% |
+|  new   | bench_scope_exists::scope_2 |   786 |         |  0 |          |   0 |         |
 
 ---------------------------------------------------

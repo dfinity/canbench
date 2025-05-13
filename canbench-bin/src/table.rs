@@ -1,40 +1,63 @@
-use crate::data::Entry;
+use crate::data::{Change, Entry};
 
-pub(crate) fn filter_entries(data: &[Entry], noise_threshold: f64) -> Vec<&Entry> {
-    let mut filtered: Vec<_> = data
+pub(crate) fn filter_entries(data: &[Entry], noise_threshold: f64) -> Vec<Entry> {
+    let mut filtered: Vec<Entry> = data
         .iter()
-        .filter(|entry| {
-            [
+        .filter_map(|entry| {
+            let metrics = [
                 &entry.instructions,
                 &entry.heap_increase,
                 &entry.stable_memory_increase,
-            ]
-            .iter()
-            .any(|values| {
+            ];
+
+            let is_significant = metrics.iter().any(|v| {
                 matches!(
-                    values.status(noise_threshold),
-                    crate::data::Change::New
-                        | crate::data::Change::Improved
-                        | crate::data::Change::Regressed
+                    v.status(noise_threshold),
+                    Change::New | Change::Improved | Change::Regressed
                 )
-            })
+            });
+
+            if !is_significant {
+                return None;
+            }
+
+            let mut status = String::new();
+            if entry.status.is_empty() {
+                if metrics
+                    .iter()
+                    .any(|v| v.status(noise_threshold) == Change::Improved)
+                {
+                    status.push('-');
+                }
+                if metrics
+                    .iter()
+                    .any(|v| v.status(noise_threshold) == Change::Regressed)
+                {
+                    status.push('+');
+                }
+            } else {
+                status = entry.status.clone();
+            }
+
+            let mut updated = entry.clone();
+            updated.status = status;
+            Some(updated)
         })
         .collect();
 
     // Sort by instructions percent diff, descending.
     filtered.sort_by(|a, b| {
-        a.instructions
+        b.instructions
             .percent_diff()
             .unwrap_or(0.0)
-            .partial_cmp(&b.instructions.percent_diff().unwrap_or(0.0))
+            .partial_cmp(&a.instructions.percent_diff().unwrap_or(0.0))
             .unwrap_or(std::cmp::Ordering::Equal)
-            .reverse()
     });
 
     filtered
 }
 
-pub(crate) fn print_table(data: &[&Entry]) {
+pub(crate) fn print_table(data: &[Entry]) {
     let columns = [
         "status", "name", "ins", "ins Δ%", "HI", "HI Δ%", "SMI", "SMI Δ%",
     ];

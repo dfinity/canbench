@@ -2,8 +2,8 @@
 
 Benchmark: write_stable_memory (new)
   total:
-    instructions: 49.74 K (new)
-    heap_increase: 1 pages (new)
+    instructions: 49.17 K (new)
+    heap_increase: 0 pages (new)
     stable_memory_increase: 1 pages (new)
 
 ---------------------------------------------------
@@ -32,6 +32,6 @@ Summary:
 Only significant changes:
 | status | name                |    ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
 |--------|---------------------|--------|---------|----|--------|-----|---------|
-|  new   | write_stable_memory | 49.74K |         |  1 |        |   1 |         |
+|  new   | write_stable_memory | 49.17K |         |  0 |        |   1 |         |
 
 ---------------------------------------------------
