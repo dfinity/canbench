@@ -7,14 +7,14 @@ license = "Apache-2.0"
 readme = "../README.md"
 repository = "https://github.com/dfinity/canbench"
 # NOTE: Update `canbench-rs` version below when this changes.
-version = "0.1.12"
+version = "0.1.13"
 
 [[bin]]
 name = "canbench"
 path = "src/main.rs"
 
 [dependencies]
-canbench-rs = { path = "../canbench-rs", version = "0.1.12" }
+canbench-rs = { path = "../canbench-rs", version = "0.1.13" }
 candid.workspace = true
 clap.workspace = true
 colored.workspace = true
