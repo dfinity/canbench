@@ -13,7 +13,7 @@ pub(crate) fn filter_entries(data: &[Entry], noise_threshold: f64) -> Vec<Entry>
             let is_significant = metrics.iter().any(|v| {
                 matches!(
                     v.status(noise_threshold),
-                    Change::New | Change::Improved | Change::Regressed
+                    Change::New | Change::Removed | Change::Improved | Change::Regressed
                 )
             });
 
@@ -48,13 +48,19 @@ pub(crate) fn filter_entries(data: &[Entry], noise_threshold: f64) -> Vec<Entry>
         })
         .collect();
 
+    // Sort by name, ascending.
+    filtered.sort_by(|a, b| a.benchmark.full_name().cmp(&b.benchmark.full_name()));
+    // Sort by status.
+    filtered.sort_by(|a, b| a.status.cmp(&b.status));
     // Sort by instructions percent diff, descending.
+    const EMPTY: f64 = f64::MIN;
     filtered.sort_by(|a, b| {
-        b.instructions
+        a.instructions
             .percent_diff()
-            .unwrap_or(0.0)
-            .partial_cmp(&a.instructions.percent_diff().unwrap_or(0.0))
+            .unwrap_or(EMPTY)
+            .partial_cmp(&b.instructions.percent_diff().unwrap_or(EMPTY))
             .unwrap_or(std::cmp::Ordering::Equal)
+            .reverse()
     });
 
     filtered

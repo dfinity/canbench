@@ -1,6 +1,6 @@
 use crate::fmt::{fmt_human_percent, fmt_human_u64};
 use canbench_rs::{BenchResult, Measurement};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct Entry {
@@ -41,10 +41,11 @@ impl Benchmark {
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) enum Change {
-    Unchanged,
     New,
+    Removed,
     Improved,
     Regressed,
+    Unchanged,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -96,10 +97,11 @@ impl Values {
                 Some(p) if p.abs() < noise_threshold => Change::Unchanged,
                 Some(p) if p < 0.0 => Change::Improved,
                 Some(_) => Change::Regressed,
-                _ => unreachable!(),
+                _ => panic!("Invalid percent diff"),
             },
             (Some(_), None) => Change::New,
-            _ => unreachable!(),
+            (None, Some(_)) => Change::Removed,
+            _ => panic!("Invalid state"),
         }
     }
 }
@@ -109,14 +111,17 @@ pub(crate) fn extract(
     old_results: &BTreeMap<String, BenchResult>,
 ) -> Vec<Entry> {
     let mut results = Vec::new();
+    let mut processed = BTreeSet::new();
 
     for (name, new_bench) in new_results {
         let old_bench = old_results.get(name);
 
         // Process total
+        let benchmark = Benchmark::new(name, None);
+        processed.insert(benchmark.clone());
         results.push(build_entry(
-            old_bench.is_some(),
-            Benchmark::new(name, None),
+            if old_bench.is_none() { "new" } else { "" }.to_string(),
+            benchmark,
             Some(&new_bench.total),
             old_bench.map(|b| &b.total),
         ));
@@ -124,13 +129,39 @@ pub(crate) fn extract(
         // Process scopes
         for (scope, new_m) in &new_bench.scopes {
             let old_m = old_bench.and_then(|b| b.scopes.get(scope));
-
+            let benchmark = Benchmark::new(name, Some(scope));
+            processed.insert(benchmark.clone());
             results.push(build_entry(
-                old_m.is_some(),
-                Benchmark::new(name, Some(scope)),
+                if old_m.is_none() { "new" } else { "" }.to_string(),
+                benchmark,
                 Some(new_m),
                 old_m,
             ));
+        }
+    }
+
+    // Process removed benchmarks
+    for (name, old_bench) in old_results {
+        let benchmark = Benchmark::new(name, None);
+        if !processed.contains(&benchmark) {
+            results.push(build_entry(
+                "removed".to_string(),
+                Benchmark::new(name, None),
+                None,
+                Some(&old_bench.total),
+            ));
+        }
+
+        for (scope, old_m) in &old_bench.scopes {
+            let benchmark = Benchmark::new(name, Some(scope));
+            if !processed.contains(&benchmark) {
+                results.push(build_entry(
+                    "removed".to_string(),
+                    benchmark,
+                    None,
+                    Some(old_m),
+                ));
+            }
         }
     }
 
@@ -138,7 +169,7 @@ pub(crate) fn extract(
 }
 
 fn build_entry(
-    old_present: bool,
+    status: String,
     benchmark: Benchmark,
     new_m: Option<&Measurement>,
     old_m: Option<&Measurement>,
@@ -149,11 +180,7 @@ fn build_entry(
     };
 
     Entry {
-        status: if old_present {
-            "".to_string()
-        } else {
-            "new".to_string()
-        },
+        status,
         benchmark,
         instructions: extract_values(|m| m.instructions),
         heap_increase: extract_values(|m| m.heap_increase),

@@ -11,20 +11,35 @@ Benchmark: no_changes_test
 Summary:
   instructions:
     status:   No significant changes detected 👍
-    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
+    counts:   [total 8 | new 0 | removed 7 | improved 0 | regressed 0 | unchanged 1]
     change:   [min 0 | med 0 | max 0]
     change %: [min 0.00% | med 0.00% | max 0.00%]
 
   heap_increase:
     status:   No significant changes detected 👍
-    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
+    counts:   [total 8 | new 0 | removed 7 | improved 0 | regressed 0 | unchanged 1]
     change:   [min 0 | med 0 | max 0]
     change %: [min 0.00% | med 0.00% | max 0.00%]
 
   stable_memory_increase:
     status:   No significant changes detected 👍
-    counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
+    counts:   [total 8 | new 0 | removed 7 | improved 0 | regressed 0 | unchanged 1]
     change:   [min 0 | med 0 | max 0]
     change %: [min 0.00% | med 0.00% | max 0.00%]
+
+---------------------------------------------------
+
+Only significant changes:
+| status  | name                                      | ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|---------|-------------------------------------------|-----|---------|----|--------|-----|---------|
+| removed | bench_repeated_scope_exists               |     |         |    |        |     |         |
+| removed | bench_repeated_scope_exists::scope_1      |     |         |    |        |     |         |
+| removed | bench_scope_exists                        |     |         |    |        |     |         |
+| removed | bench_scope_exists::scope_1               |     |         |    |        |     |         |
+| removed | improvement_test                          |     |         |    |        |     |         |
+| removed | noisy_change_above_default_threshold_test |     |         |    |        |     |         |
+| removed | noisy_change_test                         |     |         |    |        |     |         |
+| removed | regression_test                           |     |         |    |        |     |         |
+| removed | stable_memory_increase_from_zero          |     |         |    |        |     |         |
 
 ---------------------------------------------------

@@ -18,6 +18,7 @@ where
     F: Fn(&Entry) -> &Values,
 {
     let mut new = 0;
+    let mut removed = 0;
     let mut improved = 0;
     let mut regressed = 0;
     let mut unchanged = 0;
@@ -42,13 +43,14 @@ where
         }
         match values.status(noise_threshold) {
             Change::New => new += 1,
+            Change::Removed => removed += 1,
             Change::Improved => improved += 1,
             Change::Regressed => regressed += 1,
             Change::Unchanged => unchanged += 1,
         }
     }
 
-    let total = new + improved + regressed + unchanged;
+    let total = new + removed + improved + regressed + unchanged;
     debug_assert_eq!(total, processed_entries, "total count mismatch");
 
     println!("  {label}:");
@@ -60,8 +62,8 @@ where
     };
     println!("    status:   {status}");
     println!(
-        "    counts:   [total {} | new {} | improved {} | regressed {} | unchanged {}]",
-        total, new, improved, regressed, unchanged
+        "    counts:   [total {} | new {} | removed {} | improved {} | regressed {} | unchanged {}]",
+        total, new, removed, improved, regressed, unchanged
     );
 
     if !abs_deltas.is_empty() {

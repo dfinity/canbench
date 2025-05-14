@@ -11,27 +11,36 @@ Benchmark: noisy_change_above_default_threshold_test
 Summary:
   instructions:
     status:   Improvements detected! 🟢
-    counts:   [total 1 | new 0 | improved 1 | regressed 0 | unchanged 0]
+    counts:   [total 8 | new 0 | removed 7 | improved 1 | regressed 0 | unchanged 0]
     change:   [min -154.17K | med -154.17K | max -154.17K]
     change %: [min -4.36% | med -4.36% | max -4.36%]
 
   heap_increase:
     status:   Improvements detected! 🟢
-    counts:   [total 1 | new 0 | improved 1 | regressed 0 | unchanged 0]
+    counts:   [total 8 | new 0 | removed 7 | improved 1 | regressed 0 | unchanged 0]
     change:   [min -3 | med -3 | max -3]
     change %: [min -4.62% | med -4.62% | max -4.62%]
 
   stable_memory_increase:
     status:   Improvements detected! 🟢
-    counts:   [total 1 | new 0 | improved 1 | regressed 0 | unchanged 0]
+    counts:   [total 8 | new 0 | removed 7 | improved 1 | regressed 0 | unchanged 0]
     change:   [min -4 | med -4 | max -4]
     change %: [min -3.85% | med -3.85% | max -3.85%]
 
 ---------------------------------------------------
 
 Only significant changes:
-| status | name                                      |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
-|--------|-------------------------------------------|-------|---------|----|--------|-----|---------|
-|   -    | noisy_change_above_default_threshold_test | 3.39M |  -4.36% | 62 | -4.62% | 100 |  -3.85% |
+| status  | name                                      |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|---------|-------------------------------------------|-------|---------|----|--------|-----|---------|
+|    -    | noisy_change_above_default_threshold_test | 3.39M |  -4.36% | 62 | -4.62% | 100 |  -3.85% |
+| removed | bench_repeated_scope_exists               |       |         |    |        |     |         |
+| removed | bench_repeated_scope_exists::scope_1      |       |         |    |        |     |         |
+| removed | bench_scope_exists                        |       |         |    |        |     |         |
+| removed | bench_scope_exists::scope_1               |       |         |    |        |     |         |
+| removed | improvement_test                          |       |         |    |        |     |         |
+| removed | no_changes_test                           |       |         |    |        |     |         |
+| removed | noisy_change_test                         |       |         |    |        |     |         |
+| removed | regression_test                           |       |         |    |        |     |         |
+| removed | stable_memory_increase_from_zero          |       |         |    |        |     |         |
 
 ---------------------------------------------------
