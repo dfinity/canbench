@@ -25,15 +25,18 @@ pub(crate) fn filter_entries(data: &[Entry], noise_threshold: f64) -> Vec<Entry>
             if entry.status.is_empty() {
                 if metrics
                     .iter()
-                    .any(|v| v.status(noise_threshold) == Change::Improved)
-                {
-                    status.push('-');
-                }
-                if metrics
-                    .iter()
                     .any(|v| v.status(noise_threshold) == Change::Regressed)
                 {
                     status.push('+');
+                }
+                if metrics
+                    .iter()
+                    .any(|v| v.status(noise_threshold) == Change::Improved)
+                {
+                    if !status.is_empty() {
+                        status.push('/');
+                    }
+                    status.push('-');
                 }
             } else {
                 status = entry.status.clone();
