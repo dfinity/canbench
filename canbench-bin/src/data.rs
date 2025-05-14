@@ -96,10 +96,16 @@ impl Values {
                 Some(p) if p.abs() < noise_threshold => Change::Unchanged,
                 Some(p) if p < 0.0 => Change::Improved,
                 Some(_) => Change::Regressed,
-                _ => panic!("Invalid percent diff"),
+                None => Change::Unchanged,
             },
             (Some(_), None) => Change::New,
-            _ => panic!("Invalid state"),
+            (None, Some(_)) => {
+                // This is actually a removed benchmark
+                // but we don't track it at the moment,
+                // so we treat it as unchanged.
+                Change::Unchanged
+            }
+            (None, None) => Change::Unchanged,
         }
     }
 }
