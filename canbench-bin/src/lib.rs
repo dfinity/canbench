@@ -1,9 +1,12 @@
 //! A module for running benchmarks.
 mod csv_file;
+mod data;
+mod fmt;
 mod instruction_tracing;
 mod print_benchmark;
 mod results_file;
 mod summary;
+mod table;
 
 use canbench_rs::BenchResult;
 use candid::{Encode, Principal};
@@ -130,16 +133,26 @@ pub fn run_benchmarks(
 
     println!("---------------------------------------------------");
 
+    let data = data::extract(&new_results, &old_results);
     if verbose || show_summary {
         println!();
-        summary::print_summary(&new_results, &old_results, noise_threshold);
+        summary::print_summary(&data, noise_threshold);
         println!();
         println!("---------------------------------------------------");
+
+        let filtered = table::filter_entries(&data, noise_threshold);
+        if !filtered.is_empty() {
+            println!();
+            println!("Only significant changes:");
+            table::print_table(&filtered);
+            println!();
+            println!("---------------------------------------------------");
+        }
     }
 
     // Save benchmark results in CSV format if requested.
     if csv {
-        csv_file::write(csv_results_file, &new_results, &old_results);
+        csv_file::write(csv_results_file, &data);
         println!(
             "Successfully saved CSV results to {}",
             csv_results_file.display()
