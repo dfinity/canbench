@@ -13,7 +13,7 @@ pub(crate) fn filter_entries(data: &[Entry], noise_threshold: f64) -> Vec<Entry>
             let is_significant = metrics.iter().any(|v| {
                 matches!(
                     v.status(noise_threshold),
-                    Change::New | Change::Removed | Change::Improved | Change::Regressed
+                    Change::New | Change::Improved | Change::Regressed
                 )
             });
 

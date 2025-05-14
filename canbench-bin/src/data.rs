@@ -1,6 +1,6 @@
 use crate::fmt::{fmt_human_percent, fmt_human_u64};
 use canbench_rs::{BenchResult, Measurement};
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct Entry {
@@ -42,7 +42,6 @@ impl Benchmark {
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) enum Change {
     New,
-    Removed,
     Improved,
     Regressed,
     Unchanged,
@@ -100,7 +99,6 @@ impl Values {
                 _ => panic!("Invalid percent diff"),
             },
             (Some(_), None) => Change::New,
-            (None, Some(_)) => Change::Removed,
             _ => panic!("Invalid state"),
         }
     }
@@ -111,14 +109,12 @@ pub(crate) fn extract(
     old_results: &BTreeMap<String, BenchResult>,
 ) -> Vec<Entry> {
     let mut results = Vec::new();
-    let mut processed = BTreeSet::new();
 
     for (name, new_bench) in new_results {
         let old_bench = old_results.get(name);
 
         // Process total
         let benchmark = Benchmark::new(name, None);
-        processed.insert(benchmark.clone());
         results.push(build_entry(
             if old_bench.is_none() { "new" } else { "" }.to_string(),
             benchmark,
@@ -130,38 +126,12 @@ pub(crate) fn extract(
         for (scope, new_m) in &new_bench.scopes {
             let old_m = old_bench.and_then(|b| b.scopes.get(scope));
             let benchmark = Benchmark::new(name, Some(scope));
-            processed.insert(benchmark.clone());
             results.push(build_entry(
                 if old_m.is_none() { "new" } else { "" }.to_string(),
                 benchmark,
                 Some(new_m),
                 old_m,
             ));
-        }
-    }
-
-    // Process removed benchmarks
-    for (name, old_bench) in old_results {
-        let benchmark = Benchmark::new(name, None);
-        if !processed.contains(&benchmark) {
-            results.push(build_entry(
-                "removed".to_string(),
-                Benchmark::new(name, None),
-                None,
-                Some(&old_bench.total),
-            ));
-        }
-
-        for (scope, old_m) in &old_bench.scopes {
-            let benchmark = Benchmark::new(name, Some(scope));
-            if !processed.contains(&benchmark) {
-                results.push(build_entry(
-                    "removed".to_string(),
-                    benchmark,
-                    None,
-                    Some(old_m),
-                ));
-            }
         }
     }
 
