@@ -100,7 +100,6 @@ pub fn run_benchmarks(
         let result = run_benchmark(&pocket_ic, benchmark_canister_id, bench_fn);
 
         if show_results {
-            println!();
             println!("---------------------------------------------------");
             println!();
             print_benchmark(
@@ -123,9 +122,12 @@ pub fn run_benchmarks(
         }
 
         new_results.insert(bench_fn.to_string(), result);
+
+        if show_results {
+            println!();
+        }
     }
 
-    println!();
     println!("---------------------------------------------------");
 
     if verbose || show_summary {

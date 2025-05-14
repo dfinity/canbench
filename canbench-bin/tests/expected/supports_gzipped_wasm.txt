@@ -1,4 +1,3 @@
-
 ---------------------------------------------------
 
 Benchmark: bench_1 (new)
@@ -19,16 +18,19 @@ Benchmark: bench_2 (new)
 
 Summary:
   instructions:
+    status:   No significant changes detected 👍
     counts:   [total 2 | new 2 | improved 0 | regressed 0 | unchanged 0]
     change:   n/a
     change %: n/a
 
   heap_increase:
+    status:   No significant changes detected 👍
     counts:   [total 2 | new 2 | improved 0 | regressed 0 | unchanged 0]
     change:   n/a
     change %: n/a
 
   stable_memory_increase:
+    status:   No significant changes detected 👍
     counts:   [total 2 | new 2 | improved 0 | regressed 0 | unchanged 0]
     change:   n/a
     change %: n/a
