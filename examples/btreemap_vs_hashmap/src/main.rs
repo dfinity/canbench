@@ -30,7 +30,7 @@ fn pre_upgrade() {
     // Write to stable memory.
     #[cfg(feature = "canbench-rs")]
     let _p = canbench_rs::bench_scope("writing_to_stable_memory");
-    ic_cdk::stable::StableWriter::default()
+    ic_cdk::api::stable::StableWriter::default()
         .write(&bytes)
         .unwrap();
 }

@@ -3,10 +3,10 @@ use canbench_rs::bench;
 #[bench]
 fn read_from_stable_memory() {
     let mut buf = [0; 10];
-    ic_cdk::stable::stable_read(0, &mut buf);
+    ic_cdk::api::stable::stable_read(0, &mut buf);
 
     // There should be one page in stable memory.
-    assert_eq!(ic_cdk::stable::stable_size(), 1);
+    assert_eq!(ic_cdk::api::stable::stable_size(), 1);
 
     // The `stable_memory.bin` specified in canbench.yml only has the first give bytes set.
     // The rest should be zero.
