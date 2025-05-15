@@ -133,8 +133,8 @@ pub(crate) fn print_table(data: &[Entry], max_displayed_rows: usize) {
 
         // Print omitted rows indicator
         let mut omitted_row = vec!["".to_string(); columns.len()];
-        omitted_row[0] = "...".to_string(); // Set in "status" column
-        omitted_row[1] = format!("({} omitted)", total_rows - max_displayed_rows); // Set in "name" column
+        omitted_row[0] = "...".to_string(); // "status" column
+        omitted_row[1] = format!("({} omitted)", total_rows - max_displayed_rows); // "name" column
         print_row(&omitted_row);
 
         for row in &rows[total_rows - half_limit..] {
