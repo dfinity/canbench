@@ -1,4 +1,5 @@
 use crate::data::{Change, Entry};
+use std::io::{self, Write};
 
 pub(crate) fn filter_entries(data: &[Entry], noise_threshold: f64) -> Vec<Entry> {
     let mut filtered: Vec<Entry> = data
@@ -66,67 +67,195 @@ pub(crate) fn filter_entries(data: &[Entry], noise_threshold: f64) -> Vec<Entry>
     filtered
 }
 
-pub(crate) fn print_table(data: &[Entry]) {
+pub(crate) fn print_table<W: Write>(
+    writer: &mut W,
+    data: &[Entry],
+    max_displayed_rows: usize,
+) -> io::Result<()> {
     let columns = [
         "status", "name", "ins", "ins Δ%", "HI", "HI Δ%", "SMI", "SMI Δ%",
     ];
+    let mut rows: Vec<_> = data
+        .iter()
+        .map(|entry| {
+            vec![
+                entry.status.clone(),
+                entry.benchmark.full_name(),
+                entry.instructions.fmt_human_current(),
+                entry.instructions.fmt_percent(),
+                entry.heap_increase.fmt_human_current(),
+                entry.heap_increase.fmt_percent(),
+                entry.stable_memory_increase.fmt_human_current(),
+                entry.stable_memory_increase.fmt_percent(),
+            ]
+        })
+        .collect();
 
-    let mut rows = Vec::new();
-    for entry in data {
-        let name = entry.benchmark.full_name();
-        let row = [
-            entry.status.clone(),
-            name,
-            // Table report uses short numbers
-            entry.instructions.fmt_human_current(),
-            entry.instructions.fmt_percent(),
-            entry.heap_increase.fmt_human_current(),
-            entry.heap_increase.fmt_percent(),
-            entry.stable_memory_increase.fmt_human_current(),
-            entry.stable_memory_increase.fmt_percent(),
-        ];
-        rows.push(row);
+    let total_rows = rows.len();
+
+    if total_rows > max_displayed_rows {
+        let omitted_count = total_rows - max_displayed_rows;
+        let head_rows = max_displayed_rows / 2;
+        let tail_rows = max_displayed_rows - head_rows;
+
+        let mut limited_rows = Vec::new();
+        if head_rows > 0 {
+            limited_rows.extend_from_slice(&rows[..head_rows]);
+        }
+
+        let mut omitted_row = vec!["".to_string(); columns.len()];
+        omitted_row[0] = "...".to_string();
+        omitted_row[1] = format!(
+            "({} row{} omitted)",
+            omitted_count,
+            if omitted_count == 1 { "" } else { "s" }
+        );
+        limited_rows.push(omitted_row);
+
+        if tail_rows > 0 {
+            limited_rows.extend_from_slice(&rows[total_rows - tail_rows..]);
+        }
+
+        rows = limited_rows;
     }
 
-    // Calculate max column widths
-    let mut col_widths = columns
-        .iter()
-        .map(|header| header.len())
-        .collect::<Vec<_>>();
-
+    let mut col_widths: Vec<_> = columns.iter().map(|h| h.len()).collect();
     for row in &rows {
         for (i, cell) in row.iter().enumerate() {
             col_widths[i] = col_widths[i].max(cell.len());
         }
     }
 
-    // Helper to print a row with correct alignment and separators
-    let print_row = |row: &[String]| {
-        print!("|");
+    let print_row = |writer: &mut W, row: &[String]| -> io::Result<()> {
+        write!(writer, "|")?;
         for (i, cell) in row.iter().enumerate() {
             let width = col_widths[i];
             match i {
-                0 => print!(" {:^width$} ", cell, width = width), // Center status
-                1 => print!(" {:<width$} ", cell, width = width), // Left-align name
-                _ => print!(" {:>width$} ", cell, width = width), // Right-align numbers
+                0 => write!(writer, " {:^width$} |", cell, width = width)?,
+                1 => write!(writer, " {:<width$} |", cell, width = width)?,
+                _ => write!(writer, " {:>width$} |", cell, width = width)?,
             }
-            print!("|");
         }
-        println!();
+        writeln!(writer)
     };
 
-    // Print header
-    print_row(&columns.iter().map(|s| s.to_string()).collect::<Vec<_>>());
-
-    // Print separator line
-    print!("|");
+    print_row(
+        writer,
+        &columns.iter().map(|s| s.to_string()).collect::<Vec<_>>(),
+    )?;
+    write!(writer, "|")?;
     for width in &col_widths {
-        print!("{}|", "-".repeat(width + 2));
+        write!(writer, "{}|", "-".repeat(width + 2))?;
     }
-    println!();
+    writeln!(writer)?;
 
-    // Print data rows
     for row in &rows {
-        print_row(row);
+        print_row(writer, row)?;
+    }
+
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::data::{Benchmark, Values};
+
+    fn create_entry(name: &str) -> Entry {
+        Entry {
+            status: "".to_string(),
+            benchmark: Benchmark::new(name, None),
+            instructions: Values::new(Some(9_000_000), Some(10_000_000)),
+            heap_increase: Values::new(Some(0), None),
+            stable_memory_increase: Values::new(Some(0), None),
+        }
+    }
+
+    fn run_table_test_case(max_displayed_rows: usize, expected_output: &str) {
+        let entries: Vec<Entry> = (1..=5)
+            .map(|i| create_entry(&format!("bench_{}", i)))
+            .collect();
+
+        let mut output = Vec::new();
+        print_table(&mut output, &entries, max_displayed_rows).unwrap();
+
+        let output_str = String::from_utf8_lossy(&output);
+        assert_eq!(
+            output_str, expected_output,
+            "Unexpected output with max_displayed_rows = {}:\n{}",
+            max_displayed_rows, output_str
+        );
+    }
+
+    #[test]
+    fn test_print_table_variants() {
+        let test_cases = [
+            (
+                0,
+                "\
+| status | name             | ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|------------------|-----|---------|----|--------|-----|---------|
+|  ...   | (5 rows omitted) |     |         |    |        |     |         |
+",
+            ),
+            (
+                1,
+                "\
+| status | name             |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|------------------|-------|---------|----|--------|-----|---------|
+|  ...   | (4 rows omitted) |       |         |    |        |     |         |
+|        | bench_5          | 9.00M | -10.00% |  0 |        |   0 |         |
+",
+            ),
+            (
+                2,
+                "\
+| status | name             |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|------------------|-------|---------|----|--------|-----|---------|
+|        | bench_1          | 9.00M | -10.00% |  0 |        |   0 |         |
+|  ...   | (3 rows omitted) |       |         |    |        |     |         |
+|        | bench_5          | 9.00M | -10.00% |  0 |        |   0 |         |
+",
+            ),
+            (
+                3,
+                "\
+| status | name             |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|------------------|-------|---------|----|--------|-----|---------|
+|        | bench_1          | 9.00M | -10.00% |  0 |        |   0 |         |
+|  ...   | (2 rows omitted) |       |         |    |        |     |         |
+|        | bench_4          | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_5          | 9.00M | -10.00% |  0 |        |   0 |         |
+",
+            ),
+            (
+                4,
+                "\
+| status | name            |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|-----------------|-------|---------|----|--------|-----|---------|
+|        | bench_1         | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_2         | 9.00M | -10.00% |  0 |        |   0 |         |
+|  ...   | (1 row omitted) |       |         |    |        |     |         |
+|        | bench_4         | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_5         | 9.00M | -10.00% |  0 |        |   0 |         |
+",
+            ),
+            (
+                5,
+                "\
+| status | name    |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|---------|-------|---------|----|--------|-----|---------|
+|        | bench_1 | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_2 | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_3 | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_4 | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_5 | 9.00M | -10.00% |  0 |        |   0 |         |
+",
+            ),
+        ];
+
+        for (max_displayed_rows, expected_output) in test_cases {
+            run_table_test_case(max_displayed_rows, expected_output);
+        }
     }
 }

@@ -35,6 +35,9 @@ const POCKET_IC_LINUX_SHA: &str =
     "327346b681f0c03f1eb12e8da17a1ab8d044f31b2a1cbaad4546db9dbf73caf4";
 const POCKET_IC_MAC_SHA: &str = "27bb9594e498171d2fffadf6e1e144e58ed3f5854d151ff8431d9dc298b7951e";
 
+/// The maximum number of rows to display in the summary table.
+const MAX_DISPLAYED_ROWS: usize = 50;
+
 /// Runs the benchmarks on the canister available in the provided `canister_wasm_path`.
 #[allow(clippy::too_many_arguments)]
 pub fn run_benchmarks(
@@ -144,7 +147,7 @@ pub fn run_benchmarks(
         if !filtered.is_empty() {
             println!();
             println!("Only significant changes:");
-            table::print_table(&filtered);
+            table::print_table(&mut std::io::stdout(), &filtered, MAX_DISPLAYED_ROWS).unwrap();
             println!();
             println!("---------------------------------------------------");
         }

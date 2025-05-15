@@ -49,31 +49,36 @@ pub(crate) enum Change {
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct Values {
-    new: Option<u64>,
-    old: Option<u64>,
+    curr: Option<u64>,
+    prev: Option<u64>,
 }
 
 impl Values {
+    #[cfg(test)]
+    pub(crate) fn new(curr: Option<u64>, prev: Option<u64>) -> Self {
+        Self { curr, prev }
+    }
+
     pub(crate) fn current(&self) -> Option<u64> {
-        self.new
+        self.curr
     }
 
     pub(crate) fn abs_delta(&self) -> Option<i64> {
-        Some(self.new? as i64 - self.old? as i64)
+        Some(self.curr? as i64 - self.prev? as i64)
     }
 
     pub(crate) fn percent_diff(&self) -> Option<f64> {
         let delta = self.abs_delta()?;
-        let old = self.old?;
+        let prev = self.prev?;
 
-        Some(if old == 0 {
+        Some(if prev == 0 {
             match delta {
                 d if d < 0 => f64::NEG_INFINITY,
                 d if d > 0 => f64::INFINITY,
                 _ => 0.0,
             }
         } else {
-            delta as f64 / old as f64 * 100.0
+            delta as f64 / prev as f64 * 100.0
         })
     }
 
@@ -94,7 +99,7 @@ impl Values {
     }
 
     pub(crate) fn status(&self, noise_threshold: f64) -> Change {
-        match (self.new, self.old) {
+        match (self.curr, self.prev) {
             (Some(_), Some(_)) => match self.percent_diff() {
                 Some(p) if p.abs() < noise_threshold => Change::Unchanged,
                 Some(p) if p < 0.0 => Change::Improved,
@@ -154,8 +159,8 @@ fn build_entry(
     old_m: Option<&Measurement>,
 ) -> Entry {
     let extract_values = |f: fn(&Measurement) -> u64| Values {
-        new: new_m.map(f),
-        old: old_m.map(f),
+        curr: new_m.map(f),
+        prev: old_m.map(f),
     };
 
     Entry {
