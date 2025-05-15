@@ -32,7 +32,7 @@ pub(crate) fn write(output_file: &PathBuf, data: &[Entry]) {
         let row = [
             entry.status.clone(),
             name.clone(),
-            // CSV report use full numbers
+            // CSV report uses full numbers
             entry.instructions.fmt_current(),
             entry.instructions.fmt_abs_delta(),
             entry.instructions.fmt_percent(),

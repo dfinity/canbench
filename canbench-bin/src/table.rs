@@ -77,7 +77,7 @@ pub(crate) fn print_table(data: &[Entry]) {
         let row = [
             entry.status.clone(),
             name,
-            // Table report use short numbers
+            // Table report uses short numbers
             entry.instructions.fmt_human_current(),
             entry.instructions.fmt_percent(),
             entry.heap_increase.fmt_human_current(),
