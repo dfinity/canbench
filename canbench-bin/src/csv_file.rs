@@ -15,11 +15,14 @@ pub(crate) fn write(output_file: &PathBuf, data: &[Entry]) {
         "status",
         "name",
         "instructions",
-        "instructions change %",
+        "instructions Δ",
+        "instructions Δ%",
         "heap_increase",
-        "heap_increase change %",
+        "heap_increase Δ",
+        "heap_increase Δ%",
         "stable_memory_increase",
-        "stable_memory_increase change %",
+        "stable_memory_increase Δ",
+        "stable_memory_increase Δ%",
     ];
 
     writeln!(file, "{}", HEADERS.join(&DELIMITER.to_string())).expect("Failed to write CSV header");
@@ -29,12 +32,16 @@ pub(crate) fn write(output_file: &PathBuf, data: &[Entry]) {
         let row = [
             entry.status.clone(),
             name.clone(),
-            entry.instructions.fmt_current(), // CSV report use full numbers
-            entry.instructions.fmt_human_percent(),
+            // CSV report use full numbers
+            entry.instructions.fmt_current(),
+            entry.instructions.fmt_abs_delta(),
+            entry.instructions.fmt_percent(),
             entry.heap_increase.fmt_current(),
-            entry.heap_increase.fmt_human_percent(),
+            entry.heap_increase.fmt_abs_delta(),
+            entry.heap_increase.fmt_percent(),
             entry.stable_memory_increase.fmt_current(),
-            entry.stable_memory_increase.fmt_human_percent(),
+            entry.stable_memory_increase.fmt_abs_delta(),
+            entry.stable_memory_increase.fmt_percent(),
         ];
 
         writeln!(file, "{}", row.join(&DELIMITER.to_string()))

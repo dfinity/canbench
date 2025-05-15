@@ -1,5 +1,5 @@
 use crate::data::{Change, Entry, Values};
-use crate::fmt::{fmt_human_i64, fmt_human_percent};
+use crate::fmt::{fmt_human_i64, fmt_percent};
 use std::f64;
 
 pub(crate) fn print_summary(data: &Vec<Entry>, noise_threshold: f64) {
@@ -71,12 +71,7 @@ where
     }
 
     if !percent_diffs.is_empty() {
-        print_range(
-            "    change %:",
-            &percent_diffs,
-            fmt_human_percent,
-            percentile_f64,
-        );
+        print_range("    change %:", &percent_diffs, fmt_percent, percentile_f64);
     } else {
         println!("    change %: n/a");
     }

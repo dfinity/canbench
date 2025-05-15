@@ -27,7 +27,7 @@ pub(crate) fn fmt_human_i64(value: i64) -> String {
     }
 }
 
-pub(crate) fn fmt_human_percent(value: f64) -> String {
+pub(crate) fn fmt_percent(value: f64) -> String {
     if value.abs() < 0.01 {
         format!("{:.2}%", value)
     } else {
