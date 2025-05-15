@@ -79,11 +79,11 @@ pub(crate) fn print_table(data: &[Entry], max_displayed_rows: usize) {
                 entry.benchmark.full_name(),
                 // Table report uses short numbers
                 entry.instructions.fmt_human_current(),
-                entry.instructions.fmt_human_percent(),
+                entry.instructions.fmt_percent(),
                 entry.heap_increase.fmt_human_current(),
-                entry.heap_increase.fmt_human_percent(),
+                entry.heap_increase.fmt_percent(),
                 entry.stable_memory_increase.fmt_human_current(),
-                entry.stable_memory_increase.fmt_human_percent(),
+                entry.stable_memory_increase.fmt_percent(),
             ]
         })
         .collect();
