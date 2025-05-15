@@ -66,7 +66,7 @@ pub(crate) fn filter_entries(data: &[Entry], noise_threshold: f64) -> Vec<Entry>
     filtered
 }
 
-pub(crate) fn print_table(data: &[Entry]) {
+pub(crate) fn print_table(data: &[Entry], max_displayed_rows: usize) {
     let columns = [
         "status", "name", "ins", "ins Δ%", "HI", "HI Δ%", "SMI", "SMI Δ%",
     ];
@@ -88,18 +88,14 @@ pub(crate) fn print_table(data: &[Entry]) {
     }
 
     // Calculate max column widths
-    let mut col_widths = columns
-        .iter()
-        .map(|header| header.len())
-        .collect::<Vec<_>>();
-
+    let mut col_widths = columns.iter().map(|h| h.len()).collect::<Vec<_>>();
     for row in &rows {
         for (i, cell) in row.iter().enumerate() {
             col_widths[i] = col_widths[i].max(cell.len());
         }
     }
 
-    // Helper to print a row with correct alignment and separators
+    // Helper to print a row
     let print_row = |row: &[String]| {
         print!("|");
         for (i, cell) in row.iter().enumerate() {
@@ -117,15 +113,32 @@ pub(crate) fn print_table(data: &[Entry]) {
     // Print header
     print_row(&columns.iter().map(|s| s.to_string()).collect::<Vec<_>>());
 
-    // Print separator line
+    // Print separator
     print!("|");
     for width in &col_widths {
         print!("{}|", "-".repeat(width + 2));
     }
     println!();
 
-    // Print data rows
-    for row in &rows {
-        print_row(row);
+    let total_rows = rows.len();
+    if total_rows <= max_displayed_rows {
+        for row in &rows {
+            print_row(row);
+        }
+    } else {
+        let half_limit = max_displayed_rows / 2;
+        for row in &rows[..half_limit] {
+            print_row(row);
+        }
+
+        // Print omitted rows indicator
+        let mut omitted_row = vec!["".to_string(); columns.len()];
+        omitted_row[0] = "...".to_string(); // Set in "status" column
+        omitted_row[1] = format!("({} omitted)", total_rows - max_displayed_rows); // Set in "name" column
+        print_row(&omitted_row);
+
+        for row in &rows[total_rows - half_limit..] {
+            print_row(row);
+        }
     }
 }

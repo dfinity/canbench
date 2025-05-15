@@ -144,7 +144,8 @@ pub fn run_benchmarks(
         if !filtered.is_empty() {
             println!();
             println!("Only significant changes:");
-            table::print_table(&filtered);
+            const MAX_DISPLAYED_ROWS: usize = 50;
+            table::print_table(&filtered, MAX_DISPLAYED_ROWS);
             println!();
             println!("---------------------------------------------------");
         }
