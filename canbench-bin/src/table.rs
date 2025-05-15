@@ -71,24 +71,45 @@ pub(crate) fn print_table(data: &[Entry], max_displayed_rows: usize) {
         "status", "name", "ins", "ins Δ%", "HI", "HI Δ%", "SMI", "SMI Δ%",
     ];
 
-    let mut rows = Vec::new();
-    for entry in data {
-        let name = entry.benchmark.full_name();
-        let row = [
-            entry.status.clone(),
-            name,
-            entry.instructions.fmt_human_current(), // Table report use short numbers
-            entry.instructions.fmt_human_percent(),
-            entry.heap_increase.fmt_human_current(),
-            entry.heap_increase.fmt_human_percent(),
-            entry.stable_memory_increase.fmt_human_current(),
-            entry.stable_memory_increase.fmt_human_percent(),
-        ];
-        rows.push(row);
+    let mut rows: Vec<Vec<String>> = data
+        .iter()
+        .map(|entry| {
+            vec![
+                entry.status.clone(),
+                entry.benchmark.full_name(),
+                // Table report uses short numbers
+                entry.instructions.fmt_human_current(),
+                entry.instructions.fmt_human_percent(),
+                entry.heap_increase.fmt_human_current(),
+                entry.heap_increase.fmt_human_percent(),
+                entry.stable_memory_increase.fmt_human_current(),
+                entry.stable_memory_increase.fmt_human_percent(),
+            ]
+        })
+        .collect();
+
+    let total_rows = rows.len();
+
+    // Apply row limit and add omitted indicator if needed
+    if total_rows > max_displayed_rows && max_displayed_rows >= 3 {
+        let half_limit = max_displayed_rows / 2;
+        let omitted_count = total_rows - max_displayed_rows;
+
+        let mut limited_rows = Vec::new();
+        limited_rows.extend_from_slice(&rows[..half_limit]);
+
+        // Insert omitted rows indicator
+        let mut omitted_row = vec!["".to_string(); columns.len()];
+        omitted_row[0] = "...".to_string(); // "status" column
+        omitted_row[1] = format!("({} omitted)", omitted_count); // "name" column
+        limited_rows.push(omitted_row);
+
+        limited_rows.extend_from_slice(&rows[total_rows - (max_displayed_rows - half_limit - 1)..]);
+        rows = limited_rows;
     }
 
-    // Calculate max column widths
-    let mut col_widths = columns.iter().map(|h| h.len()).collect::<Vec<_>>();
+    // Calculate max column widths after limiting and adding the indicator
+    let mut col_widths: Vec<usize> = columns.iter().map(|h| h.len()).collect();
     for row in &rows {
         for (i, cell) in row.iter().enumerate() {
             col_widths[i] = col_widths[i].max(cell.len());
@@ -101,8 +122,8 @@ pub(crate) fn print_table(data: &[Entry], max_displayed_rows: usize) {
         for (i, cell) in row.iter().enumerate() {
             let width = col_widths[i];
             match i {
-                0 => print!(" {:^width$} ", cell, width = width), // Center status
-                1 => print!(" {:<width$} ", cell, width = width), // Left-align name
+                0 => print!(" {:^width$} ", cell, width = width), // Center "status"
+                1 => print!(" {:<width$} ", cell, width = width), // Left-align "name"
                 _ => print!(" {:>width$} ", cell, width = width), // Right-align numbers
             }
             print!("|");
@@ -120,25 +141,8 @@ pub(crate) fn print_table(data: &[Entry], max_displayed_rows: usize) {
     }
     println!();
 
-    let total_rows = rows.len();
-    if total_rows <= max_displayed_rows {
-        for row in &rows {
-            print_row(row);
-        }
-    } else {
-        let half_limit = max_displayed_rows / 2;
-        for row in &rows[..half_limit] {
-            print_row(row);
-        }
-
-        // Print omitted rows indicator
-        let mut omitted_row = vec!["".to_string(); columns.len()];
-        omitted_row[0] = "...".to_string(); // "status" column
-        omitted_row[1] = format!("({} omitted)", total_rows - max_displayed_rows); // "name" column
-        print_row(&omitted_row);
-
-        for row in &rows[total_rows - half_limit..] {
-            print_row(row);
-        }
+    // Print data rows
+    for row in &rows {
+        print_row(row);
     }
 }

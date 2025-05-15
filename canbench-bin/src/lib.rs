@@ -36,7 +36,7 @@ const POCKET_IC_LINUX_SHA: &str =
 const POCKET_IC_MAC_SHA: &str = "27bb9594e498171d2fffadf6e1e144e58ed3f5854d151ff8431d9dc298b7951e";
 
 /// The maximum number of rows to display in the summary table.
-const MAX_DISPLAYED_ROWS: usize = 50;
+const MAX_DISPLAYED_ROWS: usize = 2;
 
 /// Runs the benchmarks on the canister available in the provided `canister_wasm_path`.
 #[allow(clippy::too_many_arguments)]
