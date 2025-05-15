@@ -91,12 +91,14 @@ pub(crate) fn print_table(data: &[Entry], max_displayed_rows: usize) {
     let total_rows = rows.len();
 
     // Apply row limit and add omitted indicator if needed
-    let omitted_count = total_rows as isize - max_displayed_rows as isize;
-    if omitted_count > 2 {
-        let half_limit = max_displayed_rows / 2;
+    let omitted_count = total_rows as isize - max_displayed_rows as isize + 1;
+    if total_rows > max_displayed_rows && omitted_count >= 2 {
+        let head_rows = max_displayed_rows / 2;
+        let tail_rows = max_displayed_rows - head_rows - 1;
+        let omitted_count = total_rows - head_rows - tail_rows;
 
         let mut limited_rows = Vec::new();
-        limited_rows.extend_from_slice(&rows[..half_limit]);
+        limited_rows.extend_from_slice(&rows[..head_rows]);
 
         // Insert omitted rows indicator
         let mut omitted_row = vec!["".to_string(); columns.len()];
@@ -104,8 +106,7 @@ pub(crate) fn print_table(data: &[Entry], max_displayed_rows: usize) {
         omitted_row[1] = format!("({} rows omitted)", omitted_count); // "name" column
         limited_rows.push(omitted_row);
 
-        let suffix_rows = total_rows - half_limit - 1;
-        limited_rows.extend_from_slice(&rows[total_rows - suffix_rows..]);
+        limited_rows.extend_from_slice(&rows[total_rows - tail_rows..]);
         rows = limited_rows;
     }
 
