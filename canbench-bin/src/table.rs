@@ -91,9 +91,9 @@ pub(crate) fn print_table(data: &[Entry], max_displayed_rows: usize) {
     let total_rows = rows.len();
 
     // Apply row limit and add omitted indicator if needed
-    if total_rows > max_displayed_rows {
+    let omitted_count = total_rows as isize - max_displayed_rows as isize;
+    if omitted_count > 2 {
         let half_limit = max_displayed_rows / 2;
-        let omitted_count = total_rows - max_displayed_rows;
 
         let mut limited_rows = Vec::new();
         limited_rows.extend_from_slice(&rows[..half_limit]);
