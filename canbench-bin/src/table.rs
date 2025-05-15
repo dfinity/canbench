@@ -71,7 +71,7 @@ pub(crate) fn print_table(data: &[Entry], max_displayed_rows: usize) {
         "status", "name", "ins", "ins Δ%", "HI", "HI Δ%", "SMI", "SMI Δ%",
     ];
 
-    let mut rows: Vec<Vec<String>> = data
+    let mut rows: Vec<_> = data
         .iter()
         .map(|entry| {
             vec![
@@ -110,7 +110,7 @@ pub(crate) fn print_table(data: &[Entry], max_displayed_rows: usize) {
     }
 
     // Calculate max column widths after limiting and adding the indicator
-    let mut col_widths: Vec<usize> = columns.iter().map(|h| h.len()).collect();
+    let mut col_widths: Vec<_> = columns.iter().map(|h| h.len()).collect();
     for row in &rows {
         for (i, cell) in row.iter().enumerate() {
             col_widths[i] = col_widths[i].max(cell.len());
