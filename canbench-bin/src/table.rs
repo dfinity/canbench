@@ -104,7 +104,8 @@ pub(crate) fn print_table(data: &[Entry], max_displayed_rows: usize) {
         omitted_row[1] = format!("({} omitted)", omitted_count); // "name" column
         limited_rows.push(omitted_row);
 
-        limited_rows.extend_from_slice(&rows[total_rows - (max_displayed_rows - half_limit - 1)..]);
+        let suffix_rows = total_rows - half_limit - 1;
+        limited_rows.extend_from_slice(&rows[total_rows - suffix_rows..]);
         rows = limited_rows;
     }
 
