@@ -147,7 +147,7 @@ pub fn run_benchmarks(
         if !filtered.is_empty() {
             println!();
             println!("Only significant changes:");
-            table::print_table(&filtered, MAX_DISPLAYED_ROWS);
+            table::print_table(&mut std::io::stdout(), &filtered, MAX_DISPLAYED_ROWS).unwrap();
             println!();
             println!("---------------------------------------------------");
         }
