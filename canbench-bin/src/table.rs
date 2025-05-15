@@ -91,7 +91,7 @@ pub(crate) fn print_table(data: &[Entry], max_displayed_rows: usize) {
     let total_rows = rows.len();
 
     // Apply row limit and add omitted indicator if needed
-    if total_rows > max_displayed_rows && max_displayed_rows >= 3 {
+    if total_rows > max_displayed_rows {
         let half_limit = max_displayed_rows / 2;
         let omitted_count = total_rows - max_displayed_rows;
 
