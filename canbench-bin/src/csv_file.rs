@@ -88,6 +88,6 @@ status,name,instructions,instructions Δ,instructions Δ%,heap_increase,heap_inc
 ,bench_1,11000000,1000000,10.00%,0,,,0,,
 ,bench_2,9000000,-1000000,-10.00%,0,,,0,,
 "
-);
+        );
     }
 }
