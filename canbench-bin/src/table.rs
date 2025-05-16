@@ -82,11 +82,11 @@ pub(crate) fn print_table<W: Write>(
                 entry.status.clone(),
                 entry.benchmark.full_name(),
                 entry.instructions.fmt_human_current(),
-                entry.instructions.fmt_percent(),
+                entry.instructions.fmt_human_percent(),
                 entry.heap_increase.fmt_human_current(),
-                entry.heap_increase.fmt_percent(),
+                entry.heap_increase.fmt_human_percent(),
                 entry.stable_memory_increase.fmt_human_current(),
-                entry.stable_memory_increase.fmt_percent(),
+                entry.stable_memory_increase.fmt_human_percent(),
             ]
         })
         .collect();
@@ -106,7 +106,7 @@ pub(crate) fn print_table<W: Write>(
         let mut omitted_row = vec!["".to_string(); columns.len()];
         omitted_row[0] = "...".to_string();
         omitted_row[1] = format!(
-            "({} row{} omitted)",
+            "... {} row{} omitted ...",
             omitted_count,
             if omitted_count == 1 { "" } else { "s" }
         );
