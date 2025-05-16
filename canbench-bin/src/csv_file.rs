@@ -78,6 +78,13 @@ mod tests {
                 Entry {
                     status: "".to_string(),
                     benchmark: Benchmark::new("bench_2", None),
+                    instructions: Values::new(Some(10_000_000), Some(10_000_000)),
+                    heap_increase: Values::new(Some(0), None),
+                    stable_memory_increase: Values::new(Some(0), None),
+                },
+                Entry {
+                    status: "".to_string(),
+                    benchmark: Benchmark::new("bench_3", None),
                     instructions: Values::new(Some(9_000_000), Some(10_000_000)),
                     heap_increase: Values::new(Some(0), None),
                     stable_memory_increase: Values::new(Some(0), None),
@@ -86,7 +93,8 @@ mod tests {
             "\
 status,name,instructions,instructions Δ,instructions Δ%,heap_increase,heap_increase Δ,heap_increase Δ%,stable_memory_increase,stable_memory_increase Δ,stable_memory_increase Δ%
 ,bench_1,11000000,1000000,10.00%,0,,,0,,
-,bench_2,9000000,-1000000,-10.00%,0,,,0,,
+,bench_2,10000000,0,0.00%,0,,,0,,
+,bench_3,9000000,-1000000,-10.00%,0,,,0,,
 ",
         );
     }
