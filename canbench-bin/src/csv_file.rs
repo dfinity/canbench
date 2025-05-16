@@ -109,7 +109,7 @@ status,name,instructions,instructions Δ,instructions Δ%,heap_increase,heap_inc
 ,bench_regression,11000000,1000000,10.00%,0,,,0,,
 ,bench_no_change,10000000,0,0.00%,0,,,0,,
 ,bench_improvement,9000000,-1000000,-10.00%,0,,,0,,
-,bench_positive_inf,10000000,10000000,1.0E100%,0,,,0,,
+,bench_positive_inf,10000000,10000000,1.0E99,0,,,0,,
 ,bench_from_10M_to_0,0,-10000000,-100.00%,0,,,0,,
 ",
         );

@@ -1,5 +1,5 @@
-const POSITIVE_INFINITY_PERCENT: &str = "1.0E100%";
-const NEGATIVE_INFINITY_PERCENT: &str = "-1.0E100%";
+const POSITIVE_INFINITY_PERCENT: &str = "1.0E99";
+const NEGATIVE_INFINITY_PERCENT: &str = "-1.0E99";
 
 /// Format numbers with unit suffixes (e.g., K, M, B, T) for better readability.
 fn format_with_unit(val: f64) -> (f64, &'static str) {
