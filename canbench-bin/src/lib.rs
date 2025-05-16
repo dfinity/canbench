@@ -155,14 +155,18 @@ pub fn run_benchmarks(
 
     // Save benchmark results in CSV format if requested.
     if csv {
-        let mut file = std::fs::File::create(csv_results_file).expect(&format!(
-            "Failed to create results file: {}",
-            csv_results_file.display()
-        ));
-        csv_file::write(&mut file, &data).expect(&format!(
-            "Failed to write CSV results to: {}",
-            csv_results_file.display()
-        ));
+        let mut file = std::fs::File::create(csv_results_file).unwrap_or_else(|_| {
+            panic!(
+                "Failed to create results file: {}",
+                csv_results_file.display()
+            )
+        });
+        csv_file::write(&mut file, &data).unwrap_or_else(|_| {
+            panic!(
+                "Failed to write CSV results to: {}",
+                csv_results_file.display()
+            )
+        });
         println!("CSV results saved to {}", csv_results_file.display());
     }
 
