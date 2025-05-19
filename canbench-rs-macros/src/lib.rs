@@ -139,10 +139,10 @@ pub fn bench_id_enum(input: TokenStream) -> TokenStream {
         }
     };
 
-    let mut id_counter = 0u16;
     let mut name_match_arms = Vec::new();
 
-    for variant in &data_enum.variants {
+    for (id_counter, variant) in data_enum.variants.iter().enumerate() {
+        let id_counter = id_counter as u16;
         if !matches!(variant.fields, Fields::Unit) {
             return syn::Error::new_spanned(
                 &variant.ident,
@@ -152,33 +152,22 @@ pub fn bench_id_enum(input: TokenStream) -> TokenStream {
             .into();
         }
 
+        // Forbid explicit discriminants
+        if let Some((_, expr)) = &variant.discriminant {
+            return syn::Error::new_spanned(
+                expr,
+                "`BenchIdEnum` does not allow explicit discriminant values. Remove the `= value`.",
+            )
+            .to_compile_error()
+            .into();
+        }
+
         let variant_ident = &variant.ident;
         let snake_case_name = variant_ident.to_string().to_snake_case();
 
-        let discriminant = if let Some((_, expr)) = &variant.discriminant {
-            if let syn::Expr::Lit(syn::ExprLit {
-                lit: syn::Lit::Int(lit_int),
-                ..
-            }) = expr
-            {
-                lit_int.base10_parse::<u16>().unwrap_or(id_counter)
-            } else {
-                return syn::Error::new_spanned(
-                    expr,
-                    "Only integer literals are supported as discriminant values for `BenchIdEnum` variants.",
-                )
-                .to_compile_error()
-                .into();
-            }
-        } else {
-            id_counter
-        };
-
         name_match_arms.push(quote! {
-            #discriminant => Some(#snake_case_name),
+            #id_counter => Some(#snake_case_name),
         });
-
-        id_counter = discriminant + 1;
     }
 
     let expanded = quote! {
