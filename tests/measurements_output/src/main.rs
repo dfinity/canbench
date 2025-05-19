@@ -1,4 +1,5 @@
 use canbench_rs::{bench, bench_fn, bench_scope_id, set_bench_id_resolver, BenchId, BenchResult};
+use canbench_rs_macros::BenchIdEnum;
 
 #[link(wasm_import_module = "ic0")]
 extern "C" {
@@ -71,21 +72,10 @@ fn write_stable_memory() {
     }
 }
 
-#[repr(u16)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, BenchIdEnum)]
 enum Scopes {
-    Scope1 = 0,
-    Scope2 = 1,
-}
-
-impl BenchId for Scopes {
-    fn name_from_id(id: u16) -> Option<&'static str> {
-        match id {
-            0 => Some("scope_1"),
-            1 => Some("scope_2"),
-            _ => None,
-        }
-    }
+    SomeScope1 = 0,
+    SomeScope2 = 1,
 }
 
 // A benchmark that includes some profiling, but isn't persisted in the results.
@@ -94,12 +84,12 @@ fn bench_scope_new() {
     set_bench_id_resolver::<Scopes>();
 
     {
-        let _p = bench_scope_id(Scopes::Scope1 as u16);
+        let _p = bench_scope_id(Scopes::SomeScope1 as u16);
         println!("do something");
     }
 
     {
-        let _p = bench_scope_id(Scopes::Scope2 as u16);
+        let _p = bench_scope_id(Scopes::SomeScope2 as u16);
         println!("do something else");
     }
 }
@@ -110,12 +100,12 @@ fn bench_scope_exists() {
     set_bench_id_resolver::<Scopes>();
 
     {
-        let _p = bench_scope_id(Scopes::Scope1 as u16);
+        let _p = bench_scope_id(Scopes::SomeScope1 as u16);
         println!("do something");
     }
 
     {
-        let _p = bench_scope_id(Scopes::Scope2 as u16);
+        let _p = bench_scope_id(Scopes::SomeScope2 as u16);
         println!("do something else");
     }
 }
@@ -127,7 +117,7 @@ fn bench_repeated_scope_new() {
 
     {
         for _ in 0..10 {
-            let _p = bench_scope_id(Scopes::Scope1 as u16);
+            let _p = bench_scope_id(Scopes::SomeScope1 as u16);
             println!("do something");
         }
     }
@@ -140,7 +130,7 @@ fn bench_repeated_scope_exists() {
 
     {
         for _ in 0..10 {
-            let _p = bench_scope_id(Scopes::Scope1 as u16);
+            let _p = bench_scope_id(Scopes::SomeScope1 as u16);
             println!("do something");
         }
     }

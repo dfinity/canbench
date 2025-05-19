@@ -1,6 +1,9 @@
+use heck::ToSnakeCase;
 use proc_macro::TokenStream;
 use quote::{quote, ToTokens};
-use syn::{parse_macro_input, AttributeArgs, ItemFn, NestedMeta, ReturnType};
+use syn::{
+    parse_macro_input, AttributeArgs, Data, DeriveInput, Fields, ItemFn, NestedMeta, ReturnType,
+};
 
 /// A macro for declaring a benchmark where only some part of the function is
 /// benchmarked.
@@ -112,6 +115,75 @@ pub fn bench(arg_tokens: TokenStream, item: TokenStream) -> TokenStream {
             )
             .to_compile_error()
             .into();
+        }
+    };
+
+    TokenStream::from(expanded)
+}
+
+#[proc_macro_derive(BenchIdEnum)]
+pub fn bench_id_enum(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+    let enum_name = &input.ident;
+
+    // Ensure it's an enum
+    let data_enum = match &input.data {
+        Data::Enum(data_enum) => data_enum,
+        _ => {
+            return syn::Error::new_spanned(
+                &input.ident,
+                "`BenchIdEnum` can only be derived for enums.",
+            )
+            .to_compile_error()
+            .into();
+        }
+    };
+
+    let mut id_counter = 0u16;
+    let mut name_match_arms = Vec::new();
+
+    for variant in &data_enum.variants {
+        if !matches!(variant.fields, Fields::Unit) {
+            return syn::Error::new_spanned(
+                &variant.ident,
+                "`BenchIdEnum` variants must not have fields.",
+            )
+            .to_compile_error()
+            .into();
+        }
+
+        let variant_ident = &variant.ident;
+        let snake_case_name = variant_ident.to_string().to_snake_case();
+
+        let discriminant = if let Some((_, expr)) = &variant.discriminant {
+            if let syn::Expr::Lit(syn::ExprLit {
+                lit: syn::Lit::Int(lit_int),
+                ..
+            }) = expr
+            {
+                lit_int.base10_parse::<u16>().unwrap_or(id_counter)
+            } else {
+                id_counter
+            }
+        } else {
+            id_counter
+        };
+
+        name_match_arms.push(quote! {
+            #discriminant => Some(#snake_case_name),
+        });
+
+        id_counter = discriminant + 1;
+    }
+
+    let expanded = quote! {
+        impl BenchId for #enum_name {
+            fn name_from_id(id: u16) -> Option<&'static str> {
+                match id {
+                    #(#name_match_arms)*
+                    _ => None,
+                }
+            }
         }
     };
 

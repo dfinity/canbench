@@ -279,6 +279,7 @@ dependencies = [
 name = "canbench-rs-macros"
 version = "0.1.14"
 dependencies = [
+ "heck 0.5.0",
  "proc-macro2",
  "quote",
  "syn 1.0.109",
@@ -2264,6 +2265,7 @@ name = "tests"
 version = "0.1.0"
 dependencies = [
  "canbench-rs",
+ "canbench-rs-macros",
  "candid",
  "ic-cdk",
  "ic-cdk-macros",
