@@ -19,6 +19,7 @@ canbench-rs-macros = { path = "../canbench-rs-macros", version = "0.1.14" }
 candid.workspace = true
 ic-cdk.workspace = true
 serde.workspace = true
+heck = "0.5.0"
 
 [dev-dependencies]
 ic-cdk-macros.workspace = true

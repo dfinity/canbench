@@ -466,6 +466,7 @@
 //!
 pub use canbench_rs_macros::bench;
 use candid::CandidType;
+use heck::ToSnakeCase;
 use serde::{Deserialize, Serialize};
 use std::{cell::RefCell, collections::BTreeMap, ops::Add};
 
@@ -602,7 +603,7 @@ pub fn bench_scope_id(id: u16) -> BenchScope {
     BenchScope::from_id(id)
 }
 
-pub trait ScopeId {
+pub trait ScopeIdName {
     fn name_from_id(id: u16) -> Option<&'static str>;
 }
 
@@ -622,7 +623,7 @@ impl BenchId {
     }
 }
 
-pub fn set_bench_id_resolver<T: ScopeId + 'static>() {
+pub fn set_bench_id_resolver<T: ScopeIdName + 'static>() {
     GLOBAL_RESOLVER.with(|resolver| {
         *resolver.borrow_mut() = T::name_from_id as *const () as *mut ();
     });
@@ -643,16 +644,17 @@ fn resolve_name(id: u16) -> Option<&'static str> {
 
 impl std::fmt::Display for BenchId {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::Name(name) => write!(f, "{}", name),
+        let str = match self {
+            Self::Name(name) => name,
             Self::Id(id) => {
                 if let Some(name) = resolve_name(*id) {
-                    write!(f, "{}", name)
+                    name
                 } else {
-                    write!(f, "{}", id)
+                    &format!("scope_{id}")
                 }
             }
-        }
+        };
+        write!(f, "{}", str.to_snake_case())
     }
 }
 

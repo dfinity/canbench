@@ -270,6 +270,7 @@ version = "0.1.14"
 dependencies = [
  "canbench-rs-macros",
  "candid",
+ "heck 0.5.0",
  "ic-cdk",
  "ic-cdk-macros",
  "serde",
