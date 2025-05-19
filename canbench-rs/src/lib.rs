@@ -592,6 +592,7 @@ pub fn bench_fn<R>(f: impl FnOnce() -> R) -> BenchResult {
 ///   // Do something.
 /// }
 /// ```
+#[must_use]
 pub fn bench_scope(name: &'static str) -> BenchScope {
     BenchScope::new(name)
 }
