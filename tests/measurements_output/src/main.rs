@@ -1,4 +1,4 @@
-use canbench_rs::{bench, bench_fn, bench_scope, BenchResult};
+use canbench_rs::{bench, bench_fn, bench_scope_id, set_bench_id_resolver, BenchResult, ScopeId};
 
 #[link(wasm_import_module = "ic0")]
 extern "C" {
@@ -71,16 +71,35 @@ fn write_stable_memory() {
     }
 }
 
+#[repr(u16)]
+#[derive(Copy, Clone)]
+enum Scopes {
+    Scope1 = 0,
+    Scope2 = 1,
+}
+
+impl ScopeId for Scopes {
+    fn name_from_id(id: u16) -> Option<&'static str> {
+        match id {
+            0 => Some("scope_1"),
+            1 => Some("scope_2"),
+            _ => None,
+        }
+    }
+}
+
 // A benchmark that includes some profiling, but isn't persisted in the results.
 #[bench]
 fn bench_scope_new() {
+    set_bench_id_resolver::<Scopes>();
+
     {
-        let _p = bench_scope("scope_1");
+        let _p = bench_scope_id(Scopes::Scope1 as u16);
         println!("do something");
     }
 
     {
-        let _p = bench_scope("scope_2");
+        let _p = bench_scope_id(Scopes::Scope2 as u16);
         println!("do something else");
     }
 }
@@ -88,13 +107,15 @@ fn bench_scope_new() {
 // A benchmark that includes some profiling and is persisted in the results.
 #[bench]
 fn bench_scope_exists() {
+    set_bench_id_resolver::<Scopes>();
+
     {
-        let _p = bench_scope("scope_1");
+        let _p = bench_scope_id(Scopes::Scope1 as u16);
         println!("do something");
     }
 
     {
-        let _p = bench_scope("scope_2");
+        let _p = bench_scope_id(Scopes::Scope2 as u16);
         println!("do something else");
     }
 }
@@ -102,9 +123,11 @@ fn bench_scope_exists() {
 // A benchmark that includes a repeated scope, but isn't persisted in the results.
 #[bench]
 fn bench_repeated_scope_new() {
+    set_bench_id_resolver::<Scopes>();
+
     {
         for _ in 0..10 {
-            let _p = bench_scope("scope_1");
+            let _p = bench_scope_id(Scopes::Scope1 as u16);
             println!("do something");
         }
     }
@@ -113,9 +136,11 @@ fn bench_repeated_scope_new() {
 // A benchmark that includes a repeated scope and is persisted in the results.
 #[bench]
 fn bench_repeated_scope_exists() {
+    set_bench_id_resolver::<Scopes>();
+
     {
         for _ in 0..10 {
-            let _p = bench_scope("scope_1");
+            let _p = bench_scope_id(Scopes::Scope1 as u16);
             println!("do something");
         }
     }

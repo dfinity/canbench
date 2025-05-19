@@ -2,7 +2,7 @@
 
 Benchmark: bench_repeated_scope_new (new)
   total:
-    instructions: 16.48 K (new)
+    instructions: 14.95 K (new)
     heap_increase: 0 pages (new)
     stable_memory_increase: 0 pages (new)
 
@@ -37,7 +37,7 @@ Summary:
 Only significant changes:
 | status | name                              |    ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
 |--------|-----------------------------------|--------|---------|----|--------|-----|---------|
-|  new   | bench_repeated_scope_new          | 16.48K |         |  0 |        |   0 |         |
+|  new   | bench_repeated_scope_new          | 14.95K |         |  0 |        |   0 |         |
 |  new   | bench_repeated_scope_new::scope_1 |  8.12K |         |  0 |        |   0 |         |
 
 ---------------------------------------------------

@@ -470,8 +470,9 @@ use serde::{Deserialize, Serialize};
 use std::{cell::RefCell, collections::BTreeMap, ops::Add};
 
 thread_local! {
-    static SCOPES: RefCell<BTreeMap<&'static str, Vec<Measurement>>> =
+    static SCOPES: RefCell<BTreeMap<BenchId, Vec<Measurement>>> =
         const { RefCell::new(BTreeMap::new()) };
+    static GLOBAL_RESOLVER: RefCell<*mut ()> = const { RefCell::new(std::ptr::null_mut()) };
 }
 
 /// The results of a benchmark.
@@ -596,9 +597,68 @@ pub fn bench_scope(name: &'static str) -> BenchScope {
     BenchScope::new(name)
 }
 
+#[must_use]
+pub fn bench_scope_id(id: u16) -> BenchScope {
+    BenchScope::from_id(id)
+}
+
+pub trait ScopeId {
+    fn name_from_id(id: u16) -> Option<&'static str>;
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub enum BenchId {
+    Name(&'static str),
+    Id(u16),
+}
+
+impl BenchId {
+    fn new(name: &'static str) -> Self {
+        Self::Name(name)
+    }
+
+    fn from_id(id: u16) -> Self {
+        Self::Id(id)
+    }
+}
+
+pub fn set_bench_id_resolver<T: ScopeId + 'static>() {
+    GLOBAL_RESOLVER.with(|resolver| {
+        *resolver.borrow_mut() = T::name_from_id as *const () as *mut ();
+    });
+}
+
+fn resolve_name(id: u16) -> Option<&'static str> {
+    GLOBAL_RESOLVER.with(|resolver| {
+        let func_ptr = *resolver.borrow();
+        if func_ptr.is_null() {
+            None
+        } else {
+            let resolver_fn: fn(u16) -> Option<&'static str> =
+                unsafe { std::mem::transmute(func_ptr) };
+            resolver_fn(id)
+        }
+    })
+}
+
+impl std::fmt::Display for BenchId {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Name(name) => write!(f, "{}", name),
+            Self::Id(id) => {
+                if let Some(name) = resolve_name(*id) {
+                    write!(f, "{}", name)
+                } else {
+                    write!(f, "{}", id)
+                }
+            }
+        }
+    }
+}
+
 /// An object used for benchmarking a specific scope.
 pub struct BenchScope {
-    name: &'static str,
+    id: BenchId,
     start_instructions: u64,
     start_stable_memory: u64,
     start_heap: u64,
@@ -606,12 +666,20 @@ pub struct BenchScope {
 
 impl BenchScope {
     fn new(name: &'static str) -> Self {
+        Self::new_inner(BenchId::new(name))
+    }
+
+    fn from_id(id: u16) -> Self {
+        Self::new_inner(BenchId::from_id(id))
+    }
+
+    fn new_inner(id: BenchId) -> Self {
         let start_heap = heap_size();
         let start_stable_memory = ic_cdk::api::stable::stable_size();
         let start_instructions = instruction_count();
 
         Self {
-            name,
+            id,
             start_instructions,
             start_stable_memory,
             start_heap,
@@ -627,7 +695,8 @@ impl Drop for BenchScope {
 
         SCOPES.with(|p| {
             let mut p = p.borrow_mut();
-            p.entry(self.name).or_default().push(Measurement {
+            let id = std::mem::replace(&mut self.id, BenchId::Id(0));
+            p.entry(id).or_default().push(Measurement {
                 instructions,
                 heap_increase,
                 stable_memory_increase,
@@ -643,16 +712,16 @@ fn reset() {
 
 // Returns the measurements for any declared scopes,
 // aggregated by the scope name.
-fn get_scopes_measurements() -> std::collections::BTreeMap<&'static str, Measurement> {
+fn get_scopes_measurements() -> std::collections::BTreeMap<String, Measurement> {
     SCOPES
         .with(|p| p.borrow().clone())
         .into_iter()
-        .map(|(scope, measurements)| {
+        .map(|(id, measurements)| {
             let mut total = Measurement::default();
             for measurement in measurements {
                 total = total + measurement;
             }
-            (scope, total)
+            (id.to_string(), total)
         })
         .collect()
 }
