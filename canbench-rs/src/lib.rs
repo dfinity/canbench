@@ -470,7 +470,7 @@ use serde::{Deserialize, Serialize};
 use std::{cell::RefCell, collections::BTreeMap, ops::Add};
 
 thread_local! {
-    static SCOPES: RefCell<BTreeMap<BenchId, Vec<Measurement>>> =
+    static SCOPES: RefCell<BTreeMap<BenchName, Vec<Measurement>>> =
         const { RefCell::new(BTreeMap::new()) };
 }
 
@@ -597,12 +597,12 @@ pub fn bench_scope(name: &'static str) -> BenchScope {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub enum BenchId {
+pub enum BenchName {
     Name(&'static str),
     Id(u16),
 }
 
-impl BenchId {
+impl BenchName {
     fn new(name: &'static str) -> Self {
         Self::Name(name)
     }
@@ -612,7 +612,7 @@ impl BenchId {
     }
 }
 
-impl std::fmt::Display for BenchId {
+impl std::fmt::Display for BenchName {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Name(name) => write!(f, "{}", name),
@@ -623,7 +623,7 @@ impl std::fmt::Display for BenchId {
 
 /// An object used for benchmarking a specific scope.
 pub struct BenchScope {
-    id: BenchId,
+    id: BenchName,
     start_instructions: u64,
     start_stable_memory: u64,
     start_heap: u64,
@@ -636,7 +636,7 @@ impl BenchScope {
         let start_instructions = instruction_count();
 
         Self {
-            id: BenchId::new(name),
+            id: BenchName::new(name),
             start_instructions,
             start_stable_memory,
             start_heap,
@@ -652,7 +652,7 @@ impl Drop for BenchScope {
 
         SCOPES.with(|p| {
             let mut p = p.borrow_mut();
-            let mut id = BenchId::from_id(0);
+            let mut id = BenchName::from_id(0);
             std::mem::swap(&mut self.id, &mut id);
             p.entry(id).or_default().push(Measurement {
                 instructions,
