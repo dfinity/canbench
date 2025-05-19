@@ -604,6 +604,7 @@ pub fn bench_scope_id(id: u16) -> BenchScope {
 }
 
 pub trait ScopeIdName {
+    fn id(&self) -> u16;
     fn name_from_id(id: u16) -> Option<&'static str>;
 }
 

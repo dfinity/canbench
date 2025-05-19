@@ -81,6 +81,10 @@ enum ScopeId {
 }
 
 impl ScopeIdName for ScopeId {
+    fn id(&self) -> u16 {
+        *self as u16
+    }
+
     fn name_from_id(id: u16) -> Option<&'static str> {
         match id {
             0 => Some("Something"),
@@ -96,12 +100,12 @@ fn bench_scope_new() {
     set_bench_id_resolver::<ScopeId>();
 
     {
-        let _p = bench_scope_id(ScopeId::Something as u16);
+        let _p = bench_scope_id(ScopeId::Something.id());
         println!("do something");
     }
 
     {
-        let _p = bench_scope_id(ScopeId::SomethingElse as u16);
+        let _p = bench_scope_id(ScopeId::SomethingElse.id());
         println!("do something else");
     }
 }
@@ -112,12 +116,12 @@ fn bench_scope_exists() {
     set_bench_id_resolver::<ScopeId>();
 
     {
-        let _p = bench_scope_id(ScopeId::Something as u16);
+        let _p = bench_scope_id(ScopeId::Something.id());
         println!("do something");
     }
 
     {
-        let _p = bench_scope_id(ScopeId::SomethingElse as u16);
+        let _p = bench_scope_id(ScopeId::SomethingElse.id());
         println!("do something else");
     }
 }
@@ -129,7 +133,7 @@ fn bench_repeated_scope_new() {
 
     {
         for _ in 0..10 {
-            let _p = bench_scope_id(ScopeId::Something as u16);
+            let _p = bench_scope_id(ScopeId::Something.id());
             println!("do something");
         }
     }
@@ -142,7 +146,7 @@ fn bench_repeated_scope_exists() {
 
     {
         for _ in 0..10 {
-            let _p = bench_scope_id(ScopeId::Something as u16);
+            let _p = bench_scope_id(ScopeId::Something.id());
             println!("do something");
         }
     }
