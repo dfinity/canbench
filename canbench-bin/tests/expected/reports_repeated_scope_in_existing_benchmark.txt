@@ -2,12 +2,12 @@
 
 Benchmark: bench_repeated_scope_exists
   total:
-    instructions: 21.60 K (regressed from 0)
+    instructions: 16.93 K (regressed from 0)
     heap_increase: 0 pages (no change)
     stable_memory_increase: 0 pages (no change)
 
   scope_1 (scope):
-    instructions: 11.41 K (regressed by 1326.25%)
+    instructions: 8124 (regressed by 915.50%)
     heap_increase: 0 pages (improved by 100.00%)
     stable_memory_increase: 0 pages (no change)
 
@@ -17,7 +17,7 @@ Summary:
   instructions:
     status:   Regressions detected! 🔴
     counts:   [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0]
-    change:   [min +21.60K | med +21.60K | max +21.60K]
+    change:   [min +16.93K | med +16.93K | max +16.93K]
     change %: [min +inf% | med +inf% | max +inf%]
 
   heap_increase:
@@ -35,9 +35,9 @@ Summary:
 ---------------------------------------------------
 
 Only significant changes:
-| status | name                                 |    ins |    ins Δ% | HI |    HI Δ% | SMI |  SMI Δ% |
-|--------|--------------------------------------|--------|-----------|----|----------|-----|---------|
-|   +    | bench_repeated_scope_exists          | 21.60K |     +inf% |  0 |    0.00% |   0 |   0.00% |
-|  +/-   | bench_repeated_scope_exists::scope_1 | 11.41K | +1326.25% |  0 | -100.00% |   0 |   0.00% |
+| status | name                                 |    ins |   ins Δ% | HI |    HI Δ% | SMI |  SMI Δ% |
+|--------|--------------------------------------|--------|----------|----|----------|-----|---------|
+|   +    | bench_repeated_scope_exists          | 16.93K |    +inf% |  0 |    0.00% |   0 |   0.00% |
+|  +/-   | bench_repeated_scope_exists::scope_1 |  8.12K | +915.50% |  0 | -100.00% |   0 |   0.00% |
 
 ---------------------------------------------------

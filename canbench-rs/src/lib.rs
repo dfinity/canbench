@@ -598,13 +598,13 @@ pub fn bench_scope(name: &'static str) -> BenchScope {
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum BenchId {
-    Name(String),
+    Name(&'static str),
     Id(u16),
 }
 
 impl BenchId {
     fn new(name: &'static str) -> Self {
-        Self::Name(name.to_string())
+        Self::Name(name)
     }
 
     fn from_id(id: u16) -> Self {
