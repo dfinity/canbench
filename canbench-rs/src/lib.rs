@@ -699,8 +699,8 @@ impl Drop for BenchScope {
 
         SCOPES.with(|p| {
             let mut p = p.borrow_mut();
-            let mut id = BenchName::from_id(0);
-            std::mem::swap(&mut self.id, &mut id);
+            // Move out `self.id` without cloning, leave a dummy value behind.
+            let id = std::mem::replace(&mut self.id, BenchName::from_id(0));
             p.entry(id).or_default().push(Measurement {
                 instructions,
                 heap_increase,
