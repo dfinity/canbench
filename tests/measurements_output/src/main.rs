@@ -80,11 +80,13 @@ enum ScopeId {
     SomethingElse = 1,
 }
 
-impl ScopeIdName for ScopeId {
-    fn id(&self) -> u16 {
-        *self as u16
+impl ScopeId {
+    fn id(self) -> u16 {
+        self as u16
     }
+}
 
+impl ScopeIdName for ScopeId {
     fn name_from_id(id: u16) -> Option<&'static str> {
         match id {
             0 => Some("Something"),
