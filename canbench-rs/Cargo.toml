@@ -20,6 +20,7 @@ candid.workspace = true
 ic-cdk.workspace = true
 serde.workspace = true
 heck = "0.5.0"
+num_enum.workspace = true
 
 [dev-dependencies]
 ic-cdk-macros.workspace = true

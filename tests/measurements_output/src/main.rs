@@ -74,7 +74,7 @@ fn write_stable_memory() {
 }
 
 #[repr(u16)]
-#[derive(Copy, Clone, num_enum::IntoPrimitive)]
+#[derive(num_enum::IntoPrimitive)]
 enum ScopeId {
     Something = 0,
     SomethingElse = 1,

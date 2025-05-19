@@ -598,12 +598,61 @@ pub fn bench_scope(name: &'static str) -> BenchScope {
     BenchScope::new(name)
 }
 
+/// Benchmarks the scope this function is declared in.
+///
+/// NOTE: It's important to assign this function, otherwise benchmarking won't work correctly.
+///
+/// # Correct Usage
+///
+/// ```
+/// # #[repr(u16)]
+/// # #[derive(num_enum::IntoPrimitive)]
+/// # enum ScopeId {
+/// #     MyScope = 0,
+/// # }
+///
+/// fn my_func() {
+///   let _p = canbench_rs::bench_scope_id(ScopeId::MyScope);
+///   // Do something.
+/// }
+/// ```
+///
+/// # Incorrect Usages
+///
+/// ```
+/// # #[repr(u16)]
+/// # #[derive(num_enum::IntoPrimitive)]
+/// # enum ScopeId {
+/// #     MyScope = 0,
+/// # }
+///
+/// fn my_func() {
+///   let _ = canbench_rs::bench_scope_id(ScopeId::MyScope); // Doesn't capture the scope.
+///   // Do something.
+/// }
+/// ```
+///
+/// ```
+/// # #[repr(u16)]
+/// # #[derive(num_enum::IntoPrimitive)]
+/// # enum ScopeId {
+/// #     MyScope = 0,
+/// # }
+///
+/// fn my_func() {
+///   canbench_rs::bench_scope_id(ScopeId::MyScope); // Doesn't capture the scope.
+///   // Do something.
+/// }
+/// ```
 #[must_use]
 pub fn bench_scope_id<T: Into<u16>>(id: T) -> BenchScope {
     BenchScope::from_id(id.into())
 }
 
 pub trait ScopeIdName {
+    /// Returns the name of the scope given its ID.
+    ///
+    /// (!) The name will be converted into a snake case string when printed.
     fn name_from_id(id: u16) -> Option<&'static str>;
 }
 
@@ -623,6 +672,9 @@ impl BenchId {
     }
 }
 
+/// Sets the function used to resolve the name of a scope given its ID.
+///
+/// IMPORTANT: This function must be called before any benchmarks are run.
 pub fn set_bench_id_resolver<T: ScopeIdName + 'static>() {
     GLOBAL_RESOLVER.with(|resolver| {
         *resolver.borrow_mut() = T::name_from_id as *const () as *mut ();
