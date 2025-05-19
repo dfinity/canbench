@@ -642,8 +642,8 @@ pub fn bench_scope(name: &'static str) -> BenchScope {
 /// }
 /// ```
 #[must_use]
-pub fn bench_scope_id<T: Into<u16>>(id: T) -> BenchScope {
-    BenchScope::from_id(id.into())
+pub fn bench_scope_id(id: u16) -> BenchScope {
+    BenchScope::from_id(id)
 }
 
 pub trait ScopeIdName {
