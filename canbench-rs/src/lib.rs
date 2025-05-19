@@ -606,13 +606,12 @@ pub fn bench_scope(name: &'static str) -> BenchScope {
 ///
 /// ```
 /// # #[repr(u16)]
-/// # #[derive(num_enum::IntoPrimitive)]
 /// # enum ScopeId {
 /// #     MyScope = 0,
 /// # }
 ///
 /// fn my_func() {
-///   let _p = canbench_rs::bench_scope_id(ScopeId::MyScope);
+///   let _p = canbench_rs::bench_scope_id(ScopeId::MyScope as u16);
 ///   // Do something.
 /// }
 /// ```
@@ -621,26 +620,24 @@ pub fn bench_scope(name: &'static str) -> BenchScope {
 ///
 /// ```
 /// # #[repr(u16)]
-/// # #[derive(num_enum::IntoPrimitive)]
 /// # enum ScopeId {
 /// #     MyScope = 0,
 /// # }
 ///
 /// fn my_func() {
-///   let _ = canbench_rs::bench_scope_id(ScopeId::MyScope); // Doesn't capture the scope.
+///   let _ = canbench_rs::bench_scope_id(ScopeId::MyScope as u16); // Doesn't capture the scope.
 ///   // Do something.
 /// }
 /// ```
 ///
 /// ```
 /// # #[repr(u16)]
-/// # #[derive(num_enum::IntoPrimitive)]
 /// # enum ScopeId {
 /// #     MyScope = 0,
 /// # }
 ///
 /// fn my_func() {
-///   canbench_rs::bench_scope_id(ScopeId::MyScope); // Doesn't capture the scope.
+///   canbench_rs::bench_scope_id(ScopeId::MyScope as u16); // Doesn't capture the scope.
 ///   // Do something.
 /// }
 /// ```

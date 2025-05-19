@@ -74,7 +74,6 @@ fn write_stable_memory() {
 }
 
 #[repr(u16)]
-#[derive(num_enum::IntoPrimitive)]
 enum ScopeId {
     Something = 0,
     SomethingElse = 1,
@@ -96,12 +95,12 @@ fn bench_scope_new() {
     set_bench_id_resolver::<ScopeId>();
 
     {
-        let _p = bench_scope_id(ScopeId::Something);
+        let _p = bench_scope_id(ScopeId::Something as u16);
         println!("do something");
     }
 
     {
-        let _p = bench_scope_id(ScopeId::SomethingElse);
+        let _p = bench_scope_id(ScopeId::SomethingElse as u16);
         println!("do something else");
     }
 }
@@ -112,12 +111,12 @@ fn bench_scope_exists() {
     set_bench_id_resolver::<ScopeId>();
 
     {
-        let _p = bench_scope_id(ScopeId::Something);
+        let _p = bench_scope_id(ScopeId::Something as u16);
         println!("do something");
     }
 
     {
-        let _p = bench_scope_id(ScopeId::SomethingElse);
+        let _p = bench_scope_id(ScopeId::SomethingElse as u16);
         println!("do something else");
     }
 }
@@ -129,7 +128,7 @@ fn bench_repeated_scope_new() {
 
     {
         for _ in 0..10 {
-            let _p = bench_scope_id(ScopeId::Something);
+            let _p = bench_scope_id(ScopeId::Something as u16);
             println!("do something");
         }
     }
@@ -142,7 +141,7 @@ fn bench_repeated_scope_exists() {
 
     {
         for _ in 0..10 {
-            let _p = bench_scope_id(ScopeId::Something);
+            let _p = bench_scope_id(ScopeId::Something as u16);
             println!("do something");
         }
     }

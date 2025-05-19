@@ -34,5 +34,4 @@ canbench-rs = { path = "../canbench-rs" }
 candid.workspace = true
 ic-cdk-macros.workspace = true
 ic-cdk.workspace = true
-num_enum.workspace = true
 serde.workspace = true
