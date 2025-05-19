@@ -470,7 +470,7 @@ use serde::{Deserialize, Serialize};
 use std::{cell::RefCell, collections::BTreeMap, ops::Add};
 
 thread_local! {
-    static SCOPES: RefCell<BTreeMap<&'static str, Vec<Measurement>>> =
+    static SCOPES: RefCell<BTreeMap<BenchId, Vec<Measurement>>> =
         const { RefCell::new(BTreeMap::new()) };
 }
 
@@ -596,9 +596,34 @@ pub fn bench_scope(name: &'static str) -> BenchScope {
     BenchScope::new(name)
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub enum BenchId {
+    Name(String),
+    Id(u16),
+}
+
+impl BenchId {
+    fn new(name: &'static str) -> Self {
+        Self::Name(name.to_string())
+    }
+
+    fn from_id(id: u16) -> Self {
+        Self::Id(id)
+    }
+}
+
+impl std::fmt::Display for BenchId {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Name(name) => write!(f, "{}", name),
+            Self::Id(id) => write!(f, "{}", id),
+        }
+    }
+}
+
 /// An object used for benchmarking a specific scope.
 pub struct BenchScope {
-    name: &'static str,
+    id: BenchId,
     start_instructions: u64,
     start_stable_memory: u64,
     start_heap: u64,
@@ -611,7 +636,7 @@ impl BenchScope {
         let start_instructions = instruction_count();
 
         Self {
-            name,
+            id: BenchId::new(name),
             start_instructions,
             start_stable_memory,
             start_heap,
@@ -627,7 +652,9 @@ impl Drop for BenchScope {
 
         SCOPES.with(|p| {
             let mut p = p.borrow_mut();
-            p.entry(self.name).or_default().push(Measurement {
+            let mut id = BenchId::from_id(0);
+            std::mem::swap(&mut self.id, &mut id);
+            p.entry(id).or_default().push(Measurement {
                 instructions,
                 heap_increase,
                 stable_memory_increase,
@@ -643,7 +670,7 @@ fn reset() {
 
 // Returns the measurements for any declared scopes,
 // aggregated by the scope name.
-fn get_scopes_measurements() -> std::collections::BTreeMap<&'static str, Measurement> {
+fn get_scopes_measurements() -> std::collections::BTreeMap<String, Measurement> {
     SCOPES
         .with(|p| p.borrow().clone())
         .into_iter()
@@ -652,7 +679,7 @@ fn get_scopes_measurements() -> std::collections::BTreeMap<&'static str, Measure
             for measurement in measurements {
                 total = total + measurement;
             }
-            (scope, total)
+            (scope.to_string(), total)
         })
         .collect()
 }
