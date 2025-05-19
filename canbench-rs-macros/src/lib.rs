@@ -163,7 +163,12 @@ pub fn bench_id_enum(input: TokenStream) -> TokenStream {
             {
                 lit_int.base10_parse::<u16>().unwrap_or(id_counter)
             } else {
-                id_counter
+                return syn::Error::new_spanned(
+                    expr,
+                    "Only integer literals are supported as discriminant values for `BenchIdEnum` variants.",
+                )
+                .to_compile_error()
+                .into();
             }
         } else {
             id_counter
