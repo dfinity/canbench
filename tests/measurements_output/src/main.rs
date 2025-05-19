@@ -74,8 +74,8 @@ fn write_stable_memory() {
 
 #[derive(Copy, Clone, BenchIdEnum)]
 enum Scopes {
-    SomeScope1 = 0,
-    SomeScope2 = 1,
+    SomeScope1,
+    SomeScope2,
 }
 
 // A benchmark that includes some profiling, but isn't persisted in the results.
