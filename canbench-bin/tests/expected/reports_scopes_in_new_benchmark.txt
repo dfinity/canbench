@@ -2,7 +2,7 @@
 
 Benchmark: bench_scope_new (new)
   total:
-    instructions: 4204 (new)
+    instructions: 4096 (new)
     heap_increase: 0 pages (new)
     stable_memory_increase: 0 pages (new)
 
@@ -42,7 +42,7 @@ Summary:
 Only significant changes:
 | status | name                     |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
 |--------|--------------------------|-------|---------|----|--------|-----|---------|
-|  new   | bench_scope_new          | 4.20K |         |  0 |        |   0 |         |
+|  new   | bench_scope_new          | 4.10K |         |  0 |        |   0 |         |
 |  new   | bench_scope_new::scope_1 | 1.05K |         |  0 |        |   0 |         |
 |  new   | bench_scope_new::scope_2 |   786 |         |  0 |        |   0 |         |
 

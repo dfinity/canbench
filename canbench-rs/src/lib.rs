@@ -472,6 +472,7 @@ use std::{cell::RefCell, collections::BTreeMap, ops::Add};
 thread_local! {
     static SCOPES: RefCell<BTreeMap<BenchName, Vec<Measurement>>> =
         const { RefCell::new(BTreeMap::new()) };
+    static GLOBAL_RESOLVER: RefCell<*mut ()> = const { RefCell::new(std::ptr::null_mut()) };
 }
 
 /// The results of a benchmark.
@@ -591,9 +592,17 @@ pub fn bench_fn<R>(f: impl FnOnce() -> R) -> BenchResult {
 ///   // Do something.
 /// }
 /// ```
-#[must_use]
 pub fn bench_scope(name: &'static str) -> BenchScope {
     BenchScope::new(name)
+}
+
+#[must_use]
+pub fn bench_scope_id(id: u16) -> BenchScope {
+    BenchScope::from_id(id)
+}
+
+pub trait BenchId {
+    fn name_from_id(id: u16) -> Option<&'static str>;
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -612,11 +621,36 @@ impl BenchName {
     }
 }
 
+pub fn set_bench_id_resolver<T: BenchId + 'static>() {
+    GLOBAL_RESOLVER.with(|resolver| {
+        *resolver.borrow_mut() = T::name_from_id as *const () as *mut ();
+    });
+}
+
+fn resolve_name(id: u16) -> Option<&'static str> {
+    GLOBAL_RESOLVER.with(|resolver| {
+        let func_ptr = *resolver.borrow();
+        if func_ptr.is_null() {
+            None
+        } else {
+            let resolver_fn: fn(u16) -> Option<&'static str> =
+                unsafe { std::mem::transmute(func_ptr) };
+            resolver_fn(id)
+        }
+    })
+}
+
 impl std::fmt::Display for BenchName {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Name(name) => write!(f, "{}", name),
-            Self::Id(id) => write!(f, "{}", id),
+            Self::Id(id) => {
+                if let Some(name) = resolve_name(*id) {
+                    write!(f, "{}", name)
+                } else {
+                    write!(f, "{}", id)
+                }
+            }
         }
     }
 }
@@ -637,6 +671,19 @@ impl BenchScope {
 
         Self {
             id: BenchName::new(name),
+            start_instructions,
+            start_stable_memory,
+            start_heap,
+        }
+    }
+
+    fn from_id(id: u16) -> Self {
+        let start_heap = heap_size();
+        let start_stable_memory = ic_cdk::api::stable::stable_size();
+        let start_instructions = instruction_count();
+
+        Self {
+            id: BenchName::from_id(id),
             start_instructions,
             start_stable_memory,
             start_heap,
