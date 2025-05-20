@@ -641,8 +641,8 @@ pub fn bench_scope(name: &'static str) -> BenchScope {
 /// }
 /// ```
 #[must_use]
-pub fn bench_scope_id(id: u16) -> BenchScope {
-    BenchScope::from_id(id)
+pub fn bench_scope_id(code: u16) -> BenchScope {
+    BenchScope::from_code(code)
 }
 
 pub trait ScopeIdName {
@@ -651,18 +651,18 @@ pub trait ScopeIdName {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub enum ScopeId {
+enum ScopeId {
     Name(&'static str),
-    Id(u16),
+    Code(u16),
 }
 
 impl ScopeId {
-    fn new(name: &'static str) -> Self {
-        Self::Name(name)
+    fn from_text(text: &'static str) -> Self {
+        Self::Name(text)
     }
 
-    fn from_id(id: u16) -> Self {
-        Self::Id(id)
+    fn from_code(code: u16) -> Self {
+        Self::Code(code)
     }
 }
 
@@ -687,11 +687,11 @@ impl std::fmt::Display for ScopeId {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Name(name) => write!(f, "{name}"),
-            Self::Id(id) => {
-                if let Some(name) = resolve_name(*id) {
+            Self::Code(code) => {
+                if let Some(name) = resolve_name(*code) {
                     write!(f, "{name}")
                 } else {
-                    write!(f, "scope_{id}")
+                    write!(f, "scope_{code}")
                 }
             }
         }
@@ -708,11 +708,11 @@ pub struct BenchScope {
 
 impl BenchScope {
     fn new(name: &'static str) -> Self {
-        Self::new_inner(ScopeId::new(name))
+        Self::new_inner(ScopeId::from_text(name))
     }
 
-    fn from_id(id: u16) -> Self {
-        Self::new_inner(ScopeId::from_id(id))
+    fn from_code(id: u16) -> Self {
+        Self::new_inner(ScopeId::from_code(id))
     }
 
     fn new_inner(id: ScopeId) -> Self {
@@ -737,7 +737,7 @@ impl Drop for BenchScope {
 
         SCOPES.with(|p| {
             let mut p = p.borrow_mut();
-            let id = std::mem::replace(&mut self.id, ScopeId::Id(0));
+            let id = std::mem::replace(&mut self.id, ScopeId::Code(0));
             p.entry(id).or_default().push(Measurement {
                 instructions,
                 heap_increase,
