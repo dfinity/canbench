@@ -12,6 +12,8 @@ pub(crate) fn write<W: Write>(writer: &mut W, data: &[Entry]) -> std::io::Result
         "status",
         "name",
         "scope_calls",
+        "scope_calls Δ",
+        "scope_calls Δ%",
         "instructions",
         "instructions Δ",
         "instructions Δ%",
@@ -28,15 +30,18 @@ pub(crate) fn write<W: Write>(writer: &mut W, data: &[Entry]) -> std::io::Result
     for entry in data {
         let name = entry.benchmark.full_name();
         let scope_calls = if entry.has_scope() {
-            entry.calls.fmt_current()
+            let c = &entry.calls;
+            (c.fmt_current(), c.fmt_abs_delta(), c.fmt_percent())
         } else {
-            "".to_string()
+            ("".to_string(), "".to_string(), "".to_string())
         };
         let row = [
             entry.status.clone(),
             name.clone(),
             // CSV report uses full numbers
-            scope_calls,
+            scope_calls.0,
+            scope_calls.1,
+            scope_calls.2,
             entry.instructions.fmt_current(),
             entry.instructions.fmt_abs_delta(),
             entry.instructions.fmt_percent(),
@@ -125,13 +130,13 @@ mod tests {
                 },
             ],
             "\
-status,name,scope_calls,instructions,instructions Δ,instructions Δ%,heap_increase,heap_increase Δ,heap_increase Δ%,stable_memory_increase,stable_memory_increase Δ,stable_memory_increase Δ%
-,bench_regression,,11000000,1000000,10.00%,0,,,0,,
-,bench_no_change,,10000000,0,0.00%,0,,,0,,
-,bench_improvement,,9000000,-1000000,-10.00%,0,,,0,,
-,bench_positive_inf,,10000000,10000000,1.0E99,0,,,0,,
-,bench_from_10M_to_0,,0,-10000000,-100.00%,0,,,0,,
-,bench_with_scope::my_scope,100,10000000,1000000,11.11%,0,,,0,,
+status,name,scope_calls,scope_calls Δ,scope_calls Δ%,instructions,instructions Δ,instructions Δ%,heap_increase,heap_increase Δ,heap_increase Δ%,stable_memory_increase,stable_memory_increase Δ,stable_memory_increase Δ%
+,bench_regression,,,,11000000,1000000,10.00%,0,,,0,,
+,bench_no_change,,,,10000000,0,0.00%,0,,,0,,
+,bench_improvement,,,,9000000,-1000000,-10.00%,0,,,0,,
+,bench_positive_inf,,,,10000000,10000000,1.0E99,0,,,0,,
+,bench_from_10M_to_0,,,,0,-10000000,-100.00%,0,,,0,,
+,bench_with_scope::my_scope,100,50,100.00%,10000000,1000000,11.11%,0,,,0,,
 ",
         );
     }
