@@ -112,7 +112,7 @@ mod tests {
                 },
                 Entry {
                     status: "".to_string(),
-                    benchmark: Benchmark::new("bench_with_scope", Some("scope_1")),
+                    benchmark: Benchmark::new("bench_with_scope", Some("my_scope")),
                     scope_calls: Values::new(Some(100), Some(50)),
                     instructions: Values::new(Some(10_000_000), Some(9_000_000)),
                     heap_increase: Values::new(Some(0), None),
@@ -126,7 +126,7 @@ status,name,scope_calls,instructions,instructions Δ,instructions Δ%,heap_incre
 ,bench_improvement,,9000000,-1000000,-10.00%,0,,,0,,
 ,bench_positive_inf,,10000000,10000000,1.0E99,0,,,0,,
 ,bench_from_10M_to_0,,0,-10000000,-100.00%,0,,,0,,
-,bench_with_scope::scope_1,100,10000000,1000000,11.11%,0,,,0,,
+,bench_with_scope::my_scope,100,10000000,1000000,11.11%,0,,,0,,
 ",
         );
     }
