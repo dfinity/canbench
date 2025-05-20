@@ -20,12 +20,13 @@ pub(crate) fn print_benchmark(
     print_measurement(&new.total, old.map(|m| &m.total), noise_threshold);
 
     // Print scopes
-    for (scope, measurement) in &new.scopes {
+    for (scope, (measurement, _)) in &new.scopes {
         println!();
         println!("  {} (scope):", scope);
         print_measurement(
             measurement,
-            old.map(|m| &m.scopes).and_then(|m| m.get(scope)),
+            old.map(|b| &b.scopes)
+                .and_then(|m| m.get(scope).map(|(m, _)| m)),
             noise_threshold,
         );
     }

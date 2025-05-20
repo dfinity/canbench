@@ -482,7 +482,7 @@ pub struct BenchResult {
 
     /// Measurements for scopes.
     #[serde(default)]
-    pub scopes: BTreeMap<String, Measurement>,
+    pub scopes: BTreeMap<String, (Measurement, usize)>,
 }
 
 /// A benchmark measurement containing various stats.
@@ -643,16 +643,17 @@ fn reset() {
 
 // Returns the measurements for any declared scopes,
 // aggregated by the scope name.
-fn get_scopes_measurements() -> std::collections::BTreeMap<&'static str, Measurement> {
+fn get_scopes_measurements() -> std::collections::BTreeMap<&'static str, (Measurement, usize)> {
     SCOPES
         .with(|p| p.borrow().clone())
         .into_iter()
         .map(|(scope, measurements)| {
             let mut total = Measurement::default();
+            let calls = measurements.len();
             for measurement in measurements {
                 total = total + measurement;
             }
-            (scope, total)
+            (scope, (total, calls))
         })
         .collect()
 }

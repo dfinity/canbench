@@ -11,6 +11,7 @@ pub(crate) fn write<W: Write>(writer: &mut W, data: &[Entry]) -> std::io::Result
     const HEADERS: &[&str] = &[
         "status",
         "name",
+        "scope_calls",
         "instructions",
         "instructions Δ",
         "instructions Δ%",
@@ -30,6 +31,7 @@ pub(crate) fn write<W: Write>(writer: &mut W, data: &[Entry]) -> std::io::Result
             entry.status.clone(),
             name.clone(),
             // CSV report uses full numbers
+            entry.scope_calls.fmt_current(),
             entry.instructions.fmt_current(),
             entry.instructions.fmt_abs_delta(),
             entry.instructions.fmt_percent(),
@@ -71,6 +73,7 @@ mod tests {
                 Entry {
                     status: "".to_string(),
                     benchmark: Benchmark::new("bench_regression", None),
+                    scope_calls: Values::new(None, None),
                     instructions: Values::new(Some(11_000_000), Some(10_000_000)),
                     heap_increase: Values::new(Some(0), None),
                     stable_memory_increase: Values::new(Some(0), None),
@@ -78,6 +81,7 @@ mod tests {
                 Entry {
                     status: "".to_string(),
                     benchmark: Benchmark::new("bench_no_change", None),
+                    scope_calls: Values::new(None, None),
                     instructions: Values::new(Some(10_000_000), Some(10_000_000)),
                     heap_increase: Values::new(Some(0), None),
                     stable_memory_increase: Values::new(Some(0), None),
@@ -85,6 +89,7 @@ mod tests {
                 Entry {
                     status: "".to_string(),
                     benchmark: Benchmark::new("bench_improvement", None),
+                    scope_calls: Values::new(None, None),
                     instructions: Values::new(Some(9_000_000), Some(10_000_000)),
                     heap_increase: Values::new(Some(0), None),
                     stable_memory_increase: Values::new(Some(0), None),
@@ -92,6 +97,7 @@ mod tests {
                 Entry {
                     status: "".to_string(),
                     benchmark: Benchmark::new("bench_positive_inf", None),
+                    scope_calls: Values::new(None, None),
                     instructions: Values::new(Some(10_000_000), Some(0)),
                     heap_increase: Values::new(Some(0), None),
                     stable_memory_increase: Values::new(Some(0), None),
@@ -99,18 +105,28 @@ mod tests {
                 Entry {
                     status: "".to_string(),
                     benchmark: Benchmark::new("bench_from_10M_to_0", None),
+                    scope_calls: Values::new(None, None),
                     instructions: Values::new(Some(0), Some(10_000_000)),
+                    heap_increase: Values::new(Some(0), None),
+                    stable_memory_increase: Values::new(Some(0), None),
+                },
+                Entry {
+                    status: "".to_string(),
+                    benchmark: Benchmark::new("bench_with_scope", Some("scope_1")),
+                    scope_calls: Values::new(Some(100), Some(50)),
+                    instructions: Values::new(Some(10_000_000), Some(9_000_000)),
                     heap_increase: Values::new(Some(0), None),
                     stable_memory_increase: Values::new(Some(0), None),
                 },
             ],
             "\
-status,name,instructions,instructions Δ,instructions Δ%,heap_increase,heap_increase Δ,heap_increase Δ%,stable_memory_increase,stable_memory_increase Δ,stable_memory_increase Δ%
-,bench_regression,11000000,1000000,10.00%,0,,,0,,
-,bench_no_change,10000000,0,0.00%,0,,,0,,
-,bench_improvement,9000000,-1000000,-10.00%,0,,,0,,
-,bench_positive_inf,10000000,10000000,1.0E99,0,,,0,,
-,bench_from_10M_to_0,0,-10000000,-100.00%,0,,,0,,
+status,name,scope_calls,instructions,instructions Δ,instructions Δ%,heap_increase,heap_increase Δ,heap_increase Δ%,stable_memory_increase,stable_memory_increase Δ,stable_memory_increase Δ%
+,bench_regression,,11000000,1000000,10.00%,0,,,0,,
+,bench_no_change,,10000000,0,0.00%,0,,,0,,
+,bench_improvement,,9000000,-1000000,-10.00%,0,,,0,,
+,bench_positive_inf,,10000000,10000000,1.0E99,0,,,0,,
+,bench_from_10M_to_0,,0,-10000000,-100.00%,0,,,0,,
+,bench_with_scope::scope_1,100,10000000,1000000,11.11%,0,,,0,,
 ",
         );
     }
