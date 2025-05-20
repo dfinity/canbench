@@ -466,7 +466,6 @@
 //!
 pub use canbench_rs_macros::bench;
 use candid::CandidType;
-use heck::ToSnakeCase;
 use serde::{Deserialize, Serialize};
 use std::{cell::RefCell, collections::BTreeMap, ops::Add};
 
@@ -648,8 +647,6 @@ pub fn bench_scope_id(id: u16) -> BenchScope {
 
 pub trait ScopeIdName {
     /// Returns the name of the scope given its ID.
-    ///
-    /// (!) The name will be converted into a snake case string when printed.
     fn name_from_id(id: u16) -> Option<&'static str>;
 }
 
@@ -693,17 +690,16 @@ fn resolve_name(id: u16) -> Option<&'static str> {
 
 impl std::fmt::Display for BenchId {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let str = match self {
-            Self::Name(name) => name,
+        match self {
+            Self::Name(name) => write!(f, "{name}"),
             Self::Id(id) => {
                 if let Some(name) = resolve_name(*id) {
-                    name
+                    write!(f, "{name}")
                 } else {
-                    &format!("scope_{id}")
+                    write!(f, "scope_{id}")
                 }
             }
-        };
-        write!(f, "{}", str.to_snake_case())
+        }
     }
 }
 

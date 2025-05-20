@@ -82,8 +82,8 @@ enum ScopeId {
 impl ScopeIdName for ScopeId {
     fn name_from_id(id: u16) -> Option<&'static str> {
         match id {
-            0 => Some("Something"),
-            1 => Some("SomethingElse"),
+            0 => Some("something"),
+            1 => Some("something_else"),
             _ => None,
         }
     }
