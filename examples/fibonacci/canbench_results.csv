@@ -1,6 +1,6 @@
-status,name,instructions,instructions Δ,instructions Δ%,heap_increase,heap_increase Δ,heap_increase Δ%,stable_memory_increase,stable_memory_increase Δ,stable_memory_increase Δ%
-,fibonacci_20,726,0,0.00%,0,0,0.00%,0,0,0.00%
-,fibonacci_45,1301,0,0.00%,0,0,0.00%,0,0,0.00%
-,fibonacci_8a,450,0,0.00%,0,0,0.00%,0,0,0.00%
-,fibonacci_8b,207,0,0.00%,0,0,0.00%,0,0,0.00%
-,fibonacci_8c,391,0,0.00%,0,0,0.00%,0,0,0.00%
+status,name,scope_calls,scope_calls Δ,scope_calls Δ%,instructions,instructions Δ,instructions Δ%,heap_increase,heap_increase Δ,heap_increase Δ%,stable_memory_increase,stable_memory_increase Δ,stable_memory_increase Δ%
+,fibonacci_20,,,,729,3,0.41%,0,0,0.00%,0,0,0.00%
+,fibonacci_45,,,,1304,3,0.23%,0,0,0.00%,0,0,0.00%
+,fibonacci_8a,,,,453,3,0.67%,0,0,0.00%,0,0,0.00%
+,fibonacci_8b,,,,207,0,0.00%,0,0,0.00%,0,0,0.00%
+,fibonacci_8c,,,,394,3,0.77%,0,0,0.00%,0,0,0.00%
