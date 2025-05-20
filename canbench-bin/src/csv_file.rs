@@ -27,11 +27,16 @@ pub(crate) fn write<W: Write>(writer: &mut W, data: &[Entry]) -> std::io::Result
 
     for entry in data {
         let name = entry.benchmark.full_name();
+        let scope_calls = if entry.has_scope() {
+            entry.calls.fmt_current()
+        } else {
+            "".to_string()
+        };
         let row = [
             entry.status.clone(),
             name.clone(),
             // CSV report uses full numbers
-            entry.scope_calls.fmt_current(),
+            scope_calls,
             entry.instructions.fmt_current(),
             entry.instructions.fmt_abs_delta(),
             entry.instructions.fmt_percent(),
@@ -73,50 +78,50 @@ mod tests {
                 Entry {
                     status: "".to_string(),
                     benchmark: Benchmark::new("bench_regression", None),
-                    scope_calls: Values::new(None, None),
                     instructions: Values::new(Some(11_000_000), Some(10_000_000)),
                     heap_increase: Values::new(Some(0), None),
                     stable_memory_increase: Values::new(Some(0), None),
+                    calls: Values::new(None, None),
                 },
                 Entry {
                     status: "".to_string(),
                     benchmark: Benchmark::new("bench_no_change", None),
-                    scope_calls: Values::new(None, None),
                     instructions: Values::new(Some(10_000_000), Some(10_000_000)),
                     heap_increase: Values::new(Some(0), None),
                     stable_memory_increase: Values::new(Some(0), None),
+                    calls: Values::new(None, None),
                 },
                 Entry {
                     status: "".to_string(),
                     benchmark: Benchmark::new("bench_improvement", None),
-                    scope_calls: Values::new(None, None),
                     instructions: Values::new(Some(9_000_000), Some(10_000_000)),
                     heap_increase: Values::new(Some(0), None),
                     stable_memory_increase: Values::new(Some(0), None),
+                    calls: Values::new(None, None),
                 },
                 Entry {
                     status: "".to_string(),
                     benchmark: Benchmark::new("bench_positive_inf", None),
-                    scope_calls: Values::new(None, None),
                     instructions: Values::new(Some(10_000_000), Some(0)),
                     heap_increase: Values::new(Some(0), None),
                     stable_memory_increase: Values::new(Some(0), None),
+                    calls: Values::new(None, None),
                 },
                 Entry {
                     status: "".to_string(),
                     benchmark: Benchmark::new("bench_from_10M_to_0", None),
-                    scope_calls: Values::new(None, None),
                     instructions: Values::new(Some(0), Some(10_000_000)),
                     heap_increase: Values::new(Some(0), None),
                     stable_memory_increase: Values::new(Some(0), None),
+                    calls: Values::new(None, None),
                 },
                 Entry {
                     status: "".to_string(),
                     benchmark: Benchmark::new("bench_with_scope", Some("my_scope")),
-                    scope_calls: Values::new(Some(100), Some(50)),
                     instructions: Values::new(Some(10_000_000), Some(9_000_000)),
                     heap_increase: Values::new(Some(0), None),
                     stable_memory_increase: Values::new(Some(0), None),
+                    calls: Values::new(Some(100), Some(50)),
                 },
             ],
             "\

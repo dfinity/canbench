@@ -482,7 +482,7 @@ pub struct BenchResult {
 
     /// Measurements for scopes.
     #[serde(default)]
-    pub scopes: BTreeMap<String, (Measurement, usize)>,
+    pub scopes: BTreeMap<String, Measurement>,
 }
 
 /// A benchmark measurement containing various stats.
@@ -499,6 +499,9 @@ pub struct Measurement {
     /// The increase in stable memory (measured in pages).
     #[serde(default)]
     pub stable_memory_increase: u64,
+
+    #[serde(default)]
+    pub calls: u64,
 }
 
 impl Add for Measurement {
@@ -509,6 +512,7 @@ impl Add for Measurement {
             instructions: self.instructions + other.instructions,
             heap_increase: self.heap_increase + other.heap_increase,
             stable_memory_increase: self.stable_memory_increase + other.stable_memory_increase,
+            calls: self.calls + other.calls,
         }
     }
 }
@@ -532,6 +536,7 @@ pub fn bench_fn<R>(f: impl FnOnce() -> R) -> BenchResult {
             instructions,
             heap_increase,
             stable_memory_increase,
+            calls: 1,
         };
         let scopes: std::collections::BTreeMap<_, _> = get_scopes_measurements()
             .into_iter()
@@ -631,6 +636,7 @@ impl Drop for BenchScope {
                 instructions,
                 heap_increase,
                 stable_memory_increase,
+                calls: 1,
             });
         });
     }
@@ -643,17 +649,16 @@ fn reset() {
 
 // Returns the measurements for any declared scopes,
 // aggregated by the scope name.
-fn get_scopes_measurements() -> std::collections::BTreeMap<&'static str, (Measurement, usize)> {
+fn get_scopes_measurements() -> std::collections::BTreeMap<&'static str, Measurement> {
     SCOPES
         .with(|p| p.borrow().clone())
         .into_iter()
         .map(|(scope, measurements)| {
             let mut total = Measurement::default();
-            let calls = measurements.len();
             for measurement in measurements {
                 total = total + measurement;
             }
-            (scope, (total, calls))
+            (scope, total)
         })
         .collect()
 }

@@ -6,10 +6,10 @@ use std::collections::BTreeMap;
 pub(crate) struct Entry {
     pub(crate) status: String,
     pub(crate) benchmark: Benchmark,
-    pub(crate) scope_calls: Values,
     pub(crate) instructions: Values,
     pub(crate) heap_increase: Values,
     pub(crate) stable_memory_increase: Values,
+    pub(crate) calls: Values,
 }
 
 impl Entry {
@@ -132,15 +132,14 @@ pub(crate) fn extract(
 
     for (name, new_bench) in new_results {
         let old_bench = old_results.get(name);
-        let old_m = old_bench.map(|b| (b.total.clone(), 0));
 
         // Process total
         let benchmark = Benchmark::new(name, None);
         results.push(build_entry(
             if old_bench.is_none() { "new" } else { "" }.to_string(),
             benchmark,
-            Some(&(new_bench.total.clone(), 0)),
-            old_m.as_ref(),
+            Some(&new_bench.total),
+            old_bench.map(|b| &b.total),
         ));
 
         // Process scopes
@@ -162,24 +161,20 @@ pub(crate) fn extract(
 fn build_entry(
     status: String,
     benchmark: Benchmark,
-    new_m: Option<&(Measurement, usize)>,
-    old_m: Option<&(Measurement, usize)>,
+    new_m: Option<&Measurement>,
+    old_m: Option<&Measurement>,
 ) -> Entry {
     let extract_values = |f: fn(&Measurement) -> u64| Values {
-        curr: new_m.map(|(m, _)| f(m)),
-        prev: old_m.map(|(m, _)| f(m)),
-    };
-    let scope_calls = Values {
-        curr: new_m.map(|(_, scope_calls)| *scope_calls as u64),
-        prev: old_m.map(|(_, scope_calls)| *scope_calls as u64),
+        curr: new_m.map(f),
+        prev: old_m.map(f),
     };
 
     Entry {
         status,
         benchmark,
-        scope_calls,
         instructions: extract_values(|m| m.instructions),
         heap_increase: extract_values(|m| m.heap_increase),
         stable_memory_increase: extract_values(|m| m.stable_memory_increase),
+        calls: extract_values(|m| m.calls),
     }
 }
