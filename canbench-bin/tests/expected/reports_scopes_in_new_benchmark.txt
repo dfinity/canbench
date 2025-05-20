@@ -2,16 +2,16 @@
 
 Benchmark: bench_scope_new (new)
   total:
-    instructions: 4134 (new)
+    instructions: 4096 (new)
     heap_increase: 0 pages (new)
     stable_memory_increase: 0 pages (new)
 
-  scope_1 (scope):
+  something (scope):
     instructions: 1050 (new)
     heap_increase: 0 pages (new)
     stable_memory_increase: 0 pages (new)
 
-  scope_2 (scope):
+  something_else (scope):
     instructions: 786 (new)
     heap_increase: 0 pages (new)
     stable_memory_increase: 0 pages (new)
@@ -40,10 +40,10 @@ Summary:
 ---------------------------------------------------
 
 Only significant changes:
-| status | name                     | calls |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
-|--------|--------------------------|-------|-------|---------|----|--------|-----|---------|
-|  new   | bench_scope_new          |       | 4.13K |         |  0 |        |   0 |         |
-|  new   | bench_scope_new::scope_1 |     1 | 1.05K |         |  0 |        |   0 |         |
-|  new   | bench_scope_new::scope_2 |     1 |   786 |         |  0 |        |   0 |         |
+| status | name                            | calls |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|---------------------------------|-------|-------|---------|----|--------|-----|---------|
+|  new   | bench_scope_new                 |       | 4.10K |         |  0 |        |   0 |         |
+|  new   | bench_scope_new::something      |     1 | 1.05K |         |  0 |        |   0 |         |
+|  new   | bench_scope_new::something_else |     1 |   786 |         |  0 |        |   0 |         |
 
 ---------------------------------------------------
