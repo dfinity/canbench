@@ -73,14 +73,20 @@ pub(crate) fn print_table<W: Write>(
     max_displayed_rows: usize,
 ) -> io::Result<()> {
     let columns = [
-        "status", "name", "ins", "ins Δ%", "HI", "HI Δ%", "SMI", "SMI Δ%",
+        "status", "name", "calls", "ins", "ins Δ%", "HI", "HI Δ%", "SMI", "SMI Δ%",
     ];
     let mut rows: Vec<_> = data
         .iter()
         .map(|entry| {
+            let scope_calls = if entry.has_scope() {
+                entry.calls.fmt_human_current()
+            } else {
+                "".to_string()
+            };
             vec![
                 entry.status.clone(),
                 entry.benchmark.full_name(),
+                scope_calls,
                 entry.instructions.fmt_human_current(),
                 entry.instructions.fmt_human_percent(),
                 entry.heap_increase.fmt_human_current(),
@@ -161,10 +167,11 @@ mod tests {
     use super::*;
     use crate::data::{Benchmark, Values};
 
-    fn create_entry(name: &str) -> Entry {
+    fn create_entry(name: &str, scope: Option<&str>) -> Entry {
         Entry {
             status: "".to_string(),
-            benchmark: Benchmark::new(name, None),
+            benchmark: Benchmark::new(name, scope),
+            calls: Values::new(Some(10), None),
             instructions: Values::new(Some(9_000_000), Some(10_000_000)),
             heap_increase: Values::new(Some(0), None),
             stable_memory_increase: Values::new(Some(0), None),
@@ -173,7 +180,14 @@ mod tests {
 
     fn run_table_test_case(max_displayed_rows: usize, expected_output: &str) {
         let entries: Vec<Entry> = (1..=5)
-            .map(|i| create_entry(&format!("bench_{}", i)))
+            .flat_map(|i| {
+                let bench = format!("bench_{}", i);
+                let mut v = vec![create_entry(&bench, None)];
+                if i >= 5 {
+                    v.push(create_entry(&bench, Some("scope_0")));
+                }
+                v
+            })
             .collect();
 
         let mut output = Vec::new();
@@ -188,74 +202,106 @@ mod tests {
     }
 
     #[test]
-    fn test_print_table_variants() {
-        let test_cases = [
-            (
-                0,
-                "\
-| status | name                   | ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
-|--------|------------------------|-----|---------|----|--------|-----|---------|
-|  ...   | ... 5 rows omitted ... |     |         |    |        |     |         |
+    fn test_print_table_variants_0() {
+        run_table_test_case(
+            0,
+            "\
+| status | name                   | calls | ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|------------------------|-------|-----|---------|----|--------|-----|---------|
+|  ...   | ... 6 rows omitted ... |       |     |         |    |        |     |         |
 ",
-            ),
-            (
-                1,
-                "\
-| status | name                   |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
-|--------|------------------------|-------|---------|----|--------|-----|---------|
-|  ...   | ... 4 rows omitted ... |       |         |    |        |     |         |
-|        | bench_5                | 9.00M | -10.00% |  0 |        |   0 |         |
-",
-            ),
-            (
-                2,
-                "\
-| status | name                   |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
-|--------|------------------------|-------|---------|----|--------|-----|---------|
-|        | bench_1                | 9.00M | -10.00% |  0 |        |   0 |         |
-|  ...   | ... 3 rows omitted ... |       |         |    |        |     |         |
-|        | bench_5                | 9.00M | -10.00% |  0 |        |   0 |         |
-",
-            ),
-            (
-                3,
-                "\
-| status | name                   |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
-|--------|------------------------|-------|---------|----|--------|-----|---------|
-|        | bench_1                | 9.00M | -10.00% |  0 |        |   0 |         |
-|  ...   | ... 2 rows omitted ... |       |         |    |        |     |         |
-|        | bench_4                | 9.00M | -10.00% |  0 |        |   0 |         |
-|        | bench_5                | 9.00M | -10.00% |  0 |        |   0 |         |
-",
-            ),
-            (
-                4,
-                "\
-| status | name                  |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
-|--------|-----------------------|-------|---------|----|--------|-----|---------|
-|        | bench_1               | 9.00M | -10.00% |  0 |        |   0 |         |
-|        | bench_2               | 9.00M | -10.00% |  0 |        |   0 |         |
-|  ...   | ... 1 row omitted ... |       |         |    |        |     |         |
-|        | bench_4               | 9.00M | -10.00% |  0 |        |   0 |         |
-|        | bench_5               | 9.00M | -10.00% |  0 |        |   0 |         |
-",
-            ),
-            (
-                5,
-                "\
-| status | name    |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
-|--------|---------|-------|---------|----|--------|-----|---------|
-|        | bench_1 | 9.00M | -10.00% |  0 |        |   0 |         |
-|        | bench_2 | 9.00M | -10.00% |  0 |        |   0 |         |
-|        | bench_3 | 9.00M | -10.00% |  0 |        |   0 |         |
-|        | bench_4 | 9.00M | -10.00% |  0 |        |   0 |         |
-|        | bench_5 | 9.00M | -10.00% |  0 |        |   0 |         |
-",
-            ),
-        ];
+        );
+    }
 
-        for (max_displayed_rows, expected_output) in test_cases {
-            run_table_test_case(max_displayed_rows, expected_output);
-        }
+    #[test]
+    fn test_print_table_variants_1() {
+        run_table_test_case(
+            1,
+            "\
+| status | name                   | calls |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|------------------------|-------|-------|---------|----|--------|-----|---------|
+|  ...   | ... 5 rows omitted ... |       |       |         |    |        |     |         |
+|        | bench_5::scope_0       |    10 | 9.00M | -10.00% |  0 |        |   0 |         |
+",
+        );
+    }
+
+    #[test]
+    fn test_print_table_variants_2() {
+        run_table_test_case(
+            2,
+            "\
+| status | name                   | calls |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|------------------------|-------|-------|---------|----|--------|-----|---------|
+|        | bench_1                |       | 9.00M | -10.00% |  0 |        |   0 |         |
+|  ...   | ... 4 rows omitted ... |       |       |         |    |        |     |         |
+|        | bench_5::scope_0       |    10 | 9.00M | -10.00% |  0 |        |   0 |         |
+",
+        );
+    }
+
+    #[test]
+    fn test_print_table_variants_3() {
+        run_table_test_case(
+            3,
+            "\
+| status | name                   | calls |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|------------------------|-------|-------|---------|----|--------|-----|---------|
+|        | bench_1                |       | 9.00M | -10.00% |  0 |        |   0 |         |
+|  ...   | ... 3 rows omitted ... |       |       |         |    |        |     |         |
+|        | bench_5                |       | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_5::scope_0       |    10 | 9.00M | -10.00% |  0 |        |   0 |         |
+",
+        );
+    }
+
+    #[test]
+    fn test_print_table_variants_4() {
+        run_table_test_case(
+            4,
+            "\
+| status | name                   | calls |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|------------------------|-------|-------|---------|----|--------|-----|---------|
+|        | bench_1                |       | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_2                |       | 9.00M | -10.00% |  0 |        |   0 |         |
+|  ...   | ... 2 rows omitted ... |       |       |         |    |        |     |         |
+|        | bench_5                |       | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_5::scope_0       |    10 | 9.00M | -10.00% |  0 |        |   0 |         |
+",
+        );
+    }
+
+    #[test]
+    fn test_print_table_variants_5() {
+        run_table_test_case(
+            5,
+            "\
+| status | name                  | calls |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|-----------------------|-------|-------|---------|----|--------|-----|---------|
+|        | bench_1               |       | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_2               |       | 9.00M | -10.00% |  0 |        |   0 |         |
+|  ...   | ... 1 row omitted ... |       |       |         |    |        |     |         |
+|        | bench_4               |       | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_5               |       | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_5::scope_0      |    10 | 9.00M | -10.00% |  0 |        |   0 |         |
+",
+        );
+    }
+
+    #[test]
+    fn test_print_table_variants_6() {
+        run_table_test_case(
+            6,
+            "\
+| status | name             | calls |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|------------------|-------|-------|---------|----|--------|-----|---------|
+|        | bench_1          |       | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_2          |       | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_3          |       | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_4          |       | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_5          |       | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_5::scope_0 |    10 | 9.00M | -10.00% |  0 |        |   0 |         |
+",
+        );
     }
 }

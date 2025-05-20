@@ -2,7 +2,7 @@
 
 Benchmark: write_stable_memory (new)
   total:
-    instructions: 49.17 K (new)
+    instructions: 49.18 K (new)
     heap_increase: 0 pages (new)
     stable_memory_increase: 1 pages (new)
 Instruction traces written to write_stable_memory.svg
@@ -31,8 +31,8 @@ Summary:
 ---------------------------------------------------
 
 Only significant changes:
-| status | name                |    ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
-|--------|---------------------|--------|---------|----|--------|-----|---------|
-|  new   | write_stable_memory | 49.17K |         |  0 |        |   1 |         |
+| status | name                | calls |    ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|---------------------|-------|--------|---------|----|--------|-----|---------|
+|  new   | write_stable_memory |       | 49.18K |         |  0 |        |   1 |         |
 
 ---------------------------------------------------

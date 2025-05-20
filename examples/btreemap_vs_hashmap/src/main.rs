@@ -28,11 +28,14 @@ fn pre_upgrade() {
     };
 
     // Write to stable memory.
-    #[cfg(feature = "canbench-rs")]
-    let _p = canbench_rs::bench_scope("writing_to_stable_memory");
-    ic_cdk::api::stable::StableWriter::default()
-        .write(&bytes)
-        .unwrap();
+    // Use artificial loop to showcase repeated scopes.
+    for _ in 0..5 {
+        #[cfg(feature = "canbench-rs")]
+        let _p = canbench_rs::bench_scope("writing_to_stable_memory");
+        ic_cdk::api::stable::StableWriter::default()
+            .write(&bytes)
+            .unwrap();
+    }
 }
 
 #[cfg(feature = "canbench-rs")]

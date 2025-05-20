@@ -489,6 +489,10 @@ pub struct BenchResult {
 /// A benchmark measurement containing various stats.
 #[derive(Debug, PartialEq, Serialize, Deserialize, CandidType, Clone, Default)]
 pub struct Measurement {
+    /// The number of calls to the function or scope.
+    #[serde(default)]
+    pub calls: u64,
+
     /// The number of instructions.
     #[serde(default)]
     pub instructions: u64,
@@ -507,6 +511,7 @@ impl Add for Measurement {
 
     fn add(self, other: Self) -> Self::Output {
         Self {
+            calls: self.calls + other.calls,
             instructions: self.instructions + other.instructions,
             heap_increase: self.heap_increase + other.heap_increase,
             stable_memory_increase: self.stable_memory_increase + other.stable_memory_increase,
@@ -530,6 +535,7 @@ pub fn bench_fn<R>(f: impl FnOnce() -> R) -> BenchResult {
         let heap_increase = heap_size() - start_heap;
 
         let total = Measurement {
+            calls: 1,
             instructions,
             heap_increase,
             stable_memory_increase,
@@ -740,6 +746,7 @@ impl Drop for BenchScope {
             // Move out `self.id`` without cloning by replacing it with a dummy value.
             let id = std::mem::replace(&mut self.id, ScopeId::Code(0));
             p.entry(id).or_default().push(Measurement {
+                calls: 1,
                 instructions,
                 heap_increase,
                 stable_memory_increase,
