@@ -25,7 +25,7 @@ pub(crate) fn print_benchmark(
         println!("  {} (scope):", scope);
         print_measurement(
             measurement,
-            old.map(|b| &b.scopes).and_then(|m| m.get(scope)),
+            old.map(|m| &m.scopes).and_then(|m| m.get(scope)),
             noise_threshold,
         );
     }

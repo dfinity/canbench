@@ -165,10 +165,10 @@ mod tests {
         Entry {
             status: "".to_string(),
             benchmark: Benchmark::new(name, None),
+            calls: Values::new(Some(0), None),
             instructions: Values::new(Some(9_000_000), Some(10_000_000)),
             heap_increase: Values::new(Some(0), None),
             stable_memory_increase: Values::new(Some(0), None),
-            calls: Values::new(Some(0), None),
         }
     }
 
