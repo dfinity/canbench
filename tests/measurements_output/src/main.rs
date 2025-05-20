@@ -74,12 +74,12 @@ fn write_stable_memory() {
 }
 
 #[repr(u16)]
-enum ScopeId {
+enum Scope {
     Something = 0,
     SomethingElse = 1,
 }
 
-impl ScopeIdName for ScopeId {
+impl ScopeIdName for Scope {
     fn name_from_id(id: u16) -> Option<&'static str> {
         match id {
             0 => Some("something"),
@@ -92,15 +92,15 @@ impl ScopeIdName for ScopeId {
 // A benchmark that includes some profiling, but isn't persisted in the results.
 #[bench]
 fn bench_scope_new() {
-    set_bench_id_resolver::<ScopeId>();
+    set_bench_id_resolver::<Scope>();
 
     {
-        let _p = bench_scope_id(ScopeId::Something as u16);
+        let _p = bench_scope_id(Scope::Something as u16);
         println!("do something");
     }
 
     {
-        let _p = bench_scope_id(ScopeId::SomethingElse as u16);
+        let _p = bench_scope_id(Scope::SomethingElse as u16);
         println!("do something else");
     }
 }
@@ -108,15 +108,15 @@ fn bench_scope_new() {
 // A benchmark that includes some profiling and is persisted in the results.
 #[bench]
 fn bench_scope_exists() {
-    set_bench_id_resolver::<ScopeId>();
+    set_bench_id_resolver::<Scope>();
 
     {
-        let _p = bench_scope_id(ScopeId::Something as u16);
+        let _p = bench_scope_id(Scope::Something as u16);
         println!("do something");
     }
 
     {
-        let _p = bench_scope_id(ScopeId::SomethingElse as u16);
+        let _p = bench_scope_id(Scope::SomethingElse as u16);
         println!("do something else");
     }
 }
@@ -124,11 +124,11 @@ fn bench_scope_exists() {
 // A benchmark that includes a repeated scope, but isn't persisted in the results.
 #[bench]
 fn bench_repeated_scope_new() {
-    set_bench_id_resolver::<ScopeId>();
+    set_bench_id_resolver::<Scope>();
 
     {
         for _ in 0..10 {
-            let _p = bench_scope_id(ScopeId::Something as u16);
+            let _p = bench_scope_id(Scope::Something as u16);
             println!("do something");
         }
     }
@@ -137,11 +137,11 @@ fn bench_repeated_scope_new() {
 // A benchmark that includes a repeated scope and is persisted in the results.
 #[bench]
 fn bench_repeated_scope_exists() {
-    set_bench_id_resolver::<ScopeId>();
+    set_bench_id_resolver::<Scope>();
 
     {
         for _ in 0..10 {
-            let _p = bench_scope_id(ScopeId::Something as u16);
+            let _p = bench_scope_id(Scope::Something as u16);
             println!("do something");
         }
     }

@@ -470,7 +470,7 @@ use serde::{Deserialize, Serialize};
 use std::{cell::RefCell, collections::BTreeMap, ops::Add};
 
 thread_local! {
-    static SCOPES: RefCell<BTreeMap<BenchId, Vec<Measurement>>> =
+    static SCOPES: RefCell<BTreeMap<ScopeId, Vec<Measurement>>> =
         const { RefCell::new(BTreeMap::new()) };
     static GLOBAL_RESOLVER: RefCell<Option<ResolverFn>> = RefCell::new(None);
 }
@@ -605,12 +605,12 @@ pub fn bench_scope(name: &'static str) -> BenchScope {
 ///
 /// ```
 /// # #[repr(u16)]
-/// # enum ScopeId {
+/// # enum Scope {
 /// #     MyScope = 0,
 /// # }
 ///
 /// fn my_func() {
-///   let _p = canbench_rs::bench_scope_id(ScopeId::MyScope as u16);
+///   let _p = canbench_rs::bench_scope_id(Scope::MyScope as u16);
 ///   // Do something.
 /// }
 /// ```
@@ -619,24 +619,24 @@ pub fn bench_scope(name: &'static str) -> BenchScope {
 ///
 /// ```
 /// # #[repr(u16)]
-/// # enum ScopeId {
+/// # enum Scope {
 /// #     MyScope = 0,
 /// # }
 ///
 /// fn my_func() {
-///   let _ = canbench_rs::bench_scope_id(ScopeId::MyScope as u16); // Doesn't capture the scope.
+///   let _ = canbench_rs::bench_scope_id(Scope::MyScope as u16); // Doesn't capture the scope.
 ///   // Do something.
 /// }
 /// ```
 ///
 /// ```
 /// # #[repr(u16)]
-/// # enum ScopeId {
+/// # enum Scope {
 /// #     MyScope = 0,
 /// # }
 ///
 /// fn my_func() {
-///   canbench_rs::bench_scope_id(ScopeId::MyScope as u16); // Doesn't capture the scope.
+///   canbench_rs::bench_scope_id(Scope::MyScope as u16); // Doesn't capture the scope.
 ///   // Do something.
 /// }
 /// ```
@@ -651,12 +651,12 @@ pub trait ScopeIdName {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub enum BenchId {
+pub enum ScopeId {
     Name(&'static str),
     Id(u16),
 }
 
-impl BenchId {
+impl ScopeId {
     fn new(name: &'static str) -> Self {
         Self::Name(name)
     }
@@ -683,7 +683,7 @@ fn resolve_name(id: u16) -> Option<&'static str> {
     GLOBAL_RESOLVER.with(|resolver| resolver.borrow().as_ref().and_then(|f| f(id)))
 }
 
-impl std::fmt::Display for BenchId {
+impl std::fmt::Display for ScopeId {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Name(name) => write!(f, "{name}"),
@@ -700,7 +700,7 @@ impl std::fmt::Display for BenchId {
 
 /// An object used for benchmarking a specific scope.
 pub struct BenchScope {
-    id: BenchId,
+    id: ScopeId,
     start_instructions: u64,
     start_stable_memory: u64,
     start_heap: u64,
@@ -708,14 +708,14 @@ pub struct BenchScope {
 
 impl BenchScope {
     fn new(name: &'static str) -> Self {
-        Self::new_inner(BenchId::new(name))
+        Self::new_inner(ScopeId::new(name))
     }
 
     fn from_id(id: u16) -> Self {
-        Self::new_inner(BenchId::from_id(id))
+        Self::new_inner(ScopeId::from_id(id))
     }
 
-    fn new_inner(id: BenchId) -> Self {
+    fn new_inner(id: ScopeId) -> Self {
         let start_heap = heap_size();
         let start_stable_memory = ic_cdk::api::stable::stable_size();
         let start_instructions = instruction_count();
@@ -737,7 +737,7 @@ impl Drop for BenchScope {
 
         SCOPES.with(|p| {
             let mut p = p.borrow_mut();
-            let id = std::mem::replace(&mut self.id, BenchId::Id(0));
+            let id = std::mem::replace(&mut self.id, ScopeId::Id(0));
             p.entry(id).or_default().push(Measurement {
                 instructions,
                 heap_increase,
