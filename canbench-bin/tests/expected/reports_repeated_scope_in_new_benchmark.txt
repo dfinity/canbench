@@ -35,9 +35,9 @@ Summary:
 ---------------------------------------------------
 
 Only significant changes:
-| status | name                              |    ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
-|--------|-----------------------------------|--------|---------|----|--------|-----|---------|
-|  new   | bench_repeated_scope_new          | 16.50K |         |  0 |        |   0 |         |
-|  new   | bench_repeated_scope_new::scope_1 |  8.12K |         |  0 |        |   0 |         |
+| status | name                              | calls |    ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|-----------------------------------|-------|--------|---------|----|--------|-----|---------|
+|  new   | bench_repeated_scope_new          |       | 16.50K |         |  0 |        |   0 |         |
+|  new   | bench_repeated_scope_new::scope_1 |    10 |  8.12K |         |  0 |        |   0 |         |
 
 ---------------------------------------------------
