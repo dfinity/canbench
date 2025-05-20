@@ -472,7 +472,7 @@ use std::{cell::RefCell, collections::BTreeMap, ops::Add};
 thread_local! {
     static SCOPES: RefCell<BTreeMap<BenchId, Vec<Measurement>>> =
         const { RefCell::new(BTreeMap::new()) };
-    static GLOBAL_RESOLVER: RefCell<Option<fn(u16) -> Option<&'static str>>> = RefCell::new(None);
+    static GLOBAL_RESOLVER: RefCell<Option<ResolverFn>> = RefCell::new(None);
 }
 
 /// The results of a benchmark.
@@ -666,15 +666,19 @@ impl BenchId {
     }
 }
 
-/// Sets the function used to resolve the name of a scope given its ID.
+/// Sets the resolver for the scope ID to name mapping.
 ///
-/// Bench ID resolution happens when results are printed.
+/// This function should be called before any benchmarks are run.
 pub fn set_bench_id_resolver<T: ScopeIdName + 'static>() {
     GLOBAL_RESOLVER.with(|resolver| {
         resolver.replace(Some(T::name_from_id));
     });
 }
 
+/// A function that resolves the name of a scope given its ID.
+type ResolverFn = fn(u16) -> Option<&'static str>;
+
+/// Resolves the name of a scope given its ID.
 fn resolve_name(id: u16) -> Option<&'static str> {
     GLOBAL_RESOLVER.with(|resolver| resolver.borrow().as_ref().and_then(|f| f(id)))
 }
