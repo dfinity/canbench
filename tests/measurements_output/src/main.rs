@@ -89,6 +89,7 @@ impl ScopeIdName for Scope {
     }
 }
 
+#[inline(always)]
 fn initialize_bench_resolver() {
     set_bench_id_resolver::<Scope>();
 }
