@@ -9,7 +9,7 @@ benches:
   pre_upgrade_bench:
     total:
       calls: 1
-      instructions: 438873069
+      instructions: 486879877
       heap_increase: 519
       stable_memory_increase: 184
     scopes:
@@ -19,8 +19,8 @@ benches:
         heap_increase: 519
         stable_memory_increase: 0
       writing_to_stable_memory:
-        calls: 1
-        instructions: 14930542
+        calls: 5
+        instructions: 62932223
         heap_increase: 0
         stable_memory_increase: 184
   remove_users:
