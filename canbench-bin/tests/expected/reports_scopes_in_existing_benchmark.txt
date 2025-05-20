@@ -2,7 +2,7 @@
 
 Benchmark: bench_scope_exists
   total:
-    instructions: 4096 (regressed from 0)
+    instructions: 4100 (regressed from 0)
     heap_increase: 0 pages (no change)
     stable_memory_increase: 0 pages (no change)
 

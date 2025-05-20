@@ -472,7 +472,7 @@ use std::{cell::RefCell, collections::BTreeMap, ops::Add};
 thread_local! {
     static SCOPES: RefCell<BTreeMap<BenchId, Vec<Measurement>>> =
         const { RefCell::new(BTreeMap::new()) };
-    static GLOBAL_RESOLVER: RefCell<*mut ()> = const { RefCell::new(std::ptr::null_mut()) };
+    static GLOBAL_RESOLVER: RefCell<Option<fn(u16) -> Option<&'static str>>> = RefCell::new(None);
 }
 
 /// The results of a benchmark.
@@ -668,24 +668,15 @@ impl BenchId {
 
 /// Sets the function used to resolve the name of a scope given its ID.
 ///
-/// IMPORTANT: This function must be called before any benchmarks are run.
+/// Bench ID resolution happens when results are printed.
 pub fn set_bench_id_resolver<T: ScopeIdName + 'static>() {
     GLOBAL_RESOLVER.with(|resolver| {
-        *resolver.borrow_mut() = T::name_from_id as *const () as *mut ();
+        resolver.replace(Some(T::name_from_id));
     });
 }
 
 fn resolve_name(id: u16) -> Option<&'static str> {
-    GLOBAL_RESOLVER.with(|resolver| {
-        let func_ptr = *resolver.borrow();
-        if func_ptr.is_null() {
-            None
-        } else {
-            let resolver_fn: fn(u16) -> Option<&'static str> =
-                unsafe { std::mem::transmute(func_ptr) };
-            resolver_fn(id)
-        }
-    })
+    GLOBAL_RESOLVER.with(|resolver| resolver.borrow().as_ref().and_then(|f| f(id)))
 }
 
 impl std::fmt::Display for BenchId {
