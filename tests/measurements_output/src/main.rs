@@ -89,10 +89,14 @@ impl ScopeIdName for Scope {
     }
 }
 
+fn initialize_bench_resolver() {
+    set_bench_id_resolver::<Scope>();
+}
+
 // A benchmark that includes some profiling, but isn't persisted in the results.
 #[bench]
 fn bench_scope_new() {
-    set_bench_id_resolver::<Scope>();
+    initialize_bench_resolver();
 
     {
         let _p = bench_scope_id(Scope::Something as u16);
@@ -108,7 +112,7 @@ fn bench_scope_new() {
 // A benchmark that includes some profiling and is persisted in the results.
 #[bench]
 fn bench_scope_exists() {
-    set_bench_id_resolver::<Scope>();
+    initialize_bench_resolver();
 
     {
         let _p = bench_scope_id(Scope::Something as u16);
@@ -124,7 +128,7 @@ fn bench_scope_exists() {
 // A benchmark that includes a repeated scope, but isn't persisted in the results.
 #[bench]
 fn bench_repeated_scope_new() {
-    set_bench_id_resolver::<Scope>();
+    initialize_bench_resolver();
 
     {
         for _ in 0..10 {
@@ -137,7 +141,7 @@ fn bench_repeated_scope_new() {
 // A benchmark that includes a repeated scope and is persisted in the results.
 #[bench]
 fn bench_repeated_scope_exists() {
-    set_bench_id_resolver::<Scope>();
+    initialize_bench_resolver();
 
     {
         for _ in 0..10 {

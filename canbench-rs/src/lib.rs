@@ -737,6 +737,7 @@ impl Drop for BenchScope {
 
         SCOPES.with(|p| {
             let mut p = p.borrow_mut();
+            // Move out `self.id`` without cloning by replacing it with a dummy value.
             let id = std::mem::replace(&mut self.id, ScopeId::Code(0));
             p.entry(id).or_default().push(Measurement {
                 instructions,
