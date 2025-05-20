@@ -1,6 +1,6 @@
-status,name,instructions,instructions Δ,instructions Δ%,heap_increase,heap_increase Δ,heap_increase Δ%,stable_memory_increase,stable_memory_increase Δ,stable_memory_increase Δ%
-,insert_users,2558172165,0,0.00%,871,0,0.00%,0,0,0.00%
-,pre_upgrade_bench,438873073,346,0.00%,519,0,0.00%,184,0,0.00%
-,pre_upgrade_bench::serialize_state,423940174,346,0.00%,519,0,0.00%,0,0,0.00%
-,pre_upgrade_bench::writing_to_stable_memory,14930542,0,0.00%,0,0,0.00%,184,0,0.00%
-,remove_users,2109136823,0,0.00%,0,0,0.00%,0,0,0.00%
+status,name,scope_calls,scope_calls Δ,scope_calls Δ%,instructions,instructions Δ,instructions Δ%,heap_increase,heap_increase Δ,heap_increase Δ%,stable_memory_increase,stable_memory_increase Δ,stable_memory_increase Δ%
+,insert_users,,,,2558172165,0,0.00%,871,0,0.00%,0,0,0.00%
+,pre_upgrade_bench,,,,486879877,48006808,10.94%,519,0,0.00%,184,0,0.00%
+,pre_upgrade_bench::serialize_state,1,0,0.00%,423940174,0,0.00%,519,0,0.00%,0,0,0.00%
+,pre_upgrade_bench::writing_to_stable_memory,5,4,400.00%,62932223,48001681,321.50%,0,0,0.00%,184,0,0.00%
+,remove_users,,,,2109136823,0,0.00%,0,0,0.00%,0,0,0.00%
