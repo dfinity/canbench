@@ -12,19 +12,19 @@ Summary:
   instructions:
     status:   No significant changes detected 👍
     counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
-    change:   [min -154.17K | med -154.17K | max -154.17K]
-    change %: [min -4.36% | med -4.36% | max -4.36%]
+    change:   [max -154.17K | p75 -154.17K | p50 -154.17K | p25 -154.17K | min -154.17K]
+    change %: [max -4.36% | p75 -4.36% | p50 -4.36% | p25 -4.36% | min -4.36%]
 
   heap_increase:
     status:   No significant changes detected 👍
     counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
-    change:   [min -3 | med -3 | max -3]
-    change %: [min -4.62% | med -4.62% | max -4.62%]
+    change:   [max -3 | p75 -3 | p50 -3 | p25 -3 | min -3]
+    change %: [max -4.62% | p75 -4.62% | p50 -4.62% | p25 -4.62% | min -4.62%]
 
   stable_memory_increase:
     status:   No significant changes detected 👍
     counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
-    change:   [min -4 | med -4 | max -4]
-    change %: [min -3.85% | med -3.85% | max -3.85%]
+    change:   [max -4 | p75 -4 | p50 -4 | p25 -4 | min -4]
+    change %: [max -3.85% | p75 -3.85% | p50 -3.85% | p25 -3.85% | min -3.85%]
 
 ---------------------------------------------------

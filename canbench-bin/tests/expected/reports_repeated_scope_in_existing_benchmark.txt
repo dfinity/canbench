@@ -17,20 +17,20 @@ Summary:
   instructions:
     status:   Regressions detected! 🔴
     counts:   [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0]
-    change:   [min +16.50K | med +16.50K | max +16.50K]
-    change %: [min +inf% | med +inf% | max +inf%]
+    change:   [max +16.50K | p75 +16.50K | p50 +16.50K | p25 +16.50K | min +16.50K]
+    change %: [max +inf% | p75 +inf% | p50 +inf% | p25 +inf% | min +inf%]
 
   heap_increase:
     status:   No significant changes detected 👍
     counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
-    change:   [min 0 | med 0 | max 0]
-    change %: [min 0.00% | med 0.00% | max 0.00%]
+    change:   [max 0 | p75 0 | p50 0 | p25 0 | min 0]
+    change %: [max 0.00% | p75 0.00% | p50 0.00% | p25 0.00% | min 0.00%]
 
   stable_memory_increase:
     status:   No significant changes detected 👍
     counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
-    change:   [min 0 | med 0 | max 0]
-    change %: [min 0.00% | med 0.00% | max 0.00%]
+    change:   [max 0 | p75 0 | p50 0 | p25 0 | min 0]
+    change %: [max 0.00% | p75 0.00% | p50 0.00% | p25 0.00% | min 0.00%]
 
 ---------------------------------------------------
 

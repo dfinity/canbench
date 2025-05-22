@@ -54,9 +54,9 @@ where
     println!("  {label}:");
     let status = match (improved, regressed) {
         (0, 0) => "No significant changes detected 👍",
-        (_, 0) => "Improvements detected! 🟢",
         (0, _) => "Regressions detected! 🔴",
-        _ => "Both improvements and regressions detected! 🟢🔴",
+        (_, 0) => "Improvements detected! 🟢",
+        _ => "Both regressions and improvements detected! 🔴🟢",
     };
     println!("    status:   {status}");
     println!(
@@ -90,15 +90,19 @@ where
 {
     let mut sorted = values.to_vec();
     sorted.sort_by(|a, b| a.partial_cmp(b).unwrap());
-    let min = sorted.first().copied().unwrap();
-    let med = percentile_fn(&sorted, 50);
     let max = sorted.last().copied().unwrap();
+    let p75 = percentile_fn(&sorted, 75);
+    let p50 = percentile_fn(&sorted, 50);
+    let p25 = percentile_fn(&sorted, 25);
+    let min = sorted.first().copied().unwrap();
 
     println!(
-        "{prefix} [min {} | med {} | max {}]",
-        format(min),
-        format(med),
+        "{prefix} [max {} | p75 {} | p50 {} | p25 {} | min {}]",
         format(max),
+        format(p75),
+        format(p50),
+        format(p25),
+        format(min),
     );
 }
 
