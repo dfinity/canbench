@@ -159,6 +159,12 @@ pub(crate) fn print_table<W: Write>(
         print_row(writer, row)?;
     }
 
+    writeln!(writer)?;
+    writeln!(
+        writer,
+        "ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change"
+    )?;
+
     Ok(())
 }
 
@@ -209,6 +215,8 @@ mod tests {
 | status | name                   | calls | ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
 |--------|------------------------|-------|-----|---------|----|--------|-----|---------|
 |  ...   | ... 6 rows omitted ... |       |     |         |    |        |     |         |
+
+ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 ",
         );
     }
@@ -222,6 +230,8 @@ mod tests {
 |--------|------------------------|-------|-------|---------|----|--------|-----|---------|
 |  ...   | ... 5 rows omitted ... |       |       |         |    |        |     |         |
 |        | bench_5::scope_0       |    10 | 9.00M | -10.00% |  0 |        |   0 |         |
+
+ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 ",
         );
     }
@@ -236,6 +246,8 @@ mod tests {
 |        | bench_1                |       | 9.00M | -10.00% |  0 |        |   0 |         |
 |  ...   | ... 4 rows omitted ... |       |       |         |    |        |     |         |
 |        | bench_5::scope_0       |    10 | 9.00M | -10.00% |  0 |        |   0 |         |
+
+ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 ",
         );
     }
@@ -251,6 +263,8 @@ mod tests {
 |  ...   | ... 3 rows omitted ... |       |       |         |    |        |     |         |
 |        | bench_5                |       | 9.00M | -10.00% |  0 |        |   0 |         |
 |        | bench_5::scope_0       |    10 | 9.00M | -10.00% |  0 |        |   0 |         |
+
+ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 ",
         );
     }
@@ -267,6 +281,8 @@ mod tests {
 |  ...   | ... 2 rows omitted ... |       |       |         |    |        |     |         |
 |        | bench_5                |       | 9.00M | -10.00% |  0 |        |   0 |         |
 |        | bench_5::scope_0       |    10 | 9.00M | -10.00% |  0 |        |   0 |         |
+
+ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 ",
         );
     }
@@ -284,6 +300,8 @@ mod tests {
 |        | bench_4               |       | 9.00M | -10.00% |  0 |        |   0 |         |
 |        | bench_5               |       | 9.00M | -10.00% |  0 |        |   0 |         |
 |        | bench_5::scope_0      |    10 | 9.00M | -10.00% |  0 |        |   0 |         |
+
+ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 ",
         );
     }
@@ -301,6 +319,8 @@ mod tests {
 |        | bench_4          |       | 9.00M | -10.00% |  0 |        |   0 |         |
 |        | bench_5          |       | 9.00M | -10.00% |  0 |        |   0 |         |
 |        | bench_5::scope_0 |    10 | 9.00M | -10.00% |  0 |        |   0 |         |
+
+ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 ",
         );
     }

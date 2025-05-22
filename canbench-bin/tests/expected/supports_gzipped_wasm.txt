@@ -43,4 +43,6 @@ Only significant changes:
 |  new   | bench_1 |       | 207 |         |  0 |        |   0 |         |
 |  new   | bench_2 |       | 207 |         |  0 |        |   0 |         |
 
+ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
+
 ---------------------------------------------------

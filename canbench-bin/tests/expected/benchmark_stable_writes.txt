@@ -34,4 +34,6 @@ Only significant changes:
 |--------|---------------------|-------|--------|---------|----|--------|-----|---------|
 |  new   | write_stable_memory |       | 49.18K |         |  0 |        |   1 |         |
 
+ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
+
 ---------------------------------------------------
