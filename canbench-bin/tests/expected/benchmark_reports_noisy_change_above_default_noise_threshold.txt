@@ -34,6 +34,6 @@ Only significant changes:
 |--------|-------------------------------------------|-------|-------|---------|----|--------|-----|---------|
 |   -    | noisy_change_above_default_threshold_test |       | 3.39M |  -4.36% | 62 | -4.62% | 100 |  -3.85% |
 
-ins = instructions, HI = heap, SMI = stable mem, Δ% = percent change
+ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 
 ---------------------------------------------------

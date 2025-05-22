@@ -162,7 +162,7 @@ pub(crate) fn print_table<W: Write>(
     writeln!(writer)?;
     writeln!(
         writer,
-        "ins = instructions, HI = heap, SMI = stable mem, Δ% = percent change"
+        "ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change"
     )?;
 
     Ok(())
@@ -216,7 +216,7 @@ mod tests {
 |--------|------------------------|-------|-----|---------|----|--------|-----|---------|
 |  ...   | ... 6 rows omitted ... |       |     |         |    |        |     |         |
 
-ins = instructions, HI = heap, SMI = stable mem, Δ% = percent change
+ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 ",
         );
     }
@@ -231,7 +231,7 @@ ins = instructions, HI = heap, SMI = stable mem, Δ% = percent change
 |  ...   | ... 5 rows omitted ... |       |       |         |    |        |     |         |
 |        | bench_5::scope_0       |    10 | 9.00M | -10.00% |  0 |        |   0 |         |
 
-ins = instructions, HI = heap, SMI = stable mem, Δ% = percent change
+ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 ",
         );
     }
@@ -247,7 +247,7 @@ ins = instructions, HI = heap, SMI = stable mem, Δ% = percent change
 |  ...   | ... 4 rows omitted ... |       |       |         |    |        |     |         |
 |        | bench_5::scope_0       |    10 | 9.00M | -10.00% |  0 |        |   0 |         |
 
-ins = instructions, HI = heap, SMI = stable mem, Δ% = percent change
+ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 ",
         );
     }
@@ -264,7 +264,7 @@ ins = instructions, HI = heap, SMI = stable mem, Δ% = percent change
 |        | bench_5                |       | 9.00M | -10.00% |  0 |        |   0 |         |
 |        | bench_5::scope_0       |    10 | 9.00M | -10.00% |  0 |        |   0 |         |
 
-ins = instructions, HI = heap, SMI = stable mem, Δ% = percent change
+ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 ",
         );
     }
@@ -282,7 +282,7 @@ ins = instructions, HI = heap, SMI = stable mem, Δ% = percent change
 |        | bench_5                |       | 9.00M | -10.00% |  0 |        |   0 |         |
 |        | bench_5::scope_0       |    10 | 9.00M | -10.00% |  0 |        |   0 |         |
 
-ins = instructions, HI = heap, SMI = stable mem, Δ% = percent change
+ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 ",
         );
     }
@@ -301,7 +301,7 @@ ins = instructions, HI = heap, SMI = stable mem, Δ% = percent change
 |        | bench_5               |       | 9.00M | -10.00% |  0 |        |   0 |         |
 |        | bench_5::scope_0      |    10 | 9.00M | -10.00% |  0 |        |   0 |         |
 
-ins = instructions, HI = heap, SMI = stable mem, Δ% = percent change
+ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 ",
         );
     }
@@ -320,7 +320,7 @@ ins = instructions, HI = heap, SMI = stable mem, Δ% = percent change
 |        | bench_5          |       | 9.00M | -10.00% |  0 |        |   0 |         |
 |        | bench_5::scope_0 |    10 | 9.00M | -10.00% |  0 |        |   0 |         |
 
-ins = instructions, HI = heap, SMI = stable mem, Δ% = percent change
+ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 ",
         );
     }
