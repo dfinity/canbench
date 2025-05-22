@@ -34,4 +34,6 @@ Only significant changes:
 |--------|-----------------------------|-------|-----|---------|----|--------|-----|---------|
 |  new   | stable_memory_only_increase |       | 307 |         |  0 |        | 456 |         |
 
+ins = instructions, HI = heap, SMI = stable mem, Δ% = percent change
+
 ---------------------------------------------------

@@ -40,4 +40,6 @@ Only significant changes:
 |  new   | bench_repeated_scope_new          |       | 16.50K |         |  0 |        |   0 |         |
 |  new   | bench_repeated_scope_new::scope_1 |    10 |  8.12K |         |  0 |        |   0 |         |
 
+ins = instructions, HI = heap, SMI = stable mem, Δ% = percent change
+
 ---------------------------------------------------
