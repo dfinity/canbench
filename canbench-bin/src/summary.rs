@@ -90,20 +90,21 @@ where
 {
     let mut sorted = values.to_vec();
     sorted.sort_by(|a, b| a.partial_cmp(b).unwrap());
-    let max = sorted.last().copied().unwrap();
-    let p75 = percentile_fn(&sorted, 75);
-    let p50 = percentile_fn(&sorted, 50);
-    let p25 = percentile_fn(&sorted, 25);
-    let min = sorted.first().copied().unwrap();
 
-    println!(
-        "{prefix} [max {} | p75 {} | median {} | p25 {} | min {}]",
-        format(max),
-        format(p75),
-        format(p50),
-        format(p25),
-        format(min),
-    );
+    let out = [
+        ("max", sorted.last().copied().unwrap()),
+        ("p75", percentile_fn(&sorted, 75)),
+        ("median", percentile_fn(&sorted, 50)),
+        ("p25", percentile_fn(&sorted, 25)),
+        ("min", sorted.first().copied().unwrap()),
+    ];
+
+    let parts: Vec<String> = out
+        .iter()
+        .map(|(label, v)| format!("{label} {}", format(*v)))
+        .collect();
+
+    println!("{prefix} [{}]", parts.join(" | "));
 }
 
 fn percentile_f64(sorted: &[f64], pct: usize) -> f64 {
