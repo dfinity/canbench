@@ -12,20 +12,20 @@ Summary:
   instructions:
     status:   Regressions detected! 🔴
     counts:   [total 1 | new 0 | improved 0 | regressed 1 | unchanged 0]
-    change:   [max +197 | p75 +197 | p50 +197 | p25 +197 | min +197]
-    change %: [max +1970.00% | p75 +1970.00% | p50 +1970.00% | p25 +1970.00% | min +1970.00%]
+    change:   [max +197 | p75 +197 | median +197 | p25 +197 | min +197]
+    change %: [max +1970.00% | p75 +1970.00% | median +1970.00% | p25 +1970.00% | min +1970.00%]
 
   heap_increase:
     status:   No significant changes detected 👍
     counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
-    change:   [max 0 | p75 0 | p50 0 | p25 0 | min 0]
-    change %: [max 0.00% | p75 0.00% | p50 0.00% | p25 0.00% | min 0.00%]
+    change:   [max 0 | p75 0 | median 0 | p25 0 | min 0]
+    change %: [max 0.00% | p75 0.00% | median 0.00% | p25 0.00% | min 0.00%]
 
   stable_memory_increase:
     status:   No significant changes detected 👍
     counts:   [total 1 | new 0 | improved 0 | regressed 0 | unchanged 1]
-    change:   [max 0 | p75 0 | p50 0 | p25 0 | min 0]
-    change %: [max 0.00% | p75 0.00% | p50 0.00% | p25 0.00% | min 0.00%]
+    change:   [max 0 | p75 0 | median 0 | p25 0 | min 0]
+    change %: [max 0.00% | p75 0.00% | median 0.00% | p25 0.00% | min 0.00%]
 
 ---------------------------------------------------
 

@@ -97,7 +97,7 @@ where
     let min = sorted.first().copied().unwrap();
 
     println!(
-        "{prefix} [max {} | p75 {} | p50 {} | p25 {} | min {}]",
+        "{prefix} [max {} | p75 {} | median {} | p25 {} | min {}]",
         format(max),
         format(p75),
         format(p50),
