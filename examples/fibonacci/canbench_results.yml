@@ -34,4 +34,4 @@ benches:
       heap_increase: 0
       stable_memory_increase: 0
     scopes: {}
-version: 0.1.14
+version: 0.1.15
