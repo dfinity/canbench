@@ -7,7 +7,7 @@ license = "Apache-2.0"
 readme = "../README.md"
 repository = "https://github.com/dfinity/canbench"
 # NOTE: Update `canbench-rs-macros` version below when this changes.
-version = "0.1.14"
+version = "0.1.15"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -15,7 +15,7 @@ version = "0.1.14"
 path = "src/lib.rs"
 
 [dependencies]
-canbench-rs-macros = { path = "../canbench-rs-macros", version = "0.1.14" }
+canbench-rs-macros = { path = "../canbench-rs-macros", version = "0.1.15" }
 candid.workspace = true
 ic-cdk.workspace = true
 serde.workspace = true
