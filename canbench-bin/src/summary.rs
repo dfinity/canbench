@@ -54,9 +54,9 @@ where
     println!("  {label}:");
     let status = match (improved, regressed) {
         (0, 0) => "No significant changes detected 👍",
-        (_, 0) => "Improvements detected! 🟢",
         (0, _) => "Regressions detected! 🔴",
-        _ => "Both improvements and regressions detected! 🟢🔴",
+        (_, 0) => "Improvements detected! 🟢",
+        _ => "Both regressions and improvements detected! 🔴🟢",
     };
     println!("    status:   {status}");
     println!(
@@ -90,16 +90,21 @@ where
 {
     let mut sorted = values.to_vec();
     sorted.sort_by(|a, b| a.partial_cmp(b).unwrap());
-    let min = sorted.first().copied().unwrap();
-    let med = percentile_fn(&sorted, 50);
-    let max = sorted.last().copied().unwrap();
 
-    println!(
-        "{prefix} [min {} | med {} | max {}]",
-        format(min),
-        format(med),
-        format(max),
-    );
+    let out = [
+        ("max", sorted.last().copied().unwrap()),
+        ("p75", percentile_fn(&sorted, 75)),
+        ("median", percentile_fn(&sorted, 50)),
+        ("p25", percentile_fn(&sorted, 25)),
+        ("min", sorted.first().copied().unwrap()),
+    ];
+
+    let parts: Vec<String> = out
+        .iter()
+        .map(|(label, v)| format!("{label} {}", format(*v)))
+        .collect();
+
+    println!("{prefix} [{}]", parts.join(" | "));
 }
 
 fn percentile_f64(sorted: &[f64], pct: usize) -> f64 {
