@@ -7,11 +7,13 @@ Benchmark: bench_scope_exists
     stable_memory_increase: 0 pages (no change)
 
   scope_1 (scope):
+    calls: 1 (no change)
     instructions: 1050 (regressed by 31.25%)
     heap_increase: 0 pages (improved by 100.00%)
     stable_memory_increase: 0 pages (no change)
 
   scope_2 (scope):
+    calls: 1 (new)
     instructions: 786 (new)
     heap_increase: 0 pages (new)
     stable_memory_increase: 0 pages (new)
