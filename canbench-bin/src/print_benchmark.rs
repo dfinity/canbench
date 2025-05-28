@@ -39,6 +39,9 @@ fn print_measurement(
     noise_threshold: f64,
     print_calls: bool,
 ) {
+    // Currently total is always expected to be 1 call.
+    // So we want to always print for scopes, but if in some cases total is not 1 call,
+    // we want to print calls for total as well.
     if print_calls || new.calls != 1 {
         print_metric("calls", new.calls, old.map(|m| m.calls), noise_threshold);
     }
