@@ -4,6 +4,7 @@ benches:
   # A benchmark that is expected to return no changes.
   no_changes_test:
     total:
+      calls: 1
       heap_delta: 0
       instructions: 207
       stable_memory_delta: 0
@@ -11,6 +12,7 @@ benches:
   # A benchmark that is expected to return a noisy change.
   noisy_change_test:
     total:
+      calls: 1
       heap_increase: 0
       instructions: 210
       stable_memory_increase: 0
@@ -18,13 +20,15 @@ benches:
   # A benchmark that is expected to return a noisy change with a higher noise threshold.
   noisy_change_above_default_threshold_test:
     total:
-      heap_increase: 65 
+      calls: 1
+      heap_increase: 65
       instructions: 3540000
       stable_memory_increase: 104
 
   # A benchmark that is expected to return a regression.
   regression_test:
     total:
+      calls: 1
       heap_increase: 0
       instructions: 10
       stable_memory_increase: 0
@@ -32,6 +36,7 @@ benches:
   # A benchmark that is expected to return an improvement.
   improvement_test:
     total:
+      calls: 1
       heap_increase: 0
       instructions: 3100
       stable_memory_increase: 0
@@ -39,6 +44,7 @@ benches:
   # A benchmark that is expected to return a regression from zero.
   stable_memory_increase_from_zero:
     total:
+      calls: 1
       heap_increase: 0
       instructions: 0
       stable_memory_increase: 0
@@ -46,23 +52,27 @@ benches:
   # A benchmark that is expected to return an increase of new scopes steps.
   bench_scope_exists:
     total:
+      calls: 1
       heap_increase: 0
       instructions: 0
       stable_memory_increase: 0
 
     scopes:
       scope_1:
+        calls: 1
         heap_increase: 12
         instructions: 800
   # A benchmark that is expected to return an increase of new repeated scope steps.
   bench_repeated_scope_exists:
     total:
+      calls: 1
       heap_increase: 0
       instructions: 0
       stable_memory_increase: 0
 
     scopes:
       scope_1:
+        calls: 10
         heap_increase: 12
         instructions: 800
-version: 0.1.0
+version: 0.1.15
