@@ -30,7 +30,7 @@
 //!
 //! ```yml
 //! build_cmd:
-//!   cargo build --release --target wasm32-unknown-unknown --features canbench-rs
+//!   cargo build --release --target wasm32-unknown-unknown --locked --features canbench-rs
 //!
 //! wasm_path:
 //!   ./target/wasm32-unknown-unknown/release/<YOUR_CANISTER>.wasm
