@@ -2,6 +2,7 @@
 
 Benchmark: bench_1 (new)
   total:
+    calls: 1 (new)
     instructions: 207 (new)
     heap_increase: 0 pages (new)
     stable_memory_increase: 0 pages (new)
@@ -10,6 +11,7 @@ Benchmark: bench_1 (new)
 
 Benchmark: bench_2 (new)
   total:
+    calls: 1 (new)
     instructions: 207 (new)
     heap_increase: 0 pages (new)
     stable_memory_increase: 0 pages (new)

@@ -2,6 +2,7 @@
 
 Benchmark: noisy_change_above_default_threshold_test
   total:
+    calls: 1 (no change)
     instructions: 3.39 M (improved by 4.36%)
     heap_increase: 62 pages (improved by 4.62%)
     stable_memory_increase: 100 pages (improved by 3.85%)

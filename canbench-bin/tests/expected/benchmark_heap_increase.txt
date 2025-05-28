@@ -2,6 +2,7 @@
 
 Benchmark: increase_heap_increase (new)
   total:
+    calls: 1 (new)
     instructions: 3.39 M (new)
     heap_increase: 62 pages (new)
     stable_memory_increase: 0 pages (new)

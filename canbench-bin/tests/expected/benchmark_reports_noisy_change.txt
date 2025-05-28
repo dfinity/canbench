@@ -2,6 +2,7 @@
 
 Benchmark: noisy_change_test
   total:
+    calls: 1 (no change)
     instructions: 207 (-1.43%) (change within noise threshold)
     heap_increase: 0 pages (no change)
     stable_memory_increase: 0 pages (no change)

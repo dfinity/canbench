@@ -33,6 +33,7 @@ pub(crate) fn print_benchmark(
 
 // Prints a measurement along with a comparison with the old value if available.
 fn print_measurement(new: &Measurement, old: Option<&Measurement>, noise_threshold: f64) {
+    print_metric("calls", new.calls, old.map(|m| m.calls), noise_threshold);
     print_metric(
         "instructions",
         new.instructions,
@@ -70,10 +71,8 @@ fn print_metric(metric: &str, value: u64, old_value: Option<u64>, noise_threshol
 
     // Add unit to value depending on the metric.
     let value_str = match metric {
-        "instructions" => {
-            // Don't include a unit with instructions since it's clear from the metric name.
-            value_str
-        }
+        "calls" => value_str,        // Units are clear from the metric name.
+        "instructions" => value_str, // Units are clear from the metric name.
         "heap_increase" => format!("{value_str} pages"),
         "stable_memory_increase" => format!("{value_str} pages"),
         other => panic!("unknown metric {}", other),
