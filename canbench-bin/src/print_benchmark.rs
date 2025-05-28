@@ -15,7 +15,7 @@ pub(crate) fn print_benchmark(
         println!("Benchmark: {} {}", name.bold(), "(new)".blue().bold());
     }
 
-    // Print totals, skip printing calls if it's a default 1 call.
+    // Print totals, skip calls number, since it's always should be 1.
     println!("  total:");
     print_measurement(&new.total, old.map(|m| &m.total), noise_threshold, false);
 
@@ -39,10 +39,7 @@ fn print_measurement(
     noise_threshold: f64,
     print_calls: bool,
 ) {
-    // Currently total is always expected to be 1 call.
-    // So we want to always print for scopes, but if in some cases total is not 1 call,
-    // we want to print calls for total as well.
-    if print_calls || new.calls != 1 {
+    if print_calls {
         print_metric("calls", new.calls, old.map(|m| m.calls), noise_threshold);
     }
     print_metric(
