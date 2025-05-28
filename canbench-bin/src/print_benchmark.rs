@@ -15,7 +15,7 @@ pub(crate) fn print_benchmark(
         println!("Benchmark: {} {}", name.bold(), "(new)".blue().bold());
     }
 
-    // Print totals, don't print calls since it's always for total.
+    // Print totals, skip printing calls if it's a default 1 call.
     println!("  total:");
     print_measurement(&new.total, old.map(|m| &m.total), noise_threshold, false);
 
@@ -39,7 +39,7 @@ fn print_measurement(
     noise_threshold: f64,
     print_calls: bool,
 ) {
-    if print_calls {
+    if print_calls || new.calls != 1 {
         print_metric("calls", new.calls, old.map(|m| m.calls), noise_threshold);
     }
     print_metric(
