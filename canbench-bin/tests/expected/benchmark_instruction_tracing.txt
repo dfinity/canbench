@@ -2,7 +2,6 @@
 
 Benchmark: write_stable_memory (new)
   total:
-    calls: 1 (new)
     instructions: 49.18 K (new)
     heap_increase: 0 pages (new)
     stable_memory_increase: 1 pages (new)

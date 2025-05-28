@@ -2,7 +2,6 @@
 
 Benchmark: improvement_test
   total:
-    calls: 1 (no change)
     instructions: 207 (improved by 93.32%)
     heap_increase: 0 pages (no change)
     stable_memory_increase: 0 pages (no change)

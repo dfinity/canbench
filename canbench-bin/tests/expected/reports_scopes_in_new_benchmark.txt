@@ -2,7 +2,6 @@
 
 Benchmark: bench_scope_new (new)
   total:
-    calls: 1 (new)
     instructions: 4134 (new)
     heap_increase: 0 pages (new)
     stable_memory_increase: 0 pages (new)

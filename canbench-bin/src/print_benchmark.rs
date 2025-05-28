@@ -15,9 +15,9 @@ pub(crate) fn print_benchmark(
         println!("Benchmark: {} {}", name.bold(), "(new)".blue().bold());
     }
 
-    // Print totals.
+    // Print totals, don't print calls since it's always for total.
     println!("  total:");
-    print_measurement(&new.total, old.map(|m| &m.total), noise_threshold);
+    print_measurement(&new.total, old.map(|m| &m.total), noise_threshold, false);
 
     // Print scopes
     for (scope, measurement) in &new.scopes {
@@ -27,13 +27,21 @@ pub(crate) fn print_benchmark(
             measurement,
             old.map(|m| &m.scopes).and_then(|m| m.get(scope)),
             noise_threshold,
+            true,
         );
     }
 }
 
 // Prints a measurement along with a comparison with the old value if available.
-fn print_measurement(new: &Measurement, old: Option<&Measurement>, noise_threshold: f64) {
-    print_metric("calls", new.calls, old.map(|m| m.calls), noise_threshold);
+fn print_measurement(
+    new: &Measurement,
+    old: Option<&Measurement>,
+    noise_threshold: f64,
+    print_calls: bool,
+) {
+    if print_calls {
+        print_metric("calls", new.calls, old.map(|m| m.calls), noise_threshold);
+    }
     print_metric(
         "instructions",
         new.instructions,

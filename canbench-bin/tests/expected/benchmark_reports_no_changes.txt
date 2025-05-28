@@ -2,7 +2,6 @@
 
 Benchmark: no_changes_test
   total:
-    calls: 1 (no change)
     instructions: 207 (no change)
     heap_increase: 0 pages (no change)
     stable_memory_increase: 0 pages (no change)
