@@ -60,8 +60,8 @@ where
     };
     println!("    status:   {status}");
     println!(
-        "    counts:   [total {} | new {} | improved {} | regressed {} | unchanged {}]",
-        total, new, improved, regressed, unchanged
+        "    counts:   [total {} | regressed {} | improved {} | new {} | unchanged {}]",
+        total, regressed, improved, new, unchanged
     );
 
     if !abs_deltas.is_empty() {
