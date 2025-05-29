@@ -1,46 +1,42 @@
 ---------------------------------------------------
 
-Benchmark: bench_nested_scopes (new)
+Benchmark: bench_nested_scopes
   total:
-    instructions: 12.64 K (new)
-    heap_increase: 0 pages (new)
-    stable_memory_increase: 0 pages (new)
+    instructions: 46.74 K (0.00%) (change within noise threshold)
+    heap_increase: 0 pages (no change)
+    stable_memory_increase: 0 pages (no change)
 
-  nested_scope (scope):
-    calls: 10 (new)
-    instructions: 11.56 K (new)
-    heap_increase: 0 pages (new)
-    stable_memory_increase: 0 pages (new)
+  nested_scope_1 (scope):
+    calls: 10 (no change)
+    instructions: 11.99 K (-0.03%) (change within noise threshold)
+    heap_increase: 0 pages (no change)
+    stable_memory_increase: 0 pages (no change)
+
+  nested_scope_2 (scope):
+    calls: 20 (no change)
+    instructions: 32.28 K (0.01%) (change within noise threshold)
+    heap_increase: 0 pages (no change)
+    stable_memory_increase: 0 pages (no change)
 
 ---------------------------------------------------
 
 Summary:
   instructions:
     status:   No significant changes detected 👍
-    counts:   [total 1 | regressed 0 | improved 0 | new 1 | unchanged 0]
-    change:   n/a
-    change %: n/a
+    counts:   [total 1 | regressed 0 | improved 0 | new 0 | unchanged 1]
+    change:   [max +2 | p75 +2 | median +2 | p25 +2 | min +2]
+    change %: [max 0.00% | p75 0.00% | median 0.00% | p25 0.00% | min 0.00%]
 
   heap_increase:
     status:   No significant changes detected 👍
-    counts:   [total 1 | regressed 0 | improved 0 | new 1 | unchanged 0]
-    change:   n/a
-    change %: n/a
+    counts:   [total 1 | regressed 0 | improved 0 | new 0 | unchanged 1]
+    change:   [max 0 | p75 0 | median 0 | p25 0 | min 0]
+    change %: [max 0.00% | p75 0.00% | median 0.00% | p25 0.00% | min 0.00%]
 
   stable_memory_increase:
     status:   No significant changes detected 👍
-    counts:   [total 1 | regressed 0 | improved 0 | new 1 | unchanged 0]
-    change:   n/a
-    change %: n/a
-
----------------------------------------------------
-
-Only significant changes:
-| status | name                              | calls |    ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
-|--------|-----------------------------------|-------|--------|---------|----|--------|-----|---------|
-|  new   | bench_nested_scopes               |       | 12.64K |         |  0 |        |   0 |         |
-|  new   | bench_nested_scopes::nested_scope |    10 | 11.56K |         |  0 |        |   0 |         |
-
-ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
+    counts:   [total 1 | regressed 0 | improved 0 | new 0 | unchanged 1]
+    change:   [max 0 | p75 0 | median 0 | p25 0 | min 0]
+    change %: [max 0.00% | p75 0.00% | median 0.00% | p25 0.00% | min 0.00%]
 
 ---------------------------------------------------

@@ -121,16 +121,17 @@ fn bench_repeated_scope_exists() {
     }
 }
 
-fn foo(depth: usize) {
+fn foo(depth: usize, name: &'static str) {
     if depth > 0 {
-        let _p = bench_scope("nested_scope");
-        foo(depth - 1);
+        let _p = bench_scope(name);
+        foo(depth - 1, name);
     }
 }
 
 #[bench]
 fn bench_nested_scopes() {
-    foo(10);
+    foo(10, "nested_scope_1");
+    foo(20, "nested_scope_2");
 }
 
 #[export_name = "canister_query __canbench__broken_benchmark"]

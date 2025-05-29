@@ -642,62 +642,70 @@ fn reset() {
 }
 
 // Returns the measurements for any declared scopes, aggregated by the scope name.
-fn get_scopes_measurements() -> std::collections::BTreeMap<&'static str, Measurement> {
+fn get_scopes_measurements() -> BTreeMap<&'static str, Measurement> {
     fn sum_non_overlapping(measurements: &[Measurement]) -> Measurement {
-        // Each measurement is an interval: [start_instructions, start_instructions + instructions)
-        let mut intervals: Vec<(u64, u64, &Measurement)> = measurements
+        #[derive(Debug)]
+        struct Interval {
+            start: u64,
+            end: u64,
+            measurement: Measurement,
+        }
+
+        let mut intervals: Vec<Interval> = measurements
             .iter()
-            .map(|m| {
-                (
-                    m.start_instructions,
-                    m.start_instructions + m.instructions,
-                    m,
-                )
+            .map(|m| Interval {
+                start: m.start_instructions,
+                end: m.start_instructions + m.instructions,
+                measurement: m.clone(),
             })
             .collect();
 
-        // Sort intervals by start
-        intervals.sort_by_key(|&(start, _, _)| start);
+        intervals.sort_by_key(|i| i.start);
 
-        let mut merged: Vec<(u64, u64, Vec<&Measurement>)> = Vec::new();
+        let mut total = Measurement::default();
+        let mut current_start = 0;
+        let mut current_end = 0;
+        let mut group_measurements: Vec<Measurement> = Vec::new();
 
-        for (start, end, m) in intervals {
-            if let Some((_last_start, last_end, ms)) = merged.last_mut() {
-                if start < *last_end {
-                    // Overlap: merge intervals
-                    *last_end = std::cmp::max(*last_end, end);
-                    ms.push(m);
-                } else {
-                    merged.push((start, end, vec![m]));
-                }
+        for i in intervals {
+            if i.start < current_end {
+                current_end = current_end.max(i.end);
+                group_measurements.push(i.measurement);
             } else {
-                merged.push((start, end, vec![m]));
+                if current_end > current_start {
+                    total.instructions += current_end - current_start;
+                    for m in &group_measurements {
+                        total.calls += m.calls;
+                        total.heap_increase += m.heap_increase;
+                        total.stable_memory_increase += m.stable_memory_increase;
+                    }
+                }
+                current_start = i.start;
+                current_end = i.end;
+                group_measurements.clear();
+                group_measurements.push(i.measurement);
             }
         }
 
-        // Now sum the non-overlapping instruction intervals, and aggregate other fields
-        let mut total = Measurement::default();
-        for (start, end, ms) in merged {
-            let duration = end - start;
-            total.instructions += duration;
-            // For calls, heap_increase, stable_memory_increase, sum all in the merged group
-            for m in ms {
+        // Final group
+        if current_end > current_start {
+            total.instructions += current_end - current_start;
+            for m in &group_measurements {
                 total.calls += m.calls;
                 total.heap_increase += m.heap_increase;
                 total.stable_memory_increase += m.stable_memory_increase;
             }
         }
+
         total
     }
 
-    SCOPES
-        .with(|p| p.borrow().clone())
-        .into_iter()
-        .map(|(scope, measurements)| {
-            let total = sum_non_overlapping(&measurements);
-            (scope, total)
-        })
-        .collect()
+    SCOPES.with(|p| {
+        p.borrow()
+            .iter()
+            .map(|(&scope, measurements)| (scope, sum_non_overlapping(measurements)))
+            .collect()
+    })
 }
 
 fn instruction_count() -> u64 {
