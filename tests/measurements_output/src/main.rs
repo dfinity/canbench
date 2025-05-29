@@ -121,6 +121,18 @@ fn bench_repeated_scope_exists() {
     }
 }
 
+fn foo(depth: usize) {
+    if depth > 0 {
+        let _p = bench_scope("nested_scope");
+        foo(depth - 1);
+    }
+}
+
+#[bench]
+fn bench_nested_scopes() {
+    foo(10);
+}
+
 #[export_name = "canister_query __canbench__broken_benchmark"]
 fn broken_benchmark() {
     // This benchmark doesn't reply, and will therefore fail.
