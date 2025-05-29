@@ -122,6 +122,7 @@ fn bench_repeated_scope_exists() {
 }
 
 fn foo(depth: usize, name: &'static str) {
+    println!("foo");
     if depth > 0 {
         let _p = bench_scope(name);
         foo(depth - 1, name);

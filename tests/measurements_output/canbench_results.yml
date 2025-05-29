@@ -81,17 +81,17 @@ benches:
     total:
       calls: 1
       heap_increase: 0
-      instructions: 46740
+      instructions: 63490
       stable_memory_increase: 0
 
     scopes:
       nested_scope_1:
         calls: 10
         heap_increase: 0
-        instructions: 11990
+        instructions: 17140
 
       nested_scope_2:
         calls: 20
         heap_increase: 0
-        instructions: 32280
+        instructions: 42580
 version: 0.1.15
