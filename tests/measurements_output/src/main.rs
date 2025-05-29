@@ -121,12 +121,23 @@ fn bench_repeated_scope_exists() {
     }
 }
 
-fn foo(depth: usize, name: &'static str) {
-    println!("foo");
-    if depth > 0 {
-        let _p = bench_scope(name);
-        foo(depth - 1, name);
+fn wait(instructions: u64) {
+    let start = ic_cdk::api::performance_counter(0);
+    while ic_cdk::api::performance_counter(0) - start < instructions {
+        // Call `black_box` to prevent loop from being optimized out.
+        for _i in 0..100 {
+            std::hint::black_box(0);
+        }
     }
+}
+
+fn foo(depth: usize, name: &'static str) {
+    if depth == 0 {
+        return;
+    }
+    let _p = bench_scope(name);
+    wait(1_000_000);
+    foo(depth - 1, name);
 }
 
 #[bench]

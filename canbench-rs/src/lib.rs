@@ -618,13 +618,13 @@ impl BenchScope {
 
 impl Drop for BenchScope {
     fn drop(&mut self) {
-        let start_instructions = self.start_instructions;
-        let instructions = instruction_count() - self.start_instructions;
-        let stable_memory_increase = ic_cdk::api::stable::stable_size() - self.start_stable_memory;
-        let heap_increase = heap_size() - self.start_heap;
-
         SCOPES.with(|p| {
             let mut p = p.borrow_mut();
+            let start_instructions = self.start_instructions;
+            let stable_memory_increase =
+                ic_cdk::api::stable::stable_size() - self.start_stable_memory;
+            let heap_increase = heap_size() - self.start_heap;
+            let instructions = instruction_count() - self.start_instructions;
             p.entry(self.name).or_default().push(Measurement {
                 start_instructions,
                 calls: 1,
