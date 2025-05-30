@@ -467,7 +467,7 @@
 pub use canbench_rs_macros::bench;
 use candid::CandidType;
 use serde::{Deserialize, Serialize};
-use std::{cell::RefCell, collections::BTreeMap, ops::Add};
+use std::{cell::RefCell, collections::BTreeMap};
 
 thread_local! {
     static SCOPES: RefCell<BTreeMap<&'static str, Vec<Measurement>>> =
@@ -488,6 +488,9 @@ pub struct BenchResult {
 /// A benchmark measurement containing various stats.
 #[derive(Debug, PartialEq, Serialize, Deserialize, CandidType, Clone, Default)]
 pub struct Measurement {
+    #[serde(default)]
+    start_instructions: u64,
+
     /// The number of calls to the function or scope.
     #[serde(default)]
     pub calls: u64,
@@ -503,19 +506,6 @@ pub struct Measurement {
     /// The increase in stable memory (measured in pages).
     #[serde(default)]
     pub stable_memory_increase: u64,
-}
-
-impl Add for Measurement {
-    type Output = Self;
-
-    fn add(self, other: Self) -> Self::Output {
-        Self {
-            calls: self.calls + other.calls,
-            instructions: self.instructions + other.instructions,
-            heap_increase: self.heap_increase + other.heap_increase,
-            stable_memory_increase: self.stable_memory_increase + other.stable_memory_increase,
-        }
-    }
 }
 
 /// Benchmarks the given function.
@@ -534,6 +524,7 @@ pub fn bench_fn<R>(f: impl FnOnce() -> R) -> BenchResult {
         let heap_increase = heap_size() - start_heap;
 
         let total = Measurement {
+            start_instructions,
             calls: 1,
             instructions,
             heap_increase,
@@ -627,13 +618,15 @@ impl BenchScope {
 
 impl Drop for BenchScope {
     fn drop(&mut self) {
-        let instructions = instruction_count() - self.start_instructions;
-        let stable_memory_increase = ic_cdk::api::stable::stable_size() - self.start_stable_memory;
-        let heap_increase = heap_size() - self.start_heap;
-
         SCOPES.with(|p| {
             let mut p = p.borrow_mut();
+            let start_instructions = self.start_instructions;
+            let stable_memory_increase =
+                ic_cdk::api::stable::stable_size() - self.start_stable_memory;
+            let heap_increase = heap_size() - self.start_heap;
+            let instructions = instruction_count() - self.start_instructions;
             p.entry(self.name).or_default().push(Measurement {
+                start_instructions,
                 calls: 1,
                 instructions,
                 heap_increase,
@@ -648,20 +641,71 @@ fn reset() {
     SCOPES.with(|p| p.borrow_mut().clear());
 }
 
-// Returns the measurements for any declared scopes,
-// aggregated by the scope name.
-fn get_scopes_measurements() -> std::collections::BTreeMap<&'static str, Measurement> {
-    SCOPES
-        .with(|p| p.borrow().clone())
-        .into_iter()
-        .map(|(scope, measurements)| {
-            let mut total = Measurement::default();
-            for measurement in measurements {
-                total = total + measurement;
+// Returns the measurements for any declared scopes, aggregated by the scope name.
+fn get_scopes_measurements() -> BTreeMap<&'static str, Measurement> {
+    fn sum_non_overlapping(measurements: &[Measurement]) -> Measurement {
+        #[derive(Debug)]
+        struct Interval {
+            start: u64,
+            end: u64,
+            measurement: Measurement,
+        }
+
+        let mut intervals: Vec<Interval> = measurements
+            .iter()
+            .map(|m| Interval {
+                start: m.start_instructions,
+                end: m.start_instructions + m.instructions,
+                measurement: m.clone(),
+            })
+            .collect();
+
+        intervals.sort_by_key(|i| i.start);
+
+        let mut total = Measurement::default();
+        let mut current_start = 0;
+        let mut current_end = 0;
+        let mut group_measurements: Vec<Measurement> = Vec::new();
+
+        for i in intervals {
+            if i.start < current_end {
+                current_end = current_end.max(i.end);
+                group_measurements.push(i.measurement);
+            } else {
+                if current_end > current_start {
+                    total.instructions += current_end - current_start;
+                    for m in &group_measurements {
+                        total.calls += m.calls;
+                        total.heap_increase += m.heap_increase;
+                        total.stable_memory_increase += m.stable_memory_increase;
+                    }
+                }
+                current_start = i.start;
+                current_end = i.end;
+                group_measurements.clear();
+                group_measurements.push(i.measurement);
             }
-            (scope, total)
-        })
-        .collect()
+        }
+
+        // Final group
+        if current_end > current_start {
+            total.instructions += current_end - current_start;
+            for m in &group_measurements {
+                total.calls += m.calls;
+                total.heap_increase += m.heap_increase;
+                total.stable_memory_increase += m.stable_memory_increase;
+            }
+        }
+
+        total
+    }
+
+    SCOPES.with(|p| {
+        p.borrow()
+            .iter()
+            .map(|(&scope, measurements)| (scope, sum_non_overlapping(measurements)))
+            .collect()
+    })
 }
 
 fn instruction_count() -> u64 {
