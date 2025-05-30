@@ -373,10 +373,10 @@ fn reports_repeated_scope_in_existing_benchmark() {
 }
 
 #[test]
-fn reports_nested_scopes_benchmark() {
+fn reports_recursive_scopes_benchmark() {
     let name = current_test_name!();
     BenchTest::canister("measurements_output")
-        .with_bench("bench_nested_scopes")
+        .with_bench("bench_recursive_scopes")
         .run(|output| {
             let expected = load_expected(name, &output);
             assert_success!(output, expected.as_str());

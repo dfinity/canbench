@@ -1,20 +1,20 @@
 ---------------------------------------------------
 
-Benchmark: bench_nested_scopes
+Benchmark: bench_recursive_scopes
   total:
-    instructions: 30.09 M (-0.01%) (change within noise threshold)
+    instructions: 30.09 M (0.31%) (change within noise threshold)
     heap_increase: 0 pages (no change)
     stable_memory_increase: 0 pages (no change)
 
-  nested_scope_1 (scope):
+  recursive_scope_1 (scope):
     calls: 10 (no change)
-    instructions: 10.03 M (-0.04%) (change within noise threshold)
+    instructions: 10.03 M (0.26%) (change within noise threshold)
     heap_increase: 0 pages (no change)
     stable_memory_increase: 0 pages (no change)
 
-  nested_scope_2 (scope):
+  recursive_scope_2 (scope):
     calls: 20 (no change)
-    instructions: 20.06 M (-0.00%) (change within noise threshold)
+    instructions: 20.06 M (0.31%) (change within noise threshold)
     heap_increase: 0 pages (no change)
     stable_memory_increase: 0 pages (no change)
 
@@ -24,8 +24,8 @@ Summary:
   instructions:
     status:   No significant changes detected 👍
     counts:   [total 1 | regressed 0 | improved 0 | new 0 | unchanged 1]
-    change:   [max -1.92K | p75 -1.92K | median -1.92K | p25 -1.92K | min -1.92K]
-    change %: [max -0.01% | p75 -0.01% | median -0.01% | p25 -0.01% | min -0.01%]
+    change:   [max +91.83K | p75 +91.83K | median +91.83K | p25 +91.83K | min +91.83K]
+    change %: [max +0.31% | p75 +0.31% | median +0.31% | p25 +0.31% | min +0.31%]
 
   heap_increase:
     status:   No significant changes detected 👍
