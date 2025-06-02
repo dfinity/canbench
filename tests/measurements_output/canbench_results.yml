@@ -62,6 +62,7 @@ benches:
         calls: 1
         heap_increase: 12
         instructions: 800
+
   # A benchmark that is expected to return an increase of new repeated scope steps.
   bench_repeated_scope_exists:
     total:
@@ -75,4 +76,23 @@ benches:
         calls: 10
         heap_increase: 12
         instructions: 800
+
+  # A benchmark with separate recursive scopes.
+  bench_recursive_scopes:
+    total:
+      calls: 1
+      heap_increase: 0
+      instructions: 30000000
+      stable_memory_increase: 0
+
+    scopes:
+      recursive_scope_1:
+        calls: 10
+        heap_increase: 0
+        instructions: 10000000
+
+      recursive_scope_2:
+        calls: 20
+        heap_increase: 0
+        instructions: 20000000
 version: 0.1.15

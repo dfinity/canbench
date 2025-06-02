@@ -121,6 +121,36 @@ fn bench_repeated_scope_exists() {
     }
 }
 
+/// Busy-waits until approximately `instructions` have been consumed.
+fn wait_for_instructions(instructions: u64) {
+    let start = ic_cdk::api::performance_counter(0);
+    while ic_cdk::api::performance_counter(0) - start < instructions {
+        // Prevents loop from being optimized away.
+        for _ in 0..100 {
+            std::hint::black_box(0);
+        }
+    }
+}
+
+/// Recursively measures recursive scopes, delaying by `instructions_delay` at each level.
+fn measure_recursive_scope(scope_name: &'static str, depth: usize, instructions_delay: u64) {
+    if depth == 0 {
+        return;
+    }
+
+    let _scope = bench_scope(scope_name);
+    wait_for_instructions(instructions_delay);
+    measure_recursive_scope(scope_name, depth - 1, instructions_delay);
+}
+
+#[bench]
+fn bench_recursive_scopes() {
+    const INSTRUCTIONS_PER_CALL: u64 = 1_000_000;
+
+    measure_recursive_scope("recursive_scope_1", 10, INSTRUCTIONS_PER_CALL); // 10M instructions
+    measure_recursive_scope("recursive_scope_2", 20, INSTRUCTIONS_PER_CALL); // 20M instructions
+}
+
 #[export_name = "canister_query __canbench__broken_benchmark"]
 fn broken_benchmark() {
     // This benchmark doesn't reply, and will therefore fail.
