@@ -30,7 +30,4 @@ syn = "1.0"
 tempfile = "3.3.0"
 walrus = "0.23.3"
 wasmparser = "0.119.0"
-# `pocket-ic` should be pinned to an exact version so that the PocketIC server binary version
-# `POCKET_IC_SERVER_VERSION` defined in `canbench-bin/src/lib.rs` is compatible.
-pocket-ic = "=9.0.0"
 rustc-demangle = "0.1"
