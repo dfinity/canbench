@@ -62,7 +62,7 @@ canbench --less-verbose --hide-results --show-summary --csv > "$CANBENCH_OUTPUT"
 cp "./canbench_results.csv" "$CANBENCH_RESULTS_CSV_FILE"
 if has_updates; then
   UPDATED_MSG="**❌ \`$CANBENCH_RESULTS_FILE\` is not up to date**
-If the performance change is expected, run \`canbench --persist [--csv]\` to update the benchmark results."
+  If the performance change is expected, run \`canbench --persist [--csv]\` to update the benchmark results."
   # Results are outdated; fail the job.
   echo "EXIT_STATUS=1" >> "$GITHUB_ENV"
 else
