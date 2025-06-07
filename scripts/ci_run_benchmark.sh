@@ -63,9 +63,11 @@ cp "./canbench_results.csv" "$CANBENCH_RESULTS_CSV_FILE"
 if has_updates; then
   UPDATED_MSG="**❌ \`$CANBENCH_RESULTS_FILE\` is not up to date**
 If the performance change is expected, run \`canbench --persist [--csv]\` to update the benchmark results."
+  # Results are outdated; fail the job.
   echo "EXIT_STATUS=1" >> "$GITHUB_ENV"
 else
   UPDATED_MSG="✅ \`$CANBENCH_RESULTS_FILE\` is up to date"
+  # Results are up to date; job succeeds.
   echo "EXIT_STATUS=0" >> "$GITHUB_ENV"
 fi
 popd
