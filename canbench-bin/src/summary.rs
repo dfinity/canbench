@@ -52,11 +52,15 @@ where
     debug_assert_eq!(total, processed_entries, "total count mismatch");
 
     println!("  {label}:");
-    let status = match (improved, regressed) {
-        (0, 0) => "No significant changes detected 👍",
-        (0, _) => "Regressions detected! 🔴",
-        (_, 0) => "Improvements detected! 🟢",
-        _ => "Both regressions and improvements detected! 🔴🟢",
+    let status = match (new > 0, improved > 0, regressed > 0) {
+        (false, false, false) => "No significant changes 👍",
+        (true, false, false) => "New benchmarks added ➕",
+        (false, true, false) => "Improvements detected 🟢",
+        (false, false, true) => "Regressions detected 🔴",
+        (true, true, false) => "New benchmarks and improvements ➕🟢",
+        (true, false, true) => "New benchmarks and regressions ➕🔴",
+        (false, true, true) => "Improvements and regressions 🟢🔴",
+        (true, true, true) => "New benchmarks, improvements, and regressions ➕🟢🔴",
     };
     println!("    status:   {status}");
     println!(
