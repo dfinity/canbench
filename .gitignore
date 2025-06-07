@@ -8,3 +8,5 @@
 **/*~
 tests/**/*.svg
 examples/**/*.svg
+
+tmp/
