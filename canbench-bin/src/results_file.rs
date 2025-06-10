@@ -1,5 +1,4 @@
-use canbench_rs::{BenchResult, Measurement};
-use candid::CandidType;
+use canbench_rs::BenchResult;
 use semver::Version;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -49,21 +48,14 @@ pub fn read(results_file: &PathBuf) -> Result<BTreeMap<String, BenchResult>, Ver
         });
     }
 
-    Ok(results
-        .benches
-        .into_iter()
-        .map(|(k, v)| (k, BenchResult::from(v)))
-        .collect())
+    Ok(results.benches)
 }
 
 /// Write benchmark results to disk.
-pub fn write(results_file: &PathBuf, benches: BTreeMap<String, BenchResult>) {
+pub fn write(results_file: &PathBuf, results: BTreeMap<String, BenchResult>) {
     let persisted_results = PersistedResults {
         version: VERSION,
-        benches: benches
-            .into_iter()
-            .map(|(k, v)| (k, BenchResultWire::from(v)))
-            .collect(),
+        benches: results,
     };
 
     let mut file = File::create(results_file).unwrap();
@@ -78,100 +70,6 @@ pub fn write(results_file: &PathBuf, benches: BTreeMap<String, BenchResult>) {
 // Data persisted to a results file.
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 struct PersistedResults<'b> {
-    benches: BTreeMap<String, BenchResultWire>,
+    benches: BTreeMap<String, BenchResult>,
     version: &'b str,
-}
-
-/// A wire format for benchmark results.
-#[derive(Debug, PartialEq, Serialize, Deserialize, CandidType, Default)]
-pub struct BenchResultWire {
-    pub total: MeasurementWire,
-
-    #[serde(default)]
-    pub scopes: BTreeMap<String, MeasurementWire>,
-}
-
-impl From<BenchResult> for BenchResultWire {
-    fn from(br: BenchResult) -> Self {
-        Self {
-            total: MeasurementWire::from(br.total),
-            scopes: br
-                .scopes
-                .into_iter()
-                .map(|(k, v)| (k, MeasurementWire::from(v)))
-                .collect(),
-        }
-    }
-}
-
-impl From<BenchResultWire> for BenchResult {
-    fn from(br: BenchResultWire) -> Self {
-        Self {
-            total: Measurement::from(br.total),
-            scopes: br
-                .scopes
-                .into_iter()
-                .map(|(k, v)| (k, Measurement::from(v)))
-                .collect(),
-        }
-    }
-}
-
-/// A wire format for measurements.
-#[derive(Debug, PartialEq, Serialize, Deserialize, CandidType, Clone, Default)]
-pub struct MeasurementWire {
-    pub calls: Option<u64>,
-    pub instructions: Option<u64>,
-    pub heap_increase: Option<u64>,
-    pub stable_memory_increase: Option<u64>,
-}
-
-impl From<Measurement> for MeasurementWire {
-    fn from(m: Measurement) -> Self {
-        Self {
-            calls: Some(m.calls),
-            instructions: Some(m.instructions),
-            heap_increase: Some(m.heap_increase),
-            stable_memory_increase: Some(m.stable_memory_increase),
-        }
-    }
-}
-
-impl From<MeasurementWire> for Measurement {
-    fn from(m: MeasurementWire) -> Self {
-        let mut measurement = Measurement::default();
-        if let Some(calls) = m.calls {
-            measurement.calls = calls;
-        }
-        if let Some(instructions) = m.instructions {
-            measurement.instructions = instructions;
-        }
-        if let Some(heap_increase) = m.heap_increase {
-            measurement.heap_increase = heap_increase;
-        }
-        if let Some(stable_memory_increase) = m.stable_memory_increase {
-            measurement.stable_memory_increase = stable_memory_increase;
-        }
-        measurement
-    }
-}
-
-#[test]
-fn test_backwards_compatibility() {
-    use candid::{Decode, Encode};
-
-    #[derive(Debug, PartialEq, Serialize, Deserialize, CandidType, Clone, Default)]
-    pub struct MeasurementPreviousVersion {
-        pub instructions: u64,
-        pub heap_increase: u64,
-        pub stable_memory_increase: u64,
-    }
-
-    // Encode a previous version Candid struct (the fields were not provided)
-    let encoded = Encode!(&MeasurementPreviousVersion::default()).unwrap();
-    let decoded = Measurement::from(Decode!(&encoded, MeasurementWire).unwrap());
-
-    let mut expected = Measurement::default();
-    expected.calls = 0;
-    assert_eq!(decoded, expected);
 }
