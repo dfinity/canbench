@@ -512,8 +512,7 @@ pub struct Measurement {
 
 #[test]
 fn test_backward_compatibility() {
-    use candid::Decode;
-    use candid::Encode;
+    use candid::{Decode, Encode};
 
     #[derive(Debug, PartialEq, Serialize, Deserialize, CandidType, Clone, Default)]
     pub struct MeasurementPreviousVersion {
