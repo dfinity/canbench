@@ -172,7 +172,7 @@ fn build_entry(
     Entry {
         status,
         benchmark,
-        calls: extract_values(|m| m.calls),
+        calls: extract_values(|m| m.calls.unwrap_or_default()),
         instructions: extract_values(|m| m.instructions),
         heap_increase: extract_values(|m| m.heap_increase),
         stable_memory_increase: extract_values(|m| m.stable_memory_increase),

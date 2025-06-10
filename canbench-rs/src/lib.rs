@@ -488,12 +488,15 @@ pub struct BenchResult {
 /// A benchmark measurement containing various stats.
 #[derive(Debug, PartialEq, Serialize, Deserialize, CandidType, Clone, Default)]
 pub struct Measurement {
+    /// Instructions counter value at the start of measurement.
+    /// This field is not serialized, since it is never compared new vs old,
+    /// and is only used to calculate the instructions in overlapping/nested scopes.
     #[serde(skip)]
     start_instructions: u64,
 
     /// The number of calls to the function or scope.
     #[serde(default)]
-    pub calls: u64,
+    pub calls: Option<u64>,
 
     /// The number of instructions.
     #[serde(default)]
@@ -515,8 +518,6 @@ fn test_default_start_instructions() {
 
     #[derive(Debug, PartialEq, Serialize, Deserialize, CandidType, Clone, Default)]
     pub struct MeasurementV0 {
-        #[serde(default)]
-        pub calls: u64,
         #[serde(default)]
         pub instructions: u64,
         #[serde(default)]
@@ -555,7 +556,7 @@ pub fn bench_fn<R>(f: impl FnOnce() -> R) -> BenchResult {
 
         let total = Measurement {
             start_instructions,
-            calls: 1,
+            calls: Some(1),
             instructions,
             heap_increase,
             stable_memory_increase,
@@ -657,7 +658,7 @@ impl Drop for BenchScope {
             let instructions = instruction_count() - self.start_instructions;
             p.entry(self.name).or_default().push(Measurement {
                 start_instructions,
-                calls: 1,
+                calls: Some(1),
                 instructions,
                 heap_increase,
                 stable_memory_increase,
@@ -705,7 +706,7 @@ fn get_scopes_measurements() -> BTreeMap<&'static str, Measurement> {
                 if current_end > current_start {
                     total.instructions += current_end - current_start;
                     for m in &group_measurements {
-                        total.calls += m.calls;
+                        total.calls = Some(total.calls.unwrap_or(0) + m.calls.unwrap_or(1));
                         total.heap_increase += m.heap_increase;
                         total.stable_memory_increase += m.stable_memory_increase;
                     }
@@ -721,7 +722,7 @@ fn get_scopes_measurements() -> BTreeMap<&'static str, Measurement> {
         if current_end > current_start {
             total.instructions += current_end - current_start;
             for m in &group_measurements {
-                total.calls += m.calls;
+                total.calls = Some(total.calls.unwrap_or(0) + m.calls.unwrap_or(1));
                 total.heap_increase += m.heap_increase;
                 total.stable_memory_increase += m.stable_memory_increase;
             }

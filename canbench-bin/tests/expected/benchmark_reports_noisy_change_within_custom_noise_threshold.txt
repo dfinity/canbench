@@ -12,7 +12,7 @@ Summary:
   instructions:
     status:   No significant changes 👍
     counts:   [total 1 | regressed 0 | improved 0 | new 0 | unchanged 1]
-    change:   [max -154.17K | p75 -154.17K | median -154.17K | p25 -154.17K | min -154.17K]
+    change:   [max -154.16K | p75 -154.16K | median -154.16K | p25 -154.16K | min -154.16K]
     change %: [max -4.35% | p75 -4.35% | median -4.35% | p25 -4.35% | min -4.35%]
 
   heap_increase:
