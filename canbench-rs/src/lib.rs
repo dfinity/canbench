@@ -566,11 +566,8 @@ fn test_backwards_compatibility() {
 
     #[derive(Debug, PartialEq, Serialize, Deserialize, CandidType, Clone, Default)]
     pub struct MeasurementPreviousVersion {
-        #[serde(default)]
         pub instructions: u64,
-        #[serde(default)]
         pub heap_increase: u64,
-        #[serde(default)]
         pub stable_memory_increase: u64,
     }
 
