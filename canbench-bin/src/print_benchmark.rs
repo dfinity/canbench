@@ -1,11 +1,11 @@
-use canbench_rs::{BenchResult, Measurement};
+use canbench_rs::{BenchResultInternal, MeasurementInternal};
 use colored::Colorize;
 
 /// Prints a benchmark to stdout, comparing it to the previous result if available.
 pub(crate) fn print_benchmark(
     name: &str,
-    new: &BenchResult,
-    old: Option<&BenchResult>,
+    new: &BenchResultInternal,
+    old: Option<&BenchResultInternal>,
     noise_threshold: f64,
 ) {
     // Print benchmark name.
@@ -34,18 +34,13 @@ pub(crate) fn print_benchmark(
 
 // Prints a measurement along with a comparison with the old value if available.
 fn print_measurement(
-    new: &Measurement,
-    old: Option<&Measurement>,
+    new: &MeasurementInternal,
+    old: Option<&MeasurementInternal>,
     noise_threshold: f64,
     print_calls: bool,
 ) {
     if print_calls {
-        print_metric(
-            "calls",
-            new.calls.unwrap_or_default(),
-            old.map(|m| m.calls.unwrap_or_default()),
-            noise_threshold,
-        );
+        print_metric("calls", new.calls, old.map(|m| m.calls), noise_threshold);
     }
     print_metric(
         "instructions",

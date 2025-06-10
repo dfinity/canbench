@@ -8,7 +8,7 @@ mod results_file;
 mod summary;
 mod table;
 
-use canbench_rs::BenchResult;
+use canbench_rs::{BenchResult, BenchResultInternal};
 use candid::{Encode, Principal};
 use flate2::read::GzDecoder;
 use instruction_tracing::{prepare_instruction_tracing, write_traces_to_file};
@@ -60,7 +60,7 @@ pub fn run_benchmarks(
 ) {
     maybe_download_pocket_ic(runtime_path, verbose, integrity_check);
 
-    let old_results = match results_file::read(results_file) {
+    let old_results_raw = match results_file::read(results_file) {
         Ok(old_results) => old_results,
         Err(VersionError {
             our_version,
@@ -70,6 +70,10 @@ pub fn run_benchmarks(
             std::process::exit(1);
         }
     };
+    let old_results = old_results_raw
+        .into_iter()
+        .map(|(k, v)| (k.to_string(), BenchResultInternal::from(&v)))
+        .collect::<BTreeMap<String, BenchResultInternal>>();
 
     let benchmark_wasm = read_wasm(canister_wasm_path);
 
@@ -103,7 +107,8 @@ pub fn run_benchmarks(
             }
         }
 
-        let result = run_benchmark(&pocket_ic, benchmark_canister_id, bench_fn);
+        let result_raw = run_benchmark(&pocket_ic, benchmark_canister_id, bench_fn);
+        let result = BenchResultInternal::from(&result_raw);
 
         if show_results {
             println!("---------------------------------------------------");
@@ -172,7 +177,11 @@ pub fn run_benchmarks(
 
     // Persist the result if requested.
     if persist {
-        results_file::write(results_file, new_results);
+        let new_results_raw = new_results
+            .into_iter()
+            .map(|(k, v)| (k, BenchResult::from(v)))
+            .collect::<BTreeMap<String, BenchResult>>();
+        results_file::write(results_file, new_results_raw);
         println!(
             "Successfully persisted results to {}",
             results_file.display()

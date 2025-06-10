@@ -470,45 +470,113 @@ use serde::{Deserialize, Serialize};
 use std::{cell::RefCell, collections::BTreeMap};
 
 thread_local! {
-    static SCOPES: RefCell<BTreeMap<&'static str, Vec<Measurement>>> =
+    static SCOPES: RefCell<BTreeMap<&'static str, Vec<MeasurementInternal>>> =
         const { RefCell::new(BTreeMap::new()) };
 }
 
 /// The results of a benchmark.
 #[derive(Debug, PartialEq, Serialize, Deserialize, CandidType, Default)]
 pub struct BenchResult {
-    /// A measurement for the entire duration of the benchmark.
     pub total: Measurement,
 
-    /// Measurements for scopes.
     #[serde(default)]
     pub scopes: BTreeMap<String, Measurement>,
+}
+
+/// The internal representation of the benchmark result.
+#[derive(Debug, PartialEq, Default)]
+pub struct BenchResultInternal {
+    /// A measurement for the entire duration of the benchmark.
+    pub total: MeasurementInternal,
+
+    /// Measurements for scopes.
+    pub scopes: BTreeMap<String, MeasurementInternal>,
+}
+
+impl From<&BenchResult> for BenchResultInternal {
+    fn from(result: &BenchResult) -> Self {
+        BenchResultInternal {
+            total: MeasurementInternal::from(&result.total),
+            scopes: result
+                .scopes
+                .iter()
+                .map(|(k, v)| (k.clone(), MeasurementInternal::from(v)))
+                .collect(),
+        }
+    }
+}
+
+impl From<BenchResultInternal> for BenchResult {
+    fn from(result: BenchResultInternal) -> Self {
+        BenchResult {
+            total: Measurement::from(result.total),
+            scopes: result
+                .scopes
+                .into_iter()
+                .map(|(k, v)| (k, Measurement::from(v)))
+                .collect(),
+        }
+    }
 }
 
 /// A benchmark measurement containing various stats.
 #[derive(Debug, PartialEq, Serialize, Deserialize, CandidType, Clone, Default)]
 pub struct Measurement {
-    /// Instruction counter at the start of measurement.
-    /// Not serialized, because it is not supposed to be compared to other measurements.
-    /// Used internally to correctly calculate instructions of overlapping or nested scopes.
-    #[serde(skip)]
-    start_instructions: u64,
-
-    /// The number of calls to the function or scope.
-    #[serde(default)]
+    /// The number of calls made during the measurement.
     pub calls: Option<u64>,
 
     /// The number of instructions.
-    #[serde(default)]
+    pub instructions: Option<u64>,
+
+    /// The increase in heap (measured in pages).
+    pub heap_increase: Option<u64>,
+
+    /// The increase in stable memory (measured in pages).
+    pub stable_memory_increase: Option<u64>,
+}
+
+/// The internal representation of a measurement.
+#[derive(Debug, PartialEq, Clone, Default)]
+pub struct MeasurementInternal {
+    /// Instruction counter at the start of measurement.
+    /// Not serialized, because it is not supposed to be compared to other measurements.
+    /// Used internally to correctly calculate instructions of overlapping or nested scopes.
+    start_instructions: u64,
+
+    /// The number of calls made during the measurement.
+    pub calls: u64,
+
+    /// The number of instructions.
     pub instructions: u64,
 
     /// The increase in heap (measured in pages).
-    #[serde(default)]
     pub heap_increase: u64,
 
     /// The increase in stable memory (measured in pages).
-    #[serde(default)]
     pub stable_memory_increase: u64,
+}
+
+impl From<&Measurement> for MeasurementInternal {
+    fn from(m: &Measurement) -> Self {
+        MeasurementInternal {
+            start_instructions: 0, // This will be set when the measurement is created.
+            calls: m.calls.unwrap_or_default(),
+            instructions: m.instructions.unwrap_or_default(),
+            heap_increase: m.heap_increase.unwrap_or_default(),
+            stable_memory_increase: m.stable_memory_increase.unwrap_or_default(),
+        }
+    }
+}
+
+impl From<MeasurementInternal> for Measurement {
+    fn from(m: MeasurementInternal) -> Self {
+        Measurement {
+            calls: Some(m.calls),
+            instructions: Some(m.instructions),
+            heap_increase: Some(m.heap_increase),
+            stable_memory_increase: Some(m.stable_memory_increase),
+        }
+    }
 }
 
 #[test]
@@ -527,14 +595,14 @@ fn test_backwards_compatibility() {
 
     // Encode a previous version Candid struct (the fields were not provided)
     let encoded = Encode!(&MeasurementPreviousVersion::default()).unwrap();
-    let decoded: Measurement = Decode!(&encoded, Measurement).unwrap();
+    let decoded = MeasurementInternal::from(&Decode!(&encoded, Measurement).unwrap());
 
     assert_eq!(
         decoded,
-        Measurement {
+        MeasurementInternal {
             start_instructions: 0,
-            calls: None,
-            ..Measurement::default()
+            calls: 0,
+            ..MeasurementInternal::default()
         }
     );
 }
@@ -554,13 +622,14 @@ pub fn bench_fn<R>(f: impl FnOnce() -> R) -> BenchResult {
         let stable_memory_increase = ic_cdk::api::stable::stable_size() - start_stable_memory;
         let heap_increase = heap_size() - start_heap;
 
-        let total = Measurement {
+        let total = MeasurementInternal {
             start_instructions,
-            calls: Some(1),
+            calls: 1,
             instructions,
             heap_increase,
             stable_memory_increase,
-        };
+        }
+        .into();
         let scopes: std::collections::BTreeMap<_, _> = get_scopes_measurements()
             .into_iter()
             .map(|(k, v)| (k.to_string(), v))
@@ -656,9 +725,9 @@ impl Drop for BenchScope {
                 ic_cdk::api::stable::stable_size() - self.start_stable_memory;
             let heap_increase = heap_size() - self.start_heap;
             let instructions = instruction_count() - self.start_instructions;
-            p.entry(self.name).or_default().push(Measurement {
+            p.entry(self.name).or_default().push(MeasurementInternal {
                 start_instructions,
-                calls: Some(1),
+                calls: 1,
                 instructions,
                 heap_increase,
                 stable_memory_increase,
@@ -674,12 +743,12 @@ fn reset() {
 
 // Returns the measurements for any declared scopes, aggregated by the scope name.
 fn get_scopes_measurements() -> BTreeMap<&'static str, Measurement> {
-    fn sum_non_overlapping(measurements: &[Measurement]) -> Measurement {
+    fn sum_non_overlapping(measurements: &[MeasurementInternal]) -> Measurement {
         #[derive(Debug)]
         struct Interval {
             start: u64,
             end: u64,
-            measurement: Measurement,
+            measurement: MeasurementInternal,
         }
 
         let mut intervals: Vec<Interval> = measurements
@@ -693,10 +762,10 @@ fn get_scopes_measurements() -> BTreeMap<&'static str, Measurement> {
 
         intervals.sort_by_key(|i| i.start);
 
-        let mut total = Measurement::default();
+        let mut total = MeasurementInternal::default();
         let mut current_start = 0;
         let mut current_end = 0;
-        let mut group_measurements: Vec<Measurement> = Vec::new();
+        let mut group_measurements: Vec<MeasurementInternal> = Vec::new();
 
         for i in intervals {
             if i.start < current_end {
@@ -706,8 +775,7 @@ fn get_scopes_measurements() -> BTreeMap<&'static str, Measurement> {
                 if current_end > current_start {
                     total.instructions += current_end - current_start;
                     for m in &group_measurements {
-                        total.calls =
-                            Some(total.calls.unwrap_or_default() + m.calls.unwrap_or_default());
+                        total.calls += m.calls;
                         total.heap_increase += m.heap_increase;
                         total.stable_memory_increase += m.stable_memory_increase;
                     }
@@ -723,13 +791,13 @@ fn get_scopes_measurements() -> BTreeMap<&'static str, Measurement> {
         if current_end > current_start {
             total.instructions += current_end - current_start;
             for m in &group_measurements {
-                total.calls = Some(total.calls.unwrap_or_default() + m.calls.unwrap_or_default());
+                total.calls += m.calls;
                 total.heap_increase += m.heap_increase;
                 total.stable_memory_increase += m.stable_memory_increase;
             }
         }
 
-        total
+        Measurement::from(total)
     }
 
     SCOPES.with(|p| {
