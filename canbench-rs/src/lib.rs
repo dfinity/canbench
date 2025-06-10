@@ -488,7 +488,7 @@ pub struct BenchResult {
 /// The internal representation of the benchmark result.
 /// This type is not serialized, therefore fields are not `Option`.
 #[derive(Debug, PartialEq, Default)]
-pub struct BenchResultInternal {
+struct BenchResultInternal {
     /// A measurement for the entire duration of the benchmark.
     pub total: MeasurementInternal,
 
@@ -496,22 +496,9 @@ pub struct BenchResultInternal {
     pub scopes: BTreeMap<String, MeasurementInternal>,
 }
 
-impl From<&BenchResult> for BenchResultInternal {
-    fn from(result: &BenchResult) -> Self {
-        BenchResultInternal {
-            total: MeasurementInternal::from(&result.total),
-            scopes: result
-                .scopes
-                .iter()
-                .map(|(k, v)| (k.clone(), MeasurementInternal::from(v)))
-                .collect(),
-        }
-    }
-}
-
 impl From<BenchResultInternal> for BenchResult {
     fn from(result: BenchResultInternal) -> Self {
-        BenchResult {
+        Self {
             total: Measurement::from(result.total),
             scopes: result
                 .scopes
@@ -543,7 +530,7 @@ pub struct Measurement {
 /// The internal representation of a measurement.
 /// Not serialized, therefore fields are not `Option`.
 #[derive(Debug, PartialEq, Clone, Default)]
-pub struct MeasurementInternal {
+struct MeasurementInternal {
     /// Instruction counter at the start of measurement.
     /// Not serialized, because it is not supposed to be compared to other measurements.
     /// Used internally to correctly calculate instructions of overlapping or nested scopes.
@@ -562,21 +549,9 @@ pub struct MeasurementInternal {
     pub stable_memory_increase: u64,
 }
 
-impl From<&Measurement> for MeasurementInternal {
-    fn from(m: &Measurement) -> Self {
-        MeasurementInternal {
-            start_instructions: 0, // This will be set when the measurement is created.
-            calls: m.calls.unwrap_or_default(),
-            instructions: m.instructions.unwrap_or_default(),
-            heap_increase: m.heap_increase.unwrap_or_default(),
-            stable_memory_increase: m.stable_memory_increase.unwrap_or_default(),
-        }
-    }
-}
-
 impl From<MeasurementInternal> for Measurement {
     fn from(m: MeasurementInternal) -> Self {
-        Measurement {
+        Self {
             calls: Some(m.calls),
             instructions: Some(m.instructions),
             heap_increase: Some(m.heap_increase),
@@ -600,15 +575,21 @@ fn test_backwards_compatibility() {
     }
 
     // Encode a previous version Candid struct (the fields were not provided)
-    let encoded = Encode!(&MeasurementPreviousVersion::default()).unwrap();
-    let decoded = MeasurementInternal::from(&Decode!(&encoded, Measurement).unwrap());
+    let encoded = Encode!(&MeasurementPreviousVersion {
+        instructions: 1,
+        heap_increase: 2,
+        stable_memory_increase: 3,
+    })
+    .unwrap();
+    let decoded = Decode!(&encoded, Measurement).unwrap();
 
     assert_eq!(
         decoded,
-        MeasurementInternal {
-            start_instructions: 0,
-            calls: 0,
-            ..MeasurementInternal::default()
+        Measurement {
+            calls: None,
+            instructions: Some(1),
+            heap_increase: Some(2),
+            stable_memory_increase: Some(3),
         }
     );
 }

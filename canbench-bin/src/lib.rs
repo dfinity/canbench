@@ -8,7 +8,7 @@ mod results_file;
 mod summary;
 mod table;
 
-use canbench_rs::{BenchResult, BenchResultInternal};
+use canbench_rs::{BenchResult, Measurement};
 use candid::{Encode, Principal};
 use flate2::read::GzDecoder;
 use instruction_tracing::{prepare_instruction_tracing, write_traces_to_file};
@@ -37,6 +37,58 @@ const POCKET_IC_MAC_SHA: &str = "27bb9594e498171d2fffadf6e1e144e58ed3f5854d151ff
 
 /// The maximum number of rows to display in the summary table.
 const MAX_DISPLAYED_ROWS: usize = 50;
+
+/// The internal representation of the benchmark result.
+/// This type is not serialized, therefore fields are not `Option`.
+#[derive(Debug, PartialEq, Default)]
+pub(crate) struct BenchResultReportable {
+    /// A measurement for the entire duration of the benchmark.
+    pub total: MeasurementReportable,
+
+    /// Measurements for scopes.
+    pub scopes: BTreeMap<String, MeasurementReportable>,
+}
+
+impl From<&BenchResult> for BenchResultReportable {
+    fn from(result: &BenchResult) -> Self {
+        Self {
+            total: MeasurementReportable::from(&result.total),
+            scopes: result
+                .scopes
+                .iter()
+                .map(|(k, v)| (k.clone(), MeasurementReportable::from(v)))
+                .collect(),
+        }
+    }
+}
+
+/// The internal representation of a measurement.
+/// Not serialized, therefore fields are not `Option`.
+#[derive(Debug, PartialEq, Clone, Default)]
+pub(crate) struct MeasurementReportable {
+    /// The number of calls made during the measurement.
+    pub calls: u64,
+
+    /// The number of instructions.
+    pub instructions: u64,
+
+    /// The increase in heap (measured in pages).
+    pub heap_increase: u64,
+
+    /// The increase in stable memory (measured in pages).
+    pub stable_memory_increase: u64,
+}
+
+impl From<&Measurement> for MeasurementReportable {
+    fn from(measurement: &Measurement) -> Self {
+        Self {
+            calls: measurement.calls.unwrap_or_default(),
+            instructions: measurement.instructions.unwrap_or_default(),
+            heap_increase: measurement.heap_increase.unwrap_or_default(),
+            stable_memory_increase: measurement.stable_memory_increase.unwrap_or_default(),
+        }
+    }
+}
 
 /// Runs the benchmarks on the canister available in the provided `canister_wasm_path`.
 #[allow(clippy::too_many_arguments)]
@@ -72,8 +124,8 @@ pub fn run_benchmarks(
     };
     let old_results = old_results_raw
         .into_iter()
-        .map(|(k, v)| (k.to_string(), BenchResultInternal::from(&v)))
-        .collect::<BTreeMap<String, BenchResultInternal>>();
+        .map(|(k, v)| (k.to_string(), BenchResultReportable::from(&v)))
+        .collect::<BTreeMap<String, BenchResultReportable>>();
 
     let benchmark_wasm = read_wasm(canister_wasm_path);
 
@@ -99,6 +151,7 @@ pub fn run_benchmarks(
     );
 
     // Run the benchmarks
+    let mut new_results_raw = BTreeMap::new();
     let mut new_results = BTreeMap::new();
     for bench_fn in &benchmark_fns {
         if let Some(pattern) = &pattern {
@@ -108,7 +161,7 @@ pub fn run_benchmarks(
         }
 
         let result_raw = run_benchmark(&pocket_ic, benchmark_canister_id, bench_fn);
-        let result = BenchResultInternal::from(&result_raw);
+        let result = BenchResultReportable::from(&result_raw);
 
         if show_results {
             println!("---------------------------------------------------");
@@ -132,6 +185,7 @@ pub fn run_benchmarks(
             );
         }
 
+        new_results_raw.insert(bench_fn.to_string(), result_raw);
         new_results.insert(bench_fn.to_string(), result);
 
         if show_results {
@@ -177,10 +231,6 @@ pub fn run_benchmarks(
 
     // Persist the result if requested.
     if persist {
-        let new_results_raw = new_results
-            .into_iter()
-            .map(|(k, v)| (k, BenchResult::from(v)))
-            .collect::<BTreeMap<String, BenchResult>>();
         results_file::write(results_file, new_results_raw);
         println!(
             "Successfully persisted results to {}",

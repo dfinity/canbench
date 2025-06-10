@@ -1,5 +1,5 @@
 use crate::fmt::{fmt_human_percent, fmt_human_u64, fmt_percent};
-use canbench_rs::{BenchResultInternal, MeasurementInternal};
+use crate::{BenchResultReportable, MeasurementReportable};
 use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -125,8 +125,8 @@ impl Values {
 }
 
 pub(crate) fn extract(
-    new_results: &BTreeMap<String, BenchResultInternal>,
-    old_results: &BTreeMap<String, BenchResultInternal>,
+    new_results: &BTreeMap<String, BenchResultReportable>,
+    old_results: &BTreeMap<String, BenchResultReportable>,
 ) -> Vec<Entry> {
     let mut results = Vec::new();
 
@@ -161,10 +161,10 @@ pub(crate) fn extract(
 fn build_entry(
     status: String,
     benchmark: Benchmark,
-    new_m: Option<&MeasurementInternal>,
-    old_m: Option<&MeasurementInternal>,
+    new_m: Option<&MeasurementReportable>,
+    old_m: Option<&MeasurementReportable>,
 ) -> Entry {
-    let extract_values = |f: fn(&MeasurementInternal) -> u64| Values {
+    let extract_values = |f: fn(&MeasurementReportable) -> u64| Values {
         curr: new_m.map(f),
         prev: old_m.map(f),
     };
