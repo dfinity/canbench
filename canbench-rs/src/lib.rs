@@ -705,7 +705,8 @@ fn get_scopes_measurements() -> BTreeMap<&'static str, Measurement> {
                 if current_end > current_start {
                     total.instructions += current_end - current_start;
                     for m in &group_measurements {
-                        total.calls = Some(total.calls.unwrap_or(0) + m.calls.unwrap_or(1));
+                        total.calls =
+                            Some(total.calls.unwrap_or_default() + m.calls.unwrap_or_default());
                         total.heap_increase += m.heap_increase;
                         total.stable_memory_increase += m.stable_memory_increase;
                     }
@@ -721,7 +722,7 @@ fn get_scopes_measurements() -> BTreeMap<&'static str, Measurement> {
         if current_end > current_start {
             total.instructions += current_end - current_start;
             for m in &group_measurements {
-                total.calls = Some(total.calls.unwrap_or(0) + m.calls.unwrap_or(1));
+                total.calls = Some(total.calls.unwrap_or_default() + m.calls.unwrap_or_default());
                 total.heap_increase += m.heap_increase;
                 total.stable_memory_increase += m.stable_memory_increase;
             }
