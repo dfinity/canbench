@@ -8,7 +8,7 @@ mod results_file;
 mod summary;
 mod table;
 
-use canbench_rs::BenchResult;
+use canbench_rs::{BenchResult, Measurement};
 use candid::{Encode, Principal};
 use flate2::read::GzDecoder;
 use instruction_tracing::{prepare_instruction_tracing, write_traces_to_file};
@@ -38,6 +38,48 @@ const POCKET_IC_MAC_SHA: &str = "27bb9594e498171d2fffadf6e1e144e58ed3f5854d151ff
 /// The maximum number of rows to display in the summary table.
 const MAX_DISPLAYED_ROWS: usize = 50;
 
+/// The internal representation of the benchmark result.
+/// This type is not deserialized, therefore fields are not `Option`.
+#[derive(Debug, PartialEq, Default)]
+pub(crate) struct BenchResultReportable {
+    pub total: MeasurementReportable,
+    pub scopes: BTreeMap<String, MeasurementReportable>,
+}
+
+impl From<&BenchResult> for BenchResultReportable {
+    fn from(r: &BenchResult) -> Self {
+        Self {
+            total: MeasurementReportable::from(&r.total),
+            scopes: r
+                .scopes
+                .iter()
+                .map(|(k, v)| (k.clone(), MeasurementReportable::from(v)))
+                .collect(),
+        }
+    }
+}
+
+/// The internal representation of a measurement.
+/// Not deserialized, therefore fields are not `Option`.
+#[derive(Debug, PartialEq, Clone, Default)]
+pub(crate) struct MeasurementReportable {
+    pub calls: u64,
+    pub instructions: u64,
+    pub heap_increase: u64,
+    pub stable_memory_increase: u64,
+}
+
+impl From<&Measurement> for MeasurementReportable {
+    fn from(m: &Measurement) -> Self {
+        Self {
+            calls: m.calls.unwrap_or_default(),
+            instructions: m.instructions.unwrap_or_default(),
+            heap_increase: m.heap_increase.unwrap_or_default(),
+            stable_memory_increase: m.stable_memory_increase.unwrap_or_default(),
+        }
+    }
+}
+
 /// Runs the benchmarks on the canister available in the provided `canister_wasm_path`.
 #[allow(clippy::too_many_arguments)]
 pub fn run_benchmarks(
@@ -60,7 +102,7 @@ pub fn run_benchmarks(
 ) {
     maybe_download_pocket_ic(runtime_path, verbose, integrity_check);
 
-    let old_results = match results_file::read(results_file) {
+    let old_results_raw = match results_file::read(results_file) {
         Ok(old_results) => old_results,
         Err(VersionError {
             our_version,
@@ -70,6 +112,10 @@ pub fn run_benchmarks(
             std::process::exit(1);
         }
     };
+    let old_results = old_results_raw
+        .into_iter()
+        .map(|(k, v)| (k.to_string(), BenchResultReportable::from(&v)))
+        .collect::<BTreeMap<String, BenchResultReportable>>();
 
     let benchmark_wasm = read_wasm(canister_wasm_path);
 
@@ -95,6 +141,7 @@ pub fn run_benchmarks(
     );
 
     // Run the benchmarks
+    let mut new_results_raw = BTreeMap::new();
     let mut new_results = BTreeMap::new();
     for bench_fn in &benchmark_fns {
         if let Some(pattern) = &pattern {
@@ -103,7 +150,8 @@ pub fn run_benchmarks(
             }
         }
 
-        let result = run_benchmark(&pocket_ic, benchmark_canister_id, bench_fn);
+        let result_raw = run_benchmark(&pocket_ic, benchmark_canister_id, bench_fn);
+        let result = BenchResultReportable::from(&result_raw);
 
         if show_results {
             println!("---------------------------------------------------");
@@ -127,6 +175,7 @@ pub fn run_benchmarks(
             );
         }
 
+        new_results_raw.insert(bench_fn.to_string(), result_raw);
         new_results.insert(bench_fn.to_string(), result);
 
         if show_results {
@@ -172,7 +221,7 @@ pub fn run_benchmarks(
 
     // Persist the result if requested.
     if persist {
-        results_file::write(results_file, new_results);
+        results_file::write(results_file, new_results_raw);
         println!(
             "Successfully persisted results to {}",
             results_file.display()
