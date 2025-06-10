@@ -525,7 +525,7 @@ fn test_backward_compatibility() {
         pub stable_memory_increase: u64,
     }
 
-    // Encode an empty Candid struct (as if the field was not provided)
+    // Encode a previous version Candid struct (the fields were not provided)
     let encoded = Encode!(&MeasurementPreviousVersion::default()).unwrap();
     let decoded: Measurement = Decode!(&encoded, Measurement).unwrap();
 
