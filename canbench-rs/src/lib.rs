@@ -512,7 +512,7 @@ pub struct Measurement {
 }
 
 #[test]
-fn test_default_start_instructions() {
+fn test_backward_compatibility() {
     use candid::Decode;
     use candid::Encode;
 
