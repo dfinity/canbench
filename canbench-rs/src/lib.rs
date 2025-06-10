@@ -486,7 +486,7 @@ pub struct BenchResult {
 }
 
 /// The internal representation of the benchmark result.
-/// This type is not serialized, therefore fields are not `Option`.
+/// This type is not deserialized, therefore fields are not `Option`.
 #[derive(Debug, PartialEq, Default)]
 struct BenchResultInternal {
     /// A measurement for the entire duration of the benchmark.

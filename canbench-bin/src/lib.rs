@@ -39,7 +39,7 @@ const POCKET_IC_MAC_SHA: &str = "27bb9594e498171d2fffadf6e1e144e58ed3f5854d151ff
 const MAX_DISPLAYED_ROWS: usize = 50;
 
 /// The internal representation of the benchmark result.
-/// This type is not serialized, therefore fields are not `Option`.
+/// This type is not deserialized, therefore fields are not `Option`.
 #[derive(Debug, PartialEq, Default)]
 pub(crate) struct BenchResultReportable {
     /// A measurement for the entire duration of the benchmark.
