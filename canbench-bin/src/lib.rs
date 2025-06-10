@@ -63,7 +63,7 @@ impl From<&BenchResult> for BenchResultReportable {
 }
 
 /// The internal representation of a measurement.
-/// Not serialized, therefore fields are not `Option`.
+/// Not deserialized, therefore fields are not `Option`.
 #[derive(Debug, PartialEq, Clone, Default)]
 pub(crate) struct MeasurementReportable {
     /// The number of calls made during the measurement.
