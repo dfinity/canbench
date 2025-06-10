@@ -488,9 +488,8 @@ pub struct BenchResult {
 /// A benchmark measurement containing various stats.
 #[derive(Debug, PartialEq, Serialize, Deserialize, CandidType, Clone, Default)]
 pub struct Measurement {
-    /// Instructions counter value at the start of measurement.
-    /// This field is not serialized, since it is never compared new vs old,
-    /// and is only used to calculate the instructions in overlapping/nested scopes.
+    /// Instruction counter at the start of measurement.
+    /// Not serialized; used internally to correctly handle overlapping or nested scopes.
     #[serde(skip)]
     start_instructions: u64,
 
