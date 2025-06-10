@@ -42,10 +42,7 @@ const MAX_DISPLAYED_ROWS: usize = 50;
 /// This type is not deserialized, therefore fields are not `Option`.
 #[derive(Debug, PartialEq, Default)]
 pub(crate) struct BenchResultReportable {
-    /// A measurement for the entire duration of the benchmark.
     pub total: MeasurementReportable,
-
-    /// Measurements for scopes.
     pub scopes: BTreeMap<String, MeasurementReportable>,
 }
 
@@ -66,16 +63,9 @@ impl From<&BenchResult> for BenchResultReportable {
 /// Not deserialized, therefore fields are not `Option`.
 #[derive(Debug, PartialEq, Clone, Default)]
 pub(crate) struct MeasurementReportable {
-    /// The number of calls made during the measurement.
     pub calls: u64,
-
-    /// The number of instructions.
     pub instructions: u64,
-
-    /// The increase in heap (measured in pages).
     pub heap_increase: u64,
-
-    /// The increase in stable memory (measured in pages).
     pub stable_memory_increase: u64,
 }
 
