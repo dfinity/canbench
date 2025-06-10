@@ -481,7 +481,6 @@ pub struct BenchResult {
     pub total: Measurement,
 
     /// Measurements for scopes.
-    #[serde(default)]
     pub scopes: BTreeMap<String, Measurement>,
 }
 
@@ -491,52 +490,19 @@ pub struct Measurement {
     /// Instruction counter at the start of measurement.
     /// Not serialized, because it is not supposed to be compared to other measurements.
     /// Used internally to correctly calculate instructions of overlapping or nested scopes.
-    #[serde(skip)]
     start_instructions: u64,
 
     /// The number of calls to the function or scope.
-    #[serde(default)]
-    pub calls: Option<u64>,
+    pub calls: u64,
 
     /// The number of instructions.
-    #[serde(default)]
     pub instructions: u64,
 
     /// The increase in heap (measured in pages).
-    #[serde(default)]
     pub heap_increase: u64,
 
     /// The increase in stable memory (measured in pages).
-    #[serde(default)]
     pub stable_memory_increase: u64,
-}
-
-#[test]
-fn test_backwards_compatibility() {
-    use candid::{Decode, Encode};
-
-    #[derive(Debug, PartialEq, Serialize, Deserialize, CandidType, Clone, Default)]
-    pub struct MeasurementPreviousVersion {
-        #[serde(default)]
-        pub instructions: u64,
-        #[serde(default)]
-        pub heap_increase: u64,
-        #[serde(default)]
-        pub stable_memory_increase: u64,
-    }
-
-    // Encode a previous version Candid struct (the fields were not provided)
-    let encoded = Encode!(&MeasurementPreviousVersion::default()).unwrap();
-    let decoded: Measurement = Decode!(&encoded, Measurement).unwrap();
-
-    assert_eq!(
-        decoded,
-        Measurement {
-            start_instructions: 0,
-            calls: None,
-            ..Measurement::default()
-        }
-    );
 }
 
 /// Benchmarks the given function.
@@ -556,7 +522,7 @@ pub fn bench_fn<R>(f: impl FnOnce() -> R) -> BenchResult {
 
         let total = Measurement {
             start_instructions,
-            calls: Some(1),
+            calls: 1,
             instructions,
             heap_increase,
             stable_memory_increase,
@@ -658,7 +624,7 @@ impl Drop for BenchScope {
             let instructions = instruction_count() - self.start_instructions;
             p.entry(self.name).or_default().push(Measurement {
                 start_instructions,
-                calls: Some(1),
+                calls: 1,
                 instructions,
                 heap_increase,
                 stable_memory_increase,
@@ -706,8 +672,7 @@ fn get_scopes_measurements() -> BTreeMap<&'static str, Measurement> {
                 if current_end > current_start {
                     total.instructions += current_end - current_start;
                     for m in &group_measurements {
-                        total.calls =
-                            Some(total.calls.unwrap_or_default() + m.calls.unwrap_or_default());
+                        total.calls += m.calls;
                         total.heap_increase += m.heap_increase;
                         total.stable_memory_increase += m.stable_memory_increase;
                     }
@@ -723,7 +688,7 @@ fn get_scopes_measurements() -> BTreeMap<&'static str, Measurement> {
         if current_end > current_start {
             total.instructions += current_end - current_start;
             for m in &group_measurements {
-                total.calls = Some(total.calls.unwrap_or_default() + m.calls.unwrap_or_default());
+                total.calls += m.calls;
                 total.heap_increase += m.heap_increase;
                 total.stable_memory_increase += m.stable_memory_increase;
             }

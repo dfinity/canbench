@@ -40,12 +40,7 @@ fn print_measurement(
     print_calls: bool,
 ) {
     if print_calls {
-        print_metric(
-            "calls",
-            new.calls.unwrap_or_default(),
-            old.map(|m| m.calls.unwrap_or_default()),
-            noise_threshold,
-        );
+        print_metric("calls", new.calls, old.map(|m| m.calls), noise_threshold);
     }
     print_metric(
         "instructions",
