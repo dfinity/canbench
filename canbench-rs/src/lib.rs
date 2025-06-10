@@ -475,6 +475,8 @@ thread_local! {
 }
 
 /// The results of a benchmark.
+/// This type is used for serialization and deserialization,
+/// therefore nested fields are `Option` to maintain backwards compatibility.
 #[derive(Debug, PartialEq, Serialize, Deserialize, CandidType, Default)]
 pub struct BenchResult {
     pub total: Measurement,
@@ -484,6 +486,7 @@ pub struct BenchResult {
 }
 
 /// The internal representation of the benchmark result.
+/// This type is not serialized, therefore fields are not `Option`.
 #[derive(Debug, PartialEq, Default)]
 pub struct BenchResultInternal {
     /// A measurement for the entire duration of the benchmark.
@@ -520,6 +523,8 @@ impl From<BenchResultInternal> for BenchResult {
 }
 
 /// A benchmark measurement containing various stats.
+/// This type is used for serialization and deserialization,
+/// therefore fields are `Option` to maintain backwards compatibility.
 #[derive(Debug, PartialEq, Serialize, Deserialize, CandidType, Clone, Default)]
 pub struct Measurement {
     /// The number of calls made during the measurement.
@@ -536,6 +541,7 @@ pub struct Measurement {
 }
 
 /// The internal representation of a measurement.
+/// Not serialized, therefore fields are not `Option`.
 #[derive(Debug, PartialEq, Clone, Default)]
 pub struct MeasurementInternal {
     /// Instruction counter at the start of measurement.
