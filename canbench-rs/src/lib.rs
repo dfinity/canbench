@@ -534,6 +534,7 @@ fn test_backward_compatibility() {
         decoded,
         Measurement {
             start_instructions: 0,
+            calls: None,
             ..Measurement::default()
         }
     );
