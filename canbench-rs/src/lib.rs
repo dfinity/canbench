@@ -497,10 +497,10 @@ struct BenchResultInternal {
 }
 
 impl From<BenchResultInternal> for BenchResult {
-    fn from(result: BenchResultInternal) -> Self {
+    fn from(r: BenchResultInternal) -> Self {
         Self {
-            total: Measurement::from(result.total),
-            scopes: result
+            total: Measurement::from(r.total),
+            scopes: r
                 .scopes
                 .into_iter()
                 .map(|(k, v)| (k, Measurement::from(v)))

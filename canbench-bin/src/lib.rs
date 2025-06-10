@@ -50,10 +50,10 @@ pub(crate) struct BenchResultReportable {
 }
 
 impl From<&BenchResult> for BenchResultReportable {
-    fn from(result: &BenchResult) -> Self {
+    fn from(r: &BenchResult) -> Self {
         Self {
-            total: MeasurementReportable::from(&result.total),
-            scopes: result
+            total: MeasurementReportable::from(&r.total),
+            scopes: r
                 .scopes
                 .iter()
                 .map(|(k, v)| (k.clone(), MeasurementReportable::from(v)))
@@ -80,12 +80,12 @@ pub(crate) struct MeasurementReportable {
 }
 
 impl From<&Measurement> for MeasurementReportable {
-    fn from(measurement: &Measurement) -> Self {
+    fn from(m: &Measurement) -> Self {
         Self {
-            calls: measurement.calls.unwrap_or_default(),
-            instructions: measurement.instructions.unwrap_or_default(),
-            heap_increase: measurement.heap_increase.unwrap_or_default(),
-            stable_memory_increase: measurement.stable_memory_increase.unwrap_or_default(),
+            calls: m.calls.unwrap_or_default(),
+            instructions: m.instructions.unwrap_or_default(),
+            heap_increase: m.heap_increase.unwrap_or_default(),
+            stable_memory_increase: m.stable_memory_increase.unwrap_or_default(),
         }
     }
 }
