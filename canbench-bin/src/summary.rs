@@ -48,15 +48,19 @@ where
         }
     }
 
-    let total = new + improved + regressed + unchanged;
+    let total = regressed + improved + new + unchanged;
     debug_assert_eq!(total, processed_entries, "total count mismatch");
 
     println!("  {label}:");
-    let status = match (improved, regressed) {
-        (0, 0) => "No significant changes detected 👍",
-        (0, _) => "Regressions detected! 🔴",
-        (_, 0) => "Improvements detected! 🟢",
-        _ => "Both regressions and improvements detected! 🔴🟢",
+    let status = match (regressed > 0, improved > 0, new > 0) {
+        (false, false, false) => "No significant changes 👍",
+        (true, false, false) => "Regressions detected 🔴",
+        (false, true, false) => "Improvements detected 🟢",
+        (false, false, true) => "New benchmarks added ➕",
+        (true, true, false) => "Regressions and improvements 🔴🟢",
+        (true, false, true) => "Regressions and new benchmarks 🔴➕",
+        (false, true, true) => "Improvements and new benchmarks 🟢➕",
+        (true, true, true) => "Regressions, improvements, and new benchmarks 🔴🟢➕",
     };
     println!("    status:   {status}");
     println!(
