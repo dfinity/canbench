@@ -564,7 +564,7 @@ impl From<MeasurementInternal> for Measurement {
 fn test_backwards_compatibility() {
     use candid::{Decode, Encode};
 
-    #[derive(Debug, PartialEq, Serialize, Deserialize, CandidType, Clone, Default)]
+    #[derive(Serialize, Deserialize, CandidType)]
     pub struct MeasurementPreviousVersion {
         pub instructions: u64,
         pub heap_increase: u64,
