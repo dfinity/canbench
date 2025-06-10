@@ -528,11 +528,11 @@ pub struct Measurement {
 }
 
 /// The internal representation of a measurement.
-/// Not serialized, therefore fields are not `Option`.
+/// Not deserialized, therefore fields are not `Option`.
 #[derive(Debug, PartialEq, Clone, Default)]
 struct MeasurementInternal {
     /// Instruction counter at the start of measurement.
-    /// Not serialized, because it is not supposed to be compared to other measurements.
+    /// Not deserialized, because it is not supposed to be compared to other measurements.
     /// Used internally to correctly calculate instructions of overlapping or nested scopes.
     start_instructions: u64,
 
