@@ -517,7 +517,7 @@ fn test_backward_compatibility() {
     use candid::Encode;
 
     #[derive(Debug, PartialEq, Serialize, Deserialize, CandidType, Clone, Default)]
-    pub struct MeasurementV0 {
+    pub struct MeasurementPreviousVersion {
         #[serde(default)]
         pub instructions: u64,
         #[serde(default)]
@@ -527,7 +527,7 @@ fn test_backward_compatibility() {
     }
 
     // Encode an empty Candid struct (as if the field was not provided)
-    let encoded = Encode!(&MeasurementV0::default()).unwrap();
+    let encoded = Encode!(&MeasurementPreviousVersion::default()).unwrap();
     let decoded: Measurement = Decode!(&encoded, Measurement).unwrap();
 
     assert_eq!(
