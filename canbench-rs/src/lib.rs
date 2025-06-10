@@ -743,7 +743,7 @@ fn reset() {
 
 // Returns the measurements for any declared scopes, aggregated by the scope name.
 fn get_scopes_measurements() -> BTreeMap<&'static str, Measurement> {
-    fn sum_non_overlapping(measurements: &[MeasurementInternal]) -> Measurement {
+    fn sum_non_overlapping(measurements: &[MeasurementInternal]) -> MeasurementInternal {
         #[derive(Debug)]
         struct Interval {
             start: u64,
@@ -797,13 +797,15 @@ fn get_scopes_measurements() -> BTreeMap<&'static str, Measurement> {
             }
         }
 
-        Measurement::from(total)
+        total
     }
 
     SCOPES.with(|p| {
         p.borrow()
             .iter()
-            .map(|(&scope, measurements)| (scope, sum_non_overlapping(measurements)))
+            .map(|(&scope, measurements)| {
+                (scope, Measurement::from(sum_non_overlapping(measurements)))
+            })
             .collect()
     })
 }
