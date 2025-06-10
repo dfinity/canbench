@@ -488,7 +488,7 @@ pub struct BenchResult {
 /// A benchmark measurement containing various stats.
 #[derive(Debug, PartialEq, Serialize, Deserialize, CandidType, Clone, Default)]
 pub struct Measurement {
-    #[serde(default)]
+    #[serde(skip)]
     start_instructions: u64,
 
     /// The number of calls to the function or scope.
@@ -506,6 +506,36 @@ pub struct Measurement {
     /// The increase in stable memory (measured in pages).
     #[serde(default)]
     pub stable_memory_increase: u64,
+}
+
+#[test]
+fn test_default_start_instructions() {
+    use candid::Decode;
+    use candid::Encode;
+
+    #[derive(Debug, PartialEq, Serialize, Deserialize, CandidType, Clone, Default)]
+    pub struct MeasurementV0 {
+        #[serde(default)]
+        pub calls: u64,
+        #[serde(default)]
+        pub instructions: u64,
+        #[serde(default)]
+        pub heap_increase: u64,
+        #[serde(default)]
+        pub stable_memory_increase: u64,
+    }
+
+    // Encode an empty Candid struct (as if the field was not provided)
+    let encoded = Encode!(&MeasurementV0::default()).unwrap();
+    let decoded: Measurement = Decode!(&encoded, Measurement).unwrap();
+
+    assert_eq!(
+        decoded,
+        Measurement {
+            start_instructions: 0,
+            ..Measurement::default()
+        }
+    );
 }
 
 /// Benchmarks the given function.
