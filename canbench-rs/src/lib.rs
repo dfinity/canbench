@@ -478,8 +478,10 @@ thread_local! {
 /// This type is in a public API.
 #[derive(Debug, PartialEq, Serialize, Deserialize, CandidType, Default)]
 pub struct BenchResult {
+    /// A measurement for the entire duration of the benchmark.
     pub total: Measurement,
 
+    /// Measurements for scopes.
     #[serde(default)]
     pub scopes: BTreeMap<String, Measurement>,
 }
