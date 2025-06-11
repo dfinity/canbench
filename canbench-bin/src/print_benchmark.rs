@@ -37,10 +37,8 @@ fn print_measurement(
     new: &Measurement,
     old: Option<&Measurement>,
     noise_threshold: f64,
-    #[cfg(feature = "calls")] print_calls: bool,
-    #[cfg(not(feature = "calls"))] _print_calls: bool,
+    print_calls: bool,
 ) {
-    #[cfg(feature = "calls")]
     if print_calls {
         print_metric("calls", new.calls, old.map(|m| m.calls), noise_threshold);
     }
