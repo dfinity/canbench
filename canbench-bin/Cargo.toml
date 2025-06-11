@@ -43,3 +43,4 @@ pretty_assertions = "1.4.0"
 [features]
 # Enables automatic overwriting of expected test output files during test runs.
 overwrite = []
+calls = []

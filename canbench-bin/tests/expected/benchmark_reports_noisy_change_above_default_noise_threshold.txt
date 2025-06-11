@@ -30,9 +30,9 @@ Summary:
 ---------------------------------------------------
 
 Only significant changes:
-| status | name                                      | calls |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
-|--------|-------------------------------------------|-------|-------|---------|----|--------|-----|---------|
-|   -    | noisy_change_above_default_threshold_test |       | 3.39M |  -4.36% | 62 | -4.62% | 100 |  -3.85% |
+| status | name                                      |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|-------------------------------------------|-------|---------|----|--------|-----|---------|
+|   -    | noisy_change_above_default_threshold_test | 3.39M |  -4.36% | 62 | -4.62% | 100 |  -3.85% |
 
 ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 

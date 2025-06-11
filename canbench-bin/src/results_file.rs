@@ -120,6 +120,7 @@ impl From<BenchResultWire> for BenchResult {
 /// A wire format for measurements.
 #[derive(Debug, PartialEq, Serialize, Deserialize, CandidType, Clone, Default)]
 pub struct MeasurementWire {
+    #[cfg(feature = "calls")]
     pub calls: Option<u64>,
     pub instructions: Option<u64>,
     pub heap_increase: Option<u64>,
@@ -129,6 +130,7 @@ pub struct MeasurementWire {
 impl From<Measurement> for MeasurementWire {
     fn from(m: Measurement) -> Self {
         Self {
+            #[cfg(feature = "calls")]
             calls: Some(m.calls),
             instructions: Some(m.instructions),
             heap_increase: Some(m.heap_increase),
@@ -140,6 +142,7 @@ impl From<Measurement> for MeasurementWire {
 impl From<MeasurementWire> for Measurement {
     fn from(m: MeasurementWire) -> Self {
         Self {
+            #[cfg(feature = "calls")]
             calls: m.calls.unwrap_or(0),
             instructions: m.instructions.unwrap_or(0),
             heap_increase: m.heap_increase.unwrap_or(0),
@@ -172,6 +175,7 @@ fn test_backwards_compatibility() {
     assert_eq!(
         result,
         Measurement {
+            #[cfg(feature = "calls")]
             calls: 0,
             instructions: 1,
             heap_increase: 2,

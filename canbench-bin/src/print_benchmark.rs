@@ -17,7 +17,13 @@ pub(crate) fn print_benchmark(
 
     // Print totals, skip calls number, since it's always should be 1.
     println!("  total:");
-    print_measurement(&new.total, old.map(|m| &m.total), noise_threshold, false);
+    print_measurement(
+        &new.total,
+        old.map(|m| &m.total),
+        noise_threshold,
+        #[cfg(feature = "calls")]
+        false,
+    );
 
     // Print scopes
     for (scope, measurement) in &new.scopes {
@@ -27,6 +33,7 @@ pub(crate) fn print_benchmark(
             measurement,
             old.map(|m| &m.scopes).and_then(|m| m.get(scope)),
             noise_threshold,
+            #[cfg(feature = "calls")]
             true,
         );
     }
@@ -37,8 +44,9 @@ fn print_measurement(
     new: &Measurement,
     old: Option<&Measurement>,
     noise_threshold: f64,
-    print_calls: bool,
+    #[cfg(feature = "calls")] print_calls: bool,
 ) {
+    #[cfg(feature = "calls")]
     if print_calls {
         print_metric("calls", new.calls, old.map(|m| m.calls), noise_threshold);
     }

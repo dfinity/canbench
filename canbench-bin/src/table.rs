@@ -73,11 +73,21 @@ pub(crate) fn print_table<W: Write>(
     max_displayed_rows: usize,
 ) -> io::Result<()> {
     let columns = [
-        "status", "name", "calls", "ins", "ins Δ%", "HI", "HI Δ%", "SMI", "SMI Δ%",
+        "status",
+        "name",
+        #[cfg(feature = "calls")]
+        "calls",
+        "ins",
+        "ins Δ%",
+        "HI",
+        "HI Δ%",
+        "SMI",
+        "SMI Δ%",
     ];
     let mut rows: Vec<_> = data
         .iter()
         .map(|entry| {
+            #[cfg(feature = "calls")]
             let scope_calls = if entry.has_scope() {
                 entry.calls.fmt_human_current()
             } else {
@@ -86,6 +96,7 @@ pub(crate) fn print_table<W: Write>(
             vec![
                 entry.status.clone(),
                 entry.benchmark.full_name(),
+                #[cfg(feature = "calls")]
                 scope_calls,
                 entry.instructions.fmt_human_current(),
                 entry.instructions.fmt_human_percent(),
@@ -177,6 +188,7 @@ mod tests {
         Entry {
             status: "".to_string(),
             benchmark: Benchmark::new(name, scope),
+            #[cfg(feature = "calls")]
             calls: Values::new(Some(10), None),
             instructions: Values::new(Some(9_000_000), Some(10_000_000)),
             heap_increase: Values::new(Some(0), None),
@@ -212,9 +224,9 @@ mod tests {
         run_table_test_case(
             0,
             "\
-| status | name                   | calls | ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
-|--------|------------------------|-------|-----|---------|----|--------|-----|---------|
-|  ...   | ... 6 rows omitted ... |       |     |         |    |        |     |         |
+| status | name                   | ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|------------------------|-----|---------|----|--------|-----|---------|
+|  ...   | ... 6 rows omitted ... |     |         |    |        |     |         |
 
 ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 ",
@@ -226,10 +238,10 @@ ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = perc
         run_table_test_case(
             1,
             "\
-| status | name                   | calls |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
-|--------|------------------------|-------|-------|---------|----|--------|-----|---------|
-|  ...   | ... 5 rows omitted ... |       |       |         |    |        |     |         |
-|        | bench_5::scope_0       |    10 | 9.00M | -10.00% |  0 |        |   0 |         |
+| status | name                   |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|------------------------|-------|---------|----|--------|-----|---------|
+|  ...   | ... 5 rows omitted ... |       |         |    |        |     |         |
+|        | bench_5::scope_0       | 9.00M | -10.00% |  0 |        |   0 |         |
 
 ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 ",
@@ -241,11 +253,11 @@ ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = perc
         run_table_test_case(
             2,
             "\
-| status | name                   | calls |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
-|--------|------------------------|-------|-------|---------|----|--------|-----|---------|
-|        | bench_1                |       | 9.00M | -10.00% |  0 |        |   0 |         |
-|  ...   | ... 4 rows omitted ... |       |       |         |    |        |     |         |
-|        | bench_5::scope_0       |    10 | 9.00M | -10.00% |  0 |        |   0 |         |
+| status | name                   |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|------------------------|-------|---------|----|--------|-----|---------|
+|        | bench_1                | 9.00M | -10.00% |  0 |        |   0 |         |
+|  ...   | ... 4 rows omitted ... |       |         |    |        |     |         |
+|        | bench_5::scope_0       | 9.00M | -10.00% |  0 |        |   0 |         |
 
 ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 ",
@@ -257,12 +269,12 @@ ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = perc
         run_table_test_case(
             3,
             "\
-| status | name                   | calls |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
-|--------|------------------------|-------|-------|---------|----|--------|-----|---------|
-|        | bench_1                |       | 9.00M | -10.00% |  0 |        |   0 |         |
-|  ...   | ... 3 rows omitted ... |       |       |         |    |        |     |         |
-|        | bench_5                |       | 9.00M | -10.00% |  0 |        |   0 |         |
-|        | bench_5::scope_0       |    10 | 9.00M | -10.00% |  0 |        |   0 |         |
+| status | name                   |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|------------------------|-------|---------|----|--------|-----|---------|
+|        | bench_1                | 9.00M | -10.00% |  0 |        |   0 |         |
+|  ...   | ... 3 rows omitted ... |       |         |    |        |     |         |
+|        | bench_5                | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_5::scope_0       | 9.00M | -10.00% |  0 |        |   0 |         |
 
 ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 ",
@@ -274,13 +286,13 @@ ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = perc
         run_table_test_case(
             4,
             "\
-| status | name                   | calls |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
-|--------|------------------------|-------|-------|---------|----|--------|-----|---------|
-|        | bench_1                |       | 9.00M | -10.00% |  0 |        |   0 |         |
-|        | bench_2                |       | 9.00M | -10.00% |  0 |        |   0 |         |
-|  ...   | ... 2 rows omitted ... |       |       |         |    |        |     |         |
-|        | bench_5                |       | 9.00M | -10.00% |  0 |        |   0 |         |
-|        | bench_5::scope_0       |    10 | 9.00M | -10.00% |  0 |        |   0 |         |
+| status | name                   |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|------------------------|-------|---------|----|--------|-----|---------|
+|        | bench_1                | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_2                | 9.00M | -10.00% |  0 |        |   0 |         |
+|  ...   | ... 2 rows omitted ... |       |         |    |        |     |         |
+|        | bench_5                | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_5::scope_0       | 9.00M | -10.00% |  0 |        |   0 |         |
 
 ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 ",
@@ -292,14 +304,14 @@ ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = perc
         run_table_test_case(
             5,
             "\
-| status | name                  | calls |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
-|--------|-----------------------|-------|-------|---------|----|--------|-----|---------|
-|        | bench_1               |       | 9.00M | -10.00% |  0 |        |   0 |         |
-|        | bench_2               |       | 9.00M | -10.00% |  0 |        |   0 |         |
-|  ...   | ... 1 row omitted ... |       |       |         |    |        |     |         |
-|        | bench_4               |       | 9.00M | -10.00% |  0 |        |   0 |         |
-|        | bench_5               |       | 9.00M | -10.00% |  0 |        |   0 |         |
-|        | bench_5::scope_0      |    10 | 9.00M | -10.00% |  0 |        |   0 |         |
+| status | name                  |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|-----------------------|-------|---------|----|--------|-----|---------|
+|        | bench_1               | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_2               | 9.00M | -10.00% |  0 |        |   0 |         |
+|  ...   | ... 1 row omitted ... |       |         |    |        |     |         |
+|        | bench_4               | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_5               | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_5::scope_0      | 9.00M | -10.00% |  0 |        |   0 |         |
 
 ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 ",
@@ -311,14 +323,14 @@ ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = perc
         run_table_test_case(
             6,
             "\
-| status | name             | calls |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
-|--------|------------------|-------|-------|---------|----|--------|-----|---------|
-|        | bench_1          |       | 9.00M | -10.00% |  0 |        |   0 |         |
-|        | bench_2          |       | 9.00M | -10.00% |  0 |        |   0 |         |
-|        | bench_3          |       | 9.00M | -10.00% |  0 |        |   0 |         |
-|        | bench_4          |       | 9.00M | -10.00% |  0 |        |   0 |         |
-|        | bench_5          |       | 9.00M | -10.00% |  0 |        |   0 |         |
-|        | bench_5::scope_0 |    10 | 9.00M | -10.00% |  0 |        |   0 |         |
+| status | name             |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|------------------|-------|---------|----|--------|-----|---------|
+|        | bench_1          | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_2          | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_3          | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_4          | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_5          | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_5::scope_0 | 9.00M | -10.00% |  0 |        |   0 |         |
 
 ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 ",
