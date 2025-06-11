@@ -90,7 +90,6 @@ fn test_yaml_backwards_compatibility() {
     assert_eq!(
         decoded,
         Measurement {
-            #[cfg(feature = "calls")]
             calls: 0,
             instructions: 1,
             heap_increase: 0,

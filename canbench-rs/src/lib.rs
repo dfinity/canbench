@@ -515,7 +515,6 @@ impl From<BenchResultInternal> for BenchResult {
 #[derive(Debug, PartialEq, Serialize, Deserialize, CandidType, Clone, Default)]
 pub struct Measurement {
     /// The number of calls made during the measurement.
-    #[cfg(feature = "calls")]
     #[serde(default)]
     pub calls: u64,
 
@@ -543,19 +542,14 @@ fn public_api_of_measurement_should_not_change() {
     // - Fields have the expected names and types
 
     let m = Measurement {
-        #[cfg(feature = "calls")]
         calls: 0_u64,
-
         instructions: 0_u64,
         heap_increase: 0_u64,
         stable_memory_increase: 0_u64,
     };
 
     // Ensure field access works and types match expectations
-    #[cfg(feature = "calls")]
-    {
-        let _: u64 = m.calls;
-    }
+    let _: u64 = m.calls;
     let _: u64 = m.instructions;
     let _: u64 = m.heap_increase;
     let _: u64 = m.stable_memory_increase;
@@ -585,7 +579,6 @@ struct MeasurementInternal {
 impl From<MeasurementInternal> for Measurement {
     fn from(m: MeasurementInternal) -> Self {
         Self {
-            #[cfg(feature = "calls")]
             calls: m.calls,
             instructions: m.instructions,
             heap_increase: m.heap_increase,

@@ -6,7 +6,6 @@ use std::collections::BTreeMap;
 pub(crate) struct Entry {
     pub(crate) status: String,
     pub(crate) benchmark: Benchmark,
-    #[cfg(feature = "calls")]
     pub(crate) calls: Values,
     pub(crate) instructions: Values,
     pub(crate) heap_increase: Values,
@@ -173,7 +172,6 @@ fn build_entry(
     Entry {
         status,
         benchmark,
-        #[cfg(feature = "calls")]
         calls: extract_values(|m| m.calls),
         instructions: extract_values(|m| m.instructions),
         heap_increase: extract_values(|m| m.heap_increase),

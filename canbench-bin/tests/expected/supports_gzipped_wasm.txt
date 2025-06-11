@@ -38,10 +38,10 @@ Summary:
 ---------------------------------------------------
 
 Only significant changes:
-| status | name    | ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
-|--------|---------|-----|---------|----|--------|-----|---------|
-|  new   | bench_1 | 207 |         |  0 |        |   0 |         |
-|  new   | bench_2 | 207 |         |  0 |        |   0 |         |
+| status | name    | calls | ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|---------|-------|-----|---------|----|--------|-----|---------|
+|  new   | bench_1 |       | 207 |         |  0 |        |   0 |         |
+|  new   | bench_2 |       | 207 |         |  0 |        |   0 |         |
 
 ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 

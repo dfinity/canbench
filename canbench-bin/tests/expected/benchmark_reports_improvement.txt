@@ -30,9 +30,9 @@ Summary:
 ---------------------------------------------------
 
 Only significant changes:
-| status | name             | ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
-|--------|------------------|-----|---------|----|--------|-----|---------|
-|   -    | improvement_test | 207 | -93.32% |  0 |  0.00% |   0 |   0.00% |
+| status | name             | calls | ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|------------------|-------|-----|---------|----|--------|-----|---------|
+|   -    | improvement_test |       | 207 | -93.32% |  0 |  0.00% |   0 |   0.00% |
 
 ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 
