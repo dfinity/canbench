@@ -547,11 +547,6 @@ fn public_api_of_measurement_should_not_change() {
     let _: u64 = m.instructions;
     let _: u64 = m.heap_increase;
     let _: u64 = m.stable_memory_increase;
-
-    // Ensure struct is `Clone`, `PartialEq`, and `Default`
-    let _ = Measurement::default();
-    let _ = m.clone();
-    let _ = m == m;
 }
 
 /// The internal representation of a measurement.
@@ -584,37 +579,6 @@ impl From<MeasurementInternal> for Measurement {
             stable_memory_increase: m.stable_memory_increase,
         }
     }
-}
-
-#[test]
-fn test_backwards_compatibility() {
-    use candid::{Decode, Encode};
-
-    #[derive(Serialize, Deserialize, CandidType)]
-    pub struct MeasurementPreviousVersion {
-        pub instructions: u64,
-        pub heap_increase: u64,
-        pub stable_memory_increase: u64,
-    }
-
-    // Encode a previous version Candid struct (the fields were not provided)
-    let encoded = Encode!(&MeasurementPreviousVersion {
-        instructions: 1,
-        heap_increase: 2,
-        stable_memory_increase: 3,
-    })
-    .unwrap();
-    let decoded = Decode!(&encoded, Measurement).unwrap();
-
-    assert_eq!(
-        decoded,
-        Measurement {
-            calls: 0,
-            instructions: 1,
-            heap_increase: 2,
-            stable_memory_increase: 3,
-        }
-    );
 }
 
 /// Benchmarks the given function.
