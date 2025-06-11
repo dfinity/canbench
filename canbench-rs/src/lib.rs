@@ -475,8 +475,7 @@ thread_local! {
 }
 
 /// The results of a benchmark.
-/// This type is used for serialization and deserialization,
-/// therefore nested fields are `Option` to maintain backwards compatibility.
+/// This type is in a public API.
 #[derive(Debug, PartialEq, Serialize, Deserialize, CandidType, Default)]
 pub struct BenchResult {
     pub total: Measurement,
@@ -510,29 +509,27 @@ impl From<BenchResultInternal> for BenchResult {
 }
 
 /// A benchmark measurement containing various stats.
-/// This type is used for serialization and deserialization,
-/// therefore fields are `Option` to maintain backwards compatibility.
+/// This type is in a public API.
 #[derive(Debug, PartialEq, Serialize, Deserialize, CandidType, Clone, Default)]
 pub struct Measurement {
     /// The number of calls made during the measurement.
-    pub calls: Option<u64>,
+    pub calls: u64,
 
     /// The number of instructions.
-    pub instructions: Option<u64>,
+    pub instructions: u64,
 
     /// The increase in heap (measured in pages).
-    pub heap_increase: Option<u64>,
+    pub heap_increase: u64,
 
     /// The increase in stable memory (measured in pages).
-    pub stable_memory_increase: Option<u64>,
+    pub stable_memory_increase: u64,
 }
 
 /// The internal representation of a measurement.
-/// Not deserialized, therefore fields are not `Option`.
 #[derive(Debug, PartialEq, Clone, Default)]
 struct MeasurementInternal {
     /// Instruction counter at the start of measurement.
-    /// Not serialized, because it is not supposed to be compared to other measurements.
+    /// Not in public API, because it is not supposed to be compared to other measurements.
     /// Used internally to correctly calculate instructions of overlapping or nested scopes.
     start_instructions: u64,
 
@@ -552,10 +549,10 @@ struct MeasurementInternal {
 impl From<MeasurementInternal> for Measurement {
     fn from(m: MeasurementInternal) -> Self {
         Self {
-            calls: Some(m.calls),
-            instructions: Some(m.instructions),
-            heap_increase: Some(m.heap_increase),
-            stable_memory_increase: Some(m.stable_memory_increase),
+            calls: m.calls,
+            instructions: m.instructions,
+            heap_increase: m.heap_increase,
+            stable_memory_increase: m.stable_memory_increase,
         }
     }
 }
@@ -583,10 +580,10 @@ fn test_backwards_compatibility() {
     assert_eq!(
         decoded,
         Measurement {
-            calls: None,
-            instructions: Some(1),
-            heap_increase: Some(2),
-            stable_memory_increase: Some(3),
+            calls: 0,
+            instructions: 1,
+            heap_increase: 2,
+            stable_memory_increase: 3,
         }
     );
 }

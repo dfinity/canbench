@@ -72,10 +72,10 @@ pub(crate) struct MeasurementReportable {
 impl From<&Measurement> for MeasurementReportable {
     fn from(m: &Measurement) -> Self {
         Self {
-            calls: m.calls.unwrap_or_default(),
-            instructions: m.instructions.unwrap_or_default(),
-            heap_increase: m.heap_increase.unwrap_or_default(),
-            stable_memory_increase: m.stable_memory_increase.unwrap_or_default(),
+            calls: m.calls,
+            instructions: m.instructions,
+            heap_increase: m.heap_increase,
+            stable_memory_increase: m.stable_memory_increase,
         }
     }
 }
