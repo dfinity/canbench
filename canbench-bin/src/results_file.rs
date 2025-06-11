@@ -52,10 +52,10 @@ pub fn read(results_file: &PathBuf) -> Result<BTreeMap<String, BenchResult>, Ver
 }
 
 /// Write benchmark results to disk.
-pub fn write(results_file: &PathBuf, results: BTreeMap<String, BenchResult>) {
+pub fn write(results_file: &PathBuf, benches: BTreeMap<String, BenchResult>) {
     let persisted_results = PersistedResults {
         version: VERSION,
-        benches: results,
+        benches,
     };
 
     let mut file = File::create(results_file).unwrap();
@@ -72,4 +72,29 @@ pub fn write(results_file: &PathBuf, results: BTreeMap<String, BenchResult>) {
 struct PersistedResults<'b> {
     benches: BTreeMap<String, BenchResult>,
     version: &'b str,
+}
+
+#[test]
+fn test_yaml_backwards_compatibility() {
+    use canbench_rs::Measurement;
+
+    #[derive(Debug, PartialEq, Serialize, Deserialize)]
+    struct MeasurementPreviousVersion {
+        instructions: u64,
+    }
+
+    // Encode a previous version struct (the fields were not provided).
+    let encoded = serde_yaml::to_string(&MeasurementPreviousVersion { instructions: 1 });
+    let decoded = serde_yaml::from_str::<Measurement>(&encoded.unwrap()).unwrap();
+
+    assert_eq!(
+        decoded,
+        Measurement {
+            #[cfg(feature = "calls")]
+            calls: 0,
+            instructions: 1,
+            heap_increase: 0,
+            stable_memory_increase: 0,
+        }
+    );
 }

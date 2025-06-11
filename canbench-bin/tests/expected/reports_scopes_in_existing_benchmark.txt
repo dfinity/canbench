@@ -7,13 +7,11 @@ Benchmark: bench_scope_exists
     stable_memory_increase: 0 pages (no change)
 
   scope_1 (scope):
-    calls: 1 (no change)
     instructions: 1111 (regressed by 38.88%)
     heap_increase: 0 pages (improved by 100.00%)
     stable_memory_increase: 0 pages (no change)
 
   scope_2 (scope):
-    calls: 1 (new)
     instructions: 847 (new)
     heap_increase: 0 pages (new)
     stable_memory_increase: 0 pages (new)
@@ -42,11 +40,11 @@ Summary:
 ---------------------------------------------------
 
 Only significant changes:
-| status | name                        | calls |   ins |  ins Δ% | HI |    HI Δ% | SMI |  SMI Δ% |
-|--------|-----------------------------|-------|-------|---------|----|----------|-----|---------|
-|   +    | bench_scope_exists          |       | 4.13K |   +inf% |  0 |    0.00% |   0 |   0.00% |
-|  +/-   | bench_scope_exists::scope_1 |     1 | 1.11K | +38.88% |  0 | -100.00% |   0 |   0.00% |
-|  new   | bench_scope_exists::scope_2 |     1 |   847 |         |  0 |          |   0 |         |
+| status | name                        |   ins |  ins Δ% | HI |    HI Δ% | SMI |  SMI Δ% |
+|--------|-----------------------------|-------|---------|----|----------|-----|---------|
+|   +    | bench_scope_exists          | 4.13K |   +inf% |  0 |    0.00% |   0 |   0.00% |
+|  +/-   | bench_scope_exists::scope_1 | 1.11K | +38.88% |  0 | -100.00% |   0 |   0.00% |
+|  new   | bench_scope_exists::scope_2 |   847 |         |  0 |          |   0 |         |
 
 ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 

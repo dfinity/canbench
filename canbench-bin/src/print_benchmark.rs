@@ -1,11 +1,11 @@
-use crate::{BenchResultReportable, MeasurementReportable};
+use crate::{BenchResult, Measurement};
 use colored::Colorize;
 
 /// Prints a benchmark to stdout, comparing it to the previous result if available.
 pub(crate) fn print_benchmark(
     name: &str,
-    new: &BenchResultReportable,
-    old: Option<&BenchResultReportable>,
+    new: &BenchResult,
+    old: Option<&BenchResult>,
     noise_threshold: f64,
 ) {
     // Print benchmark name.
@@ -34,11 +34,13 @@ pub(crate) fn print_benchmark(
 
 // Prints a measurement along with a comparison with the old value if available.
 fn print_measurement(
-    new: &MeasurementReportable,
-    old: Option<&MeasurementReportable>,
+    new: &Measurement,
+    old: Option<&Measurement>,
     noise_threshold: f64,
-    print_calls: bool,
+    #[cfg(feature = "calls")] print_calls: bool,
+    #[cfg(not(feature = "calls"))] _print_calls: bool,
 ) {
+    #[cfg(feature = "calls")]
     if print_calls {
         print_metric("calls", new.calls, old.map(|m| m.calls), noise_threshold);
     }

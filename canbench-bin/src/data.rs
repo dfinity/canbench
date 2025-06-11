@@ -1,11 +1,12 @@
 use crate::fmt::{fmt_human_percent, fmt_human_u64, fmt_percent};
-use crate::{BenchResultReportable, MeasurementReportable};
+use crate::{BenchResult, Measurement};
 use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct Entry {
     pub(crate) status: String,
     pub(crate) benchmark: Benchmark,
+    #[cfg(feature = "calls")]
     pub(crate) calls: Values,
     pub(crate) instructions: Values,
     pub(crate) heap_increase: Values,
@@ -125,8 +126,8 @@ impl Values {
 }
 
 pub(crate) fn extract(
-    new_results: &BTreeMap<String, BenchResultReportable>,
-    old_results: &BTreeMap<String, BenchResultReportable>,
+    new_results: &BTreeMap<String, BenchResult>,
+    old_results: &BTreeMap<String, BenchResult>,
 ) -> Vec<Entry> {
     let mut results = Vec::new();
 
@@ -161,10 +162,10 @@ pub(crate) fn extract(
 fn build_entry(
     status: String,
     benchmark: Benchmark,
-    new_m: Option<&MeasurementReportable>,
-    old_m: Option<&MeasurementReportable>,
+    new_m: Option<&Measurement>,
+    old_m: Option<&Measurement>,
 ) -> Entry {
-    let extract_values = |f: fn(&MeasurementReportable) -> u64| Values {
+    let extract_values = |f: fn(&Measurement) -> u64| Values {
         curr: new_m.map(f),
         prev: old_m.map(f),
     };
@@ -172,6 +173,7 @@ fn build_entry(
     Entry {
         status,
         benchmark,
+        #[cfg(feature = "calls")]
         calls: extract_values(|m| m.calls),
         instructions: extract_values(|m| m.instructions),
         heap_increase: extract_values(|m| m.heap_increase),

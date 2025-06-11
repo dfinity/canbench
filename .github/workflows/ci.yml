@@ -42,7 +42,7 @@ jobs:
         run: cargo clippy --tests --benches -- -D clippy::all
 
       - name: Test
-        run: cargo test --all-features --color always -- --color always --test-threads=1
+        run: cargo test --features=canbench --color always -- --color always --test-threads=1
         env:
           RUST_BACKTRACE: 1
 

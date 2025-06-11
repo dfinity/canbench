@@ -475,12 +475,13 @@ thread_local! {
 }
 
 /// The results of a benchmark.
-/// This type is used for serialization and deserialization,
-/// therefore nested fields are `Option` to maintain backwards compatibility.
+/// This type is in a public API.
 #[derive(Debug, PartialEq, Serialize, Deserialize, CandidType, Default)]
 pub struct BenchResult {
+    /// A measurement for the entire duration of the benchmark.
     pub total: Measurement,
 
+    /// Measurements for scopes.
     #[serde(default)]
     pub scopes: BTreeMap<String, Measurement>,
 }
@@ -510,29 +511,61 @@ impl From<BenchResultInternal> for BenchResult {
 }
 
 /// A benchmark measurement containing various stats.
-/// This type is used for serialization and deserialization,
-/// therefore fields are `Option` to maintain backwards compatibility.
+/// This type is in a public API.
 #[derive(Debug, PartialEq, Serialize, Deserialize, CandidType, Clone, Default)]
 pub struct Measurement {
     /// The number of calls made during the measurement.
-    pub calls: Option<u64>,
+    #[cfg(feature = "calls")]
+    #[serde(default)]
+    pub calls: u64,
 
     /// The number of instructions.
-    pub instructions: Option<u64>,
+    #[serde(default)]
+    pub instructions: u64,
 
     /// The increase in heap (measured in pages).
-    pub heap_increase: Option<u64>,
+    #[serde(default)]
+    pub heap_increase: u64,
 
     /// The increase in stable memory (measured in pages).
-    pub stable_memory_increase: Option<u64>,
+    #[serde(default)]
+    pub stable_memory_increase: u64,
+}
+
+#[test]
+fn public_api_of_measurement_should_not_change() {
+    // If you have to modify this test, it's likely you broke the public API of `Measurement`.
+    // Avoid making such changes unless absolutely necessary — doing so requires a major version bump.
+    //
+    // This test checks that the `Measurement` struct:
+    // - Exists
+    // - Has all expected public fields
+    // - Fields have the expected names and types
+
+    let m = Measurement {
+        #[cfg(feature = "calls")]
+        calls: 0_u64,
+
+        instructions: 0_u64,
+        heap_increase: 0_u64,
+        stable_memory_increase: 0_u64,
+    };
+
+    // Ensure field access works and types match expectations
+    #[cfg(feature = "calls")]
+    {
+        let _: u64 = m.calls;
+    }
+    let _: u64 = m.instructions;
+    let _: u64 = m.heap_increase;
+    let _: u64 = m.stable_memory_increase;
 }
 
 /// The internal representation of a measurement.
-/// Not deserialized, therefore fields are not `Option`.
 #[derive(Debug, PartialEq, Clone, Default)]
 struct MeasurementInternal {
     /// Instruction counter at the start of measurement.
-    /// Not serialized, because it is not supposed to be compared to other measurements.
+    /// Not in public API, because it is not supposed to be compared to other measurements.
     /// Used internally to correctly calculate instructions of overlapping or nested scopes.
     start_instructions: u64,
 
@@ -552,43 +585,13 @@ struct MeasurementInternal {
 impl From<MeasurementInternal> for Measurement {
     fn from(m: MeasurementInternal) -> Self {
         Self {
-            calls: Some(m.calls),
-            instructions: Some(m.instructions),
-            heap_increase: Some(m.heap_increase),
-            stable_memory_increase: Some(m.stable_memory_increase),
+            #[cfg(feature = "calls")]
+            calls: m.calls,
+            instructions: m.instructions,
+            heap_increase: m.heap_increase,
+            stable_memory_increase: m.stable_memory_increase,
         }
     }
-}
-
-#[test]
-fn test_backwards_compatibility() {
-    use candid::{Decode, Encode};
-
-    #[derive(Serialize, Deserialize, CandidType)]
-    pub struct MeasurementPreviousVersion {
-        pub instructions: u64,
-        pub heap_increase: u64,
-        pub stable_memory_increase: u64,
-    }
-
-    // Encode a previous version Candid struct (the fields were not provided)
-    let encoded = Encode!(&MeasurementPreviousVersion {
-        instructions: 1,
-        heap_increase: 2,
-        stable_memory_increase: 3,
-    })
-    .unwrap();
-    let decoded = Decode!(&encoded, Measurement).unwrap();
-
-    assert_eq!(
-        decoded,
-        Measurement {
-            calls: None,
-            instructions: Some(1),
-            heap_increase: Some(2),
-            stable_memory_increase: Some(3),
-        }
-    );
 }
 
 /// Benchmarks the given function.

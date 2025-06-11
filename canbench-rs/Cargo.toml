@@ -25,3 +25,4 @@ ic-cdk-macros.workspace = true
 
 [features]
 canbench = [] # required for doc tests
+calls = []
