@@ -44,7 +44,7 @@ jobs:
       - name: Test
         # Do not use `--all-features` because it enables `overwrite`, which auto-updates expected outputs.
         # This makes tests always pass by overwriting failures, effectively disabling test validation.
-        run: cargo test --features=canbench --color always -- --color always --test-threads=1
+        run: cargo test --features all --color always -- --color always --test-threads=1
         env:
           RUST_BACKTRACE: 1
 
