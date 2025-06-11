@@ -7,12 +7,12 @@ benches:
     scopes: {}
   pre_upgrade_bench:
     total:
-      instructions: 486879968
+      instructions: 486878896
       heap_increase: 519
       stable_memory_increase: 184
     scopes:
       serialize_state:
-        instructions: 423940341
+        instructions: 423939269
         heap_increase: 519
         stable_memory_increase: 0
       writing_to_stable_memory:
