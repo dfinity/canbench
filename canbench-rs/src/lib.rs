@@ -514,15 +514,19 @@ impl From<BenchResultInternal> for BenchResult {
 pub struct Measurement {
     /// The number of calls made during the measurement.
     #[cfg(feature = "calls")]
+    #[serde(default)]
     pub calls: u64,
 
     /// The number of instructions.
+    #[serde(default)]
     pub instructions: u64,
 
     /// The increase in heap (measured in pages).
+    #[serde(default)]
     pub heap_increase: u64,
 
     /// The increase in stable memory (measured in pages).
+    #[serde(default)]
     pub stable_memory_increase: u64,
 }
 
