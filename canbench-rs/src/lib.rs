@@ -525,6 +525,35 @@ pub struct Measurement {
     pub stable_memory_increase: u64,
 }
 
+#[test]
+fn public_api_of_measurement_should_not_change() {
+    // If you have to modify this test, it's likely you broke the public API of `Measurement`.
+    // Avoid making such changes unless absolutely necessary — doing so requires a major version bump.
+    //
+    // This test checks that the `Measurement` struct:
+    // - Exists
+    // - Has all expected public fields
+    // - Fields have the expected names and types
+
+    let m = Measurement {
+        calls: 0_u64,
+        instructions: 0_u64,
+        heap_increase: 0_u64,
+        stable_memory_increase: 0_u64,
+    };
+
+    // Ensure field access works and types match expectations
+    let _: u64 = m.calls;
+    let _: u64 = m.instructions;
+    let _: u64 = m.heap_increase;
+    let _: u64 = m.stable_memory_increase;
+
+    // Ensure struct is `Clone`, `PartialEq`, and `Default`
+    let _ = Measurement::default();
+    let _ = m.clone();
+    let _ = m == m;
+}
+
 /// The internal representation of a measurement.
 #[derive(Debug, PartialEq, Clone, Default)]
 struct MeasurementInternal {
