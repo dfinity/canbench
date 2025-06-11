@@ -142,6 +142,7 @@ mod tests {
                     calls: Values::new(Some(100), Some(50)),
                 },
             ],
+            #[cfg(not(feature = "calls"))]
             "\
 status,name,instructions,instructions Δ,instructions Δ%,heap_increase,heap_increase Δ,heap_increase Δ%,stable_memory_increase,stable_memory_increase Δ,stable_memory_increase Δ%
 ,bench_regression,11000000,1000000,10.00%,0,,,0,,
@@ -150,6 +151,16 @@ status,name,instructions,instructions Δ,instructions Δ%,heap_increase,heap_inc
 ,bench_positive_inf,10000000,10000000,1.0E99,0,,,0,,
 ,bench_from_10M_to_0,0,-10000000,-100.00%,0,,,0,,
 ,bench_with_scope::my_scope,10000000,1000000,11.11%,0,,,0,,
+",
+            #[cfg(feature = "calls")]
+            "\
+status,name,scope_calls,scope_calls Δ,scope_calls Δ%,instructions,instructions Δ,instructions Δ%,heap_increase,heap_increase Δ,heap_increase Δ%,stable_memory_increase,stable_memory_increase Δ,stable_memory_increase Δ%
+,bench_regression,,,,11000000,1000000,10.00%,0,,,0,,
+,bench_no_change,,,,10000000,0,0.00%,0,,,0,,
+,bench_improvement,,,,9000000,-1000000,-10.00%,0,,,0,,
+,bench_positive_inf,,,,10000000,10000000,1.0E99,0,,,0,,
+,bench_from_10M_to_0,,,,0,-10000000,-100.00%,0,,,0,,
+,bench_with_scope::my_scope,100,50,100.00%,10000000,1000000,11.11%,0,,,0,,
 ",
         );
     }

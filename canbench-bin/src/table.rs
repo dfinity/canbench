@@ -223,10 +223,19 @@ mod tests {
     fn test_print_table_variants_0() {
         run_table_test_case(
             0,
+            #[cfg(not(feature = "calls"))]
             "\
 | status | name                   | ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
 |--------|------------------------|-----|---------|----|--------|-----|---------|
 |  ...   | ... 6 rows omitted ... |     |         |    |        |     |         |
+
+ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
+",
+            #[cfg(feature = "calls")]
+            "\
+| status | name                   | calls | ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|------------------------|-------|-----|---------|----|--------|-----|---------|
+|  ...   | ... 6 rows omitted ... |       |     |         |    |        |     |         |
 
 ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 ",
@@ -237,11 +246,21 @@ ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = perc
     fn test_print_table_variants_1() {
         run_table_test_case(
             1,
+            #[cfg(not(feature = "calls"))]
             "\
 | status | name                   |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
 |--------|------------------------|-------|---------|----|--------|-----|---------|
 |  ...   | ... 5 rows omitted ... |       |         |    |        |     |         |
 |        | bench_5::scope_0       | 9.00M | -10.00% |  0 |        |   0 |         |
+
+ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
+",
+            #[cfg(feature = "calls")]
+            "\
+| status | name                   | calls |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|------------------------|-------|-------|---------|----|--------|-----|---------|
+|  ...   | ... 5 rows omitted ... |       |       |         |    |        |     |         |
+|        | bench_5::scope_0       |    10 | 9.00M | -10.00% |  0 |        |   0 |         |
 
 ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 ",
@@ -252,12 +271,23 @@ ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = perc
     fn test_print_table_variants_2() {
         run_table_test_case(
             2,
+            #[cfg(not(feature = "calls"))]
             "\
 | status | name                   |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
 |--------|------------------------|-------|---------|----|--------|-----|---------|
 |        | bench_1                | 9.00M | -10.00% |  0 |        |   0 |         |
 |  ...   | ... 4 rows omitted ... |       |         |    |        |     |         |
 |        | bench_5::scope_0       | 9.00M | -10.00% |  0 |        |   0 |         |
+
+ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
+",
+            #[cfg(feature = "calls")]
+            "\
+| status | name                   | calls |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|------------------------|-------|-------|---------|----|--------|-----|---------|
+|        | bench_1                |       | 9.00M | -10.00% |  0 |        |   0 |         |
+|  ...   | ... 4 rows omitted ... |       |       |         |    |        |     |         |
+|        | bench_5::scope_0       |    10 | 9.00M | -10.00% |  0 |        |   0 |         |
 
 ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 ",
@@ -268,6 +298,7 @@ ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = perc
     fn test_print_table_variants_3() {
         run_table_test_case(
             3,
+            #[cfg(not(feature = "calls"))]
             "\
 | status | name                   |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
 |--------|------------------------|-------|---------|----|--------|-----|---------|
@@ -278,6 +309,17 @@ ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = perc
 
 ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 ",
+            #[cfg(feature = "calls")]
+            "\
+| status | name                   | calls |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|------------------------|-------|-------|---------|----|--------|-----|---------|
+|        | bench_1                |       | 9.00M | -10.00% |  0 |        |   0 |         |
+|  ...   | ... 3 rows omitted ... |       |       |         |    |        |     |         |
+|        | bench_5                |       | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_5::scope_0       |    10 | 9.00M | -10.00% |  0 |        |   0 |         |
+
+ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
+",
         );
     }
 
@@ -285,6 +327,7 @@ ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = perc
     fn test_print_table_variants_4() {
         run_table_test_case(
             4,
+            #[cfg(not(feature = "calls"))]
             "\
 | status | name                   |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
 |--------|------------------------|-------|---------|----|--------|-----|---------|
@@ -296,6 +339,18 @@ ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = perc
 
 ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 ",
+            #[cfg(feature = "calls")]
+            "\
+| status | name                   | calls |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|------------------------|-------|-------|---------|----|--------|-----|---------|
+|        | bench_1                |       | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_2                |       | 9.00M | -10.00% |  0 |        |   0 |         |
+|  ...   | ... 2 rows omitted ... |       |       |         |    |        |     |         |
+|        | bench_5                |       | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_5::scope_0       |    10 | 9.00M | -10.00% |  0 |        |   0 |         |
+
+ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
+",
         );
     }
 
@@ -303,6 +358,7 @@ ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = perc
     fn test_print_table_variants_5() {
         run_table_test_case(
             5,
+            #[cfg(not(feature = "calls"))]
             "\
 | status | name                  |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
 |--------|-----------------------|-------|---------|----|--------|-----|---------|
@@ -315,6 +371,19 @@ ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = perc
 
 ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 ",
+            #[cfg(feature = "calls")]
+            "\
+| status | name                  | calls |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|-----------------------|-------|-------|---------|----|--------|-----|---------|
+|        | bench_1               |       | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_2               |       | 9.00M | -10.00% |  0 |        |   0 |         |
+|  ...   | ... 1 row omitted ... |       |       |         |    |        |     |         |
+|        | bench_4               |       | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_5               |       | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_5::scope_0      |    10 | 9.00M | -10.00% |  0 |        |   0 |         |
+
+ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
+",
         );
     }
 
@@ -322,6 +391,7 @@ ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = perc
     fn test_print_table_variants_6() {
         run_table_test_case(
             6,
+            #[cfg(not(feature = "calls"))]
             "\
 | status | name             |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
 |--------|------------------|-------|---------|----|--------|-----|---------|
@@ -331,6 +401,19 @@ ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = perc
 |        | bench_4          | 9.00M | -10.00% |  0 |        |   0 |         |
 |        | bench_5          | 9.00M | -10.00% |  0 |        |   0 |         |
 |        | bench_5::scope_0 | 9.00M | -10.00% |  0 |        |   0 |         |
+
+ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
+",
+            #[cfg(feature = "calls")]
+            "\
+| status | name             | calls |   ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|------------------|-------|-------|---------|----|--------|-----|---------|
+|        | bench_1          |       | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_2          |       | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_3          |       | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_4          |       | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_5          |       | 9.00M | -10.00% |  0 |        |   0 |         |
+|        | bench_5::scope_0 |    10 | 9.00M | -10.00% |  0 |        |   0 |         |
 
 ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 ",
