@@ -16,6 +16,15 @@ macro_rules! current_test_name {
     }};
 }
 
+#[test]
+fn overwrite_feature_must_be_disabled() {
+    // Fails if the "overwrite" feature is accidentally enabled (e.g. via `--all-features` in CI).
+    assert!(
+        !cfg!(feature = "overwrite"),
+        "'overwrite' feature must be disabled"
+    );
+}
+
 /// Loads the expected output for a given test case.
 /// Overwrites the expected output if the "overwrite" feature is enabled.
 ///
@@ -42,15 +51,6 @@ fn load_expected(test_name: &str, output: &Output) -> String {
             err
         );
     })
-}
-
-#[test]
-fn overwrite_feature_must_be_disabled() {
-    // Fails if the "overwrite" feature is accidentally enabled (e.g. via `--all-features` in CI).
-    assert!(
-        !cfg!(feature = "overwrite"),
-        "'overwrite' feature must be disabled"
-    );
 }
 
 #[test]
