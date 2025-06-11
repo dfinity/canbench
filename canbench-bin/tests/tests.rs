@@ -45,7 +45,7 @@ fn load_expected(test_name: &str, output: &Output) -> String {
 }
 
 #[test]
-fn overwrite_feature_turned_off() {
+fn test_overwrite_feature_turned_off() {
     // This test ensures that the "overwrite" feature is not enabled accidentally.
     // This can happen in CI when running tests with `--all-features` or similar commands.
     if cfg!(feature = "overwrite") {
