@@ -307,65 +307,16 @@ fn inject_tracing(
 /// Renders the tracing to a file. Adapted from
 /// https://github.com/dfinity/ic-repl/blob/master/src/tracing.rs
 pub(super) fn write_traces_to_file(
-    input: Vec<(i32, i64)>,
+    input: InstructionTraceGraphNode,
     names: &BTreeMap<i32, String>,
     bench_fn: &str,
     filename: PathBuf,
 ) -> Result<(), String> {
     use inferno::flamegraph::{from_reader, Options};
-    let mut stack = Vec::new();
-    let mut prefix = Vec::new();
-    let mut result = Vec::new();
-    let mut prev = None;
-    for (id, count) in input.into_iter() {
-        if id >= 0 {
-            stack.push((id, count, 0));
-            let name = if id < i32::MAX {
-                match names.get(&id) {
-                    Some(name) => name.clone(),
-                    None => "func_".to_string() + &id.to_string(),
-                }
-            } else {
-                bench_fn.to_string()
-            };
-            prefix.push(name);
-        } else {
-            let end_id = reverse_func_id(id);
-            match stack.pop() {
-                None => return Err("pop empty stack".to_string()),
-                Some((start_id, start, children)) => {
-                    if start_id != end_id {
-                        return Err("func id mismatch".to_string());
-                    }
-                    let cost = count - start;
-                    let frame = prefix.join(";");
-                    prefix.pop().unwrap();
-                    if let Some((parent, parent_cost, children_cost)) = stack.pop() {
-                        stack.push((parent, parent_cost, children_cost + cost));
-                    }
-                    match prev {
-                        Some(prev) if prev == frame => {
-                            // Add an empty spacer to avoid collapsing adjacent same-named calls
-                            // See https://github.com/jonhoo/inferno/issues/185#issuecomment-671393504
-                            result.push(format!("{};spacer 0", prefix.join(";")));
-                        }
-                        _ => (),
-                    }
-                    result.push(format!("{} {}", frame, cost - children));
-                    prev = Some(frame);
-                }
-            }
-        }
-    }
-    let is_trace_incomplete = !stack.is_empty();
+    let mut result = convert_trace_graph_to_flamegraph(input, names, bench_fn);
     let mut opt = Options::default();
     opt.count_name = "instructions".to_string();
-    let bench_fn = if is_trace_incomplete {
-        bench_fn.to_string() + " (incomplete)"
-    } else {
-        bench_fn.to_string()
-    };
-    opt.title = bench_fn;
+    opt.title = bench_fn.to_string();
     opt.flame_chart = true;
     opt.no_sort = true;
     // Reserve result order to make flamegraph from left to right.
@@ -377,6 +328,49 @@ pub(super) fn write_traces_to_file(
     from_reader(&mut opt, reader, &mut writer).map_err(|e| e.to_string())?;
     println!("Instruction traces written to {}", filename.display());
     Ok(())
+}
+
+fn convert_trace_graph_to_flamegraph(
+    input: InstructionTraceGraphNode,
+    names: &BTreeMap<i32, String>,
+    bench_fn: &str,
+) -> Vec<String> {
+    let mut flamegraph = Vec::new();
+    let mut prefix = Vec::new();
+    convert_trace_node_to_flamegraph(input, names, bench_fn, &mut prefix, &mut flamegraph);
+    flamegraph
+}
+
+fn convert_trace_node_to_flamegraph(
+    input: InstructionTraceGraphNode,
+    names: &BTreeMap<i32, String>,
+    bench_fn: &str,
+    prefix: &mut Vec<String>,
+    flamegraph: &mut Vec<String>,
+) {
+    let InstructionTraceGraphNode {
+        func_id,
+        cost,
+        children,
+    } = input;
+    prefix.push(func_id_to_name(func_id, names, bench_fn));
+
+    for child in children {
+        convert_trace_node_to_flamegraph(child, names, bench_fn, prefix, flamegraph);
+    }
+    flamegraph.push(format!("{} {}", prefix.join(";"), cost));
+    prefix.pop();
+}
+
+fn func_id_to_name(func_id: i32, names: &BTreeMap<i32, String>, bench_fn: &str) -> String {
+    if func_id < i32::MAX {
+        match names.get(&func_id) {
+            Some(name) => name.clone(),
+            None => "func_".to_string() + &func_id.to_string(),
+        }
+    } else {
+        bench_fn.to_string()
+    }
 }
 
 /// Extracts function names from the module to be a map from function id to function name.
