@@ -147,8 +147,8 @@ fn measure_recursive_scope(scope_name: &'static str, depth: usize, instructions_
 fn bench_recursive_scopes() {
     const INSTRUCTIONS_PER_CALL: u64 = 1_000_000;
 
-    measure_recursive_scope("recursive_scope_1", 10, INSTRUCTIONS_PER_CALL); // 10M instructions
-    measure_recursive_scope("recursive_scope_2", 20, INSTRUCTIONS_PER_CALL); // 20M instructions
+    measure_recursive_scope("recursive_scope_1", 20, INSTRUCTIONS_PER_CALL); // 10M instructions
+    measure_recursive_scope("recursive_scope_2", 30, INSTRUCTIONS_PER_CALL); // 20M instructions
 }
 
 #[export_name = "canister_query __canbench__broken_benchmark"]

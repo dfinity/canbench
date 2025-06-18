@@ -2,19 +2,19 @@
 
 Benchmark: bench_recursive_scopes
   total:
-    instructions: 30.09 M (0.31%) (change within noise threshold)
+    instructions: 50.15 M (regressed by 67.17%)
     heap_increase: 0 pages (no change)
     stable_memory_increase: 0 pages (no change)
 
   recursive_scope_1 (scope):
-    calls: 10 (no change)
-    instructions: 10.03 M (0.26%) (change within noise threshold)
+    calls: 20 (regressed by 100.00%)
+    instructions: 20.05 M (regressed by 100.54%)
     heap_increase: 0 pages (no change)
     stable_memory_increase: 0 pages (no change)
 
   recursive_scope_2 (scope):
-    calls: 20 (no change)
-    instructions: 20.06 M (0.31%) (change within noise threshold)
+    calls: 30 (regressed by 50.00%)
+    instructions: 30.09 M (regressed by 50.47%)
     heap_increase: 0 pages (no change)
     stable_memory_increase: 0 pages (no change)
 
@@ -22,10 +22,10 @@ Benchmark: bench_recursive_scopes
 
 Summary:
   instructions:
-    status:   No significant changes 👍
-    counts:   [total 1 | regressed 0 | improved 0 | new 0 | unchanged 1]
-    change:   [max +91.83K | p75 +91.83K | median +91.83K | p25 +91.83K | min +91.83K]
-    change %: [max +0.31% | p75 +0.31% | median +0.31% | p25 +0.31% | min +0.31%]
+    status:   Regressions detected 🔴
+    counts:   [total 1 | regressed 1 | improved 0 | new 0 | unchanged 0]
+    change:   [max +20.15M | p75 +20.15M | median +20.15M | p25 +20.15M | min +20.15M]
+    change %: [max +67.17% | p75 +67.17% | median +67.17% | p25 +67.17% | min +67.17%]
 
   heap_increase:
     status:   No significant changes 👍
@@ -38,5 +38,16 @@ Summary:
     counts:   [total 1 | regressed 0 | improved 0 | new 0 | unchanged 1]
     change:   [max 0 | p75 0 | median 0 | p25 0 | min 0]
     change %: [max 0.00% | p75 0.00% | median 0.00% | p25 0.00% | min 0.00%]
+
+---------------------------------------------------
+
+Only significant changes:
+| status | name                                      | calls |    ins |   ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|-------------------------------------------|-------|--------|----------|----|--------|-----|---------|
+|   +    | bench_recursive_scopes::recursive_scope_1 |    20 | 20.05M | +100.54% |  0 |  0.00% |   0 |   0.00% |
+|   +    | bench_recursive_scopes                    |       | 50.15M |  +67.17% |  0 |  0.00% |   0 |   0.00% |
+|   +    | bench_recursive_scopes::recursive_scope_2 |    30 | 30.09M |  +50.47% |  0 |  0.00% |   0 |   0.00% |
+
+ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 
 ---------------------------------------------------
