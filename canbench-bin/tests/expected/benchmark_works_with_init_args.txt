@@ -2,7 +2,7 @@
 
 Benchmark: state_check
   total:
-    instructions: 841 (no change)
+    instructions: 872 (regressed by 3.69%)
     heap_increase: 0 pages (no change)
     stable_memory_increase: 0 pages (no change)
 
@@ -10,10 +10,10 @@ Benchmark: state_check
 
 Summary:
   instructions:
-    status:   No significant changes 👍
-    counts:   [total 1 | regressed 0 | improved 0 | new 0 | unchanged 1]
-    change:   [max 0 | p75 0 | median 0 | p25 0 | min 0]
-    change %: [max 0.00% | p75 0.00% | median 0.00% | p25 0.00% | min 0.00%]
+    status:   Regressions detected 🔴
+    counts:   [total 1 | regressed 1 | improved 0 | new 0 | unchanged 0]
+    change:   [max +31 | p75 +31 | median +31 | p25 +31 | min +31]
+    change %: [max +3.69% | p75 +3.69% | median +3.69% | p25 +3.69% | min +3.69%]
 
   heap_increase:
     status:   No significant changes 👍
@@ -26,5 +26,14 @@ Summary:
     counts:   [total 1 | regressed 0 | improved 0 | new 0 | unchanged 1]
     change:   [max 0 | p75 0 | median 0 | p25 0 | min 0]
     change %: [max 0.00% | p75 0.00% | median 0.00% | p25 0.00% | min 0.00%]
+
+---------------------------------------------------
+
+Only significant changes:
+| status | name        | calls | ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
+|--------|-------------|-------|-----|---------|----|--------|-----|---------|
+|   +    | state_check |       | 872 |  +3.69% |  0 |  0.00% |   0 |   0.00% |
+
+ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 
 ---------------------------------------------------
