@@ -10,6 +10,7 @@ mod table;
 
 use canbench_rs::{BenchResult, Measurement};
 use candid::{Encode, Principal};
+use clap::ValueEnum;
 use flate2::read::GzDecoder;
 use instruction_tracing::{prepare_instruction_tracing, write_traces_to_file};
 use pocket_ic::common::rest::BlobCompression;
@@ -38,6 +39,12 @@ const POCKET_IC_MAC_SHA: &str = "27bb9594e498171d2fffadf6e1e144e58ed3f5854d151ff
 /// The maximum number of rows to display in the summary table.
 const MAX_DISPLAYED_ROWS: usize = 50;
 
+#[derive(ValueEnum, Clone, Debug)]
+pub enum CompareOrder {
+    StoredVsComputed,
+    ComputedVsStored,
+}
+
 /// Runs the benchmarks on the canister available in the provided `canister_wasm_path`.
 #[allow(clippy::too_many_arguments)]
 pub fn run_benchmarks(
@@ -57,11 +64,12 @@ pub fn run_benchmarks(
     runtime_path: &PathBuf,
     stable_memory_path: Option<PathBuf>,
     noise_threshold: f64,
+    compare_order: CompareOrder,
 ) {
     maybe_download_pocket_ic(runtime_path, verbose, integrity_check);
 
-    let old_results = match results_file::read(results_file) {
-        Ok(old_results) => old_results,
+    let stored_results = match results_file::read(results_file) {
+        Ok(stored_results) => stored_results,
         Err(VersionError {
             our_version,
             their_version,
@@ -95,7 +103,7 @@ pub fn run_benchmarks(
     );
 
     // Run the benchmarks
-    let mut new_results = BTreeMap::new();
+    let mut computed_results = BTreeMap::new();
     for bench_fn in &benchmark_fns {
         if let Some(pattern) = &pattern {
             if !bench_fn.contains(pattern) {
@@ -103,15 +111,15 @@ pub fn run_benchmarks(
             }
         }
 
-        let result = run_benchmark(&pocket_ic, benchmark_canister_id, bench_fn);
+        let computed_result = run_benchmark(&pocket_ic, benchmark_canister_id, bench_fn);
 
         if show_results {
             println!("---------------------------------------------------");
             println!();
             print_benchmark(
                 bench_fn,
-                &result,
-                old_results.get(bench_fn),
+                &computed_result,
+                stored_results.get(bench_fn),
                 noise_threshold,
             );
         }
@@ -123,11 +131,11 @@ pub fn run_benchmarks(
                 bench_fn,
                 function_names_mapping.as_ref().unwrap(),
                 results_file,
-                result.total.instructions,
+                computed_result.total.instructions,
             );
         }
 
-        new_results.insert(bench_fn.to_string(), result);
+        computed_results.insert(bench_fn.to_string(), computed_result);
 
         if show_results {
             println!();
@@ -136,7 +144,12 @@ pub fn run_benchmarks(
 
     println!("---------------------------------------------------");
 
-    let data = data::extract(&new_results, &old_results);
+    let (old_results, new_results) = match compare_order {
+        CompareOrder::StoredVsComputed => (&stored_results, &computed_results),
+        CompareOrder::ComputedVsStored => (&computed_results, &stored_results),
+    };
+
+    let data = data::extract(new_results, old_results);
     if verbose || show_summary {
         println!();
         summary::print_summary(&data, noise_threshold);
@@ -172,7 +185,7 @@ pub fn run_benchmarks(
 
     // Persist the result if requested.
     if persist {
-        results_file::write(results_file, new_results);
+        results_file::write(results_file, computed_results);
         println!(
             "Successfully persisted results to {}",
             results_file.display()
