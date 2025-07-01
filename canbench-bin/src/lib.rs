@@ -111,17 +111,23 @@ pub fn run_benchmarks(
             }
         }
 
-        let current_result = run_benchmark(&pocket_ic, benchmark_canister_id, bench_fn);
+        let computed = run_benchmark(&pocket_ic, benchmark_canister_id, bench_fn);
 
         if show_results {
             println!("---------------------------------------------------");
             println!();
-            print_benchmark(
-                bench_fn,
-                &current_result,
-                stored_results.get(bench_fn),
-                noise_threshold,
-            );
+
+            let stored = stored_results.get(bench_fn);
+            match compare_order {
+                CompareOrder::StoredVsComputed => {
+                    print_benchmark(bench_fn, &computed, stored, noise_threshold)
+                }
+                CompareOrder::ComputedVsStored => {
+                    if let Some(stored) = stored {
+                        print_benchmark(bench_fn, stored, Some(&computed), noise_threshold);
+                    }
+                }
+            }
         }
 
         if let Some(instruction_tracing_canister_id) = instruction_tracing_canister_id {
@@ -131,11 +137,11 @@ pub fn run_benchmarks(
                 bench_fn,
                 function_names_mapping.as_ref().unwrap(),
                 results_file,
-                current_result.total.instructions,
+                computed.total.instructions,
             );
         }
 
-        computed_results.insert(bench_fn.to_string(), current_result);
+        computed_results.insert(bench_fn.to_string(), computed);
 
         if show_results {
             println!();
