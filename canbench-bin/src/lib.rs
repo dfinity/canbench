@@ -111,14 +111,14 @@ pub fn run_benchmarks(
             }
         }
 
-        let computed_result = run_benchmark(&pocket_ic, benchmark_canister_id, bench_fn);
+        let current_result = run_benchmark(&pocket_ic, benchmark_canister_id, bench_fn);
 
         if show_results {
             println!("---------------------------------------------------");
             println!();
             print_benchmark(
                 bench_fn,
-                &computed_result,
+                &current_result,
                 stored_results.get(bench_fn),
                 noise_threshold,
             );
@@ -131,11 +131,11 @@ pub fn run_benchmarks(
                 bench_fn,
                 function_names_mapping.as_ref().unwrap(),
                 results_file,
-                computed_result.total.instructions,
+                current_result.total.instructions,
             );
         }
 
-        computed_results.insert(bench_fn.to_string(), computed_result);
+        computed_results.insert(bench_fn.to_string(), current_result);
 
         if show_results {
             println!();
