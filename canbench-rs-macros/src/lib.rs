@@ -63,9 +63,9 @@ pub fn bench(arg_tokens: TokenStream, item: TokenStream) -> TokenStream {
 
                 #[ic_cdk::query]
                 #[allow(non_snake_case)]
-                fn #tracing_func_name(bench_instructions: u64) -> Result<Vec<(i32, i64)>, String> {
+                fn #tracing_func_name(bench_instructions: u64, aggregate: bool) -> Result<canbench_rs::InstructionTraceGraphNode, String> {
                     #func_name();
-                    canbench_rs::get_traces(bench_instructions)
+                    canbench_rs::get_traces(bench_instructions, aggregate)
                 }
             }
         }
@@ -91,11 +91,11 @@ pub fn bench(arg_tokens: TokenStream, item: TokenStream) -> TokenStream {
 
                 #[ic_cdk::query]
                 #[allow(non_snake_case)]
-                fn #tracing_func_name(bench_instructions: u64) -> Result<Vec<(i32, i64)>, String> {
+                fn #tracing_func_name(bench_instructions: u64, aggregate: bool) -> Result<canbench_rs::InstructionTraceGraphNode, String> {
                     canbench_rs::bench_fn(|| {
                         #func_name();
                     });
-                    canbench_rs::get_traces(bench_instructions)
+                    canbench_rs::get_traces(bench_instructions, aggregate)
                 }
             }
         }

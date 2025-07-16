@@ -467,7 +467,11 @@
 pub use canbench_rs_macros::bench;
 use candid::CandidType;
 use serde::{Deserialize, Serialize};
-use std::{cell::RefCell, collections::BTreeMap};
+use std::{
+    cell::RefCell,
+    collections::{hash_map::Entry, BTreeMap, HashMap},
+    ops::AddAssign,
+};
 
 thread_local! {
     static SCOPES: RefCell<BTreeMap<&'static str, Vec<MeasurementInternal>>> =
@@ -829,7 +833,22 @@ const BUFFER_SIZE: usize = NUM_BYTES_ENABLED_FLAG
     + NUM_BYTES_NUM_ENTRIES
     + MAX_NUM_LOG_ENTRIES * (NUM_BYTES_FUNC_ID + NUM_BYTES_INSTRUCTION_COUNTER);
 const LOGS_START_OFFSET: usize = NUM_BYTES_ENABLED_FLAG + NUM_BYTES_NUM_ENTRIES;
-const MAX_NUM_LOG_ENTRIES_IN_RESPONSE: usize = 131_000;
+/// The maximum number of nodes in the response. This number is chosen since the
+/// `InstructionTraceGraphNode` takes ~13B per node, and the maximum response size is 3MiB. This
+/// number is chosen to be below 3MiB / 13B ~ 241_979.
+const MAX_NUM_NODES_IN_RESPONSE: usize = 240_000;
+
+/// A node in the instruction trace graph. The parent-child relationship is determined by the call
+/// stack - if function `f` calls function `g`, then `g` is a child of `f`.
+#[derive(Debug, Clone, Serialize, Deserialize, CandidType)]
+pub struct InstructionTraceGraphNode {
+    /// The id of the function.
+    pub func_id: i32,
+    /// The instruction cost of the function, not including its descendants.
+    pub cost: i64,
+    /// The children of the graph node.
+    pub children: Vec<InstructionTraceGraphNode>,
+}
 
 #[export_name = "__prepare_tracing"]
 fn prepare_tracing() -> i32 {
@@ -839,7 +858,10 @@ fn prepare_tracing() -> i32 {
     })
 }
 
-pub fn get_traces(bench_instructions: u64) -> Result<Vec<(i32, i64)>, String> {
+pub fn get_traces(
+    bench_instructions: u64,
+    aggregate: bool,
+) -> Result<InstructionTraceGraphNode, String> {
     TRACING_BUFFER.with_borrow(|b| {
         if b[0] == 1 {
             panic!("Tracing is still enabled.");
@@ -877,9 +899,62 @@ pub fn get_traces(bench_instructions: u64) -> Result<Vec<(i32, i64)>, String> {
         traces.push((i32::MIN, unsafe { INSTRUCTIONS_END - instructions_start }));
         let traces = adjust_traces_for_overhead(traces, bench_instructions);
         // TODO(EXC-2020): consider using compression.
-        let traces = truncate_traces(traces);
-        Ok(traces)
+        let graph = convert_traces_to_graph(traces);
+        let graph = if aggregate {
+            agggregate_traces(graph)
+        } else {
+            graph
+        };
+        let graph = truncate_traces_graph(graph);
+        Ok(graph)
     })
+}
+
+/// Converts traces from a list of trace events (start or end of a function and the instruction
+/// count at that point) to a graph, where the parent-child relationship is determined by the call
+/// stack.
+fn convert_traces_to_graph(traces: Vec<(i32, i64)>) -> InstructionTraceGraphNode {
+    let (node, _, _) = convert_traces_range_to_graph(&traces, 0);
+    node
+}
+
+/// Converts `traces[start..]` to a graph. The return value is `(node, next_start, total_cost)`,
+/// where `node` is the graph node which corresponds to the function at `traces[start]`,
+/// `next_start` is the index of the next trace to process, and `total_cost` is the total cost of
+/// the children of the current function. The additional 2 values are used for recursion.
+fn convert_traces_range_to_graph(
+    traces: &[(i32, i64)],
+    start: usize,
+) -> (InstructionTraceGraphNode, usize, i64) {
+    let (func_id, start_counter) = traces[start];
+    assert!(func_id >= 0, "Traces are corrupted {}.", func_id);
+
+    // The following loop tries to find all children of the current function.
+    let mut next_start = start + 1;
+    let mut children = Vec::new();
+    let mut total_children_cost = 0;
+    loop {
+        // If the next trace is an end of a function, we've found all children. The function id
+        // should be `!func_id``, and it will be asserted after exiting the loop.
+        if traces[next_start].0 < 0 {
+            break;
+        }
+        let (child, new_next_start, child_cost) = convert_traces_range_to_graph(traces, next_start);
+        children.push(child);
+        next_start = new_next_start;
+        total_children_cost += child_cost;
+    }
+
+    let (end_func_id, end_counter) = traces[next_start];
+    assert_eq!(func_id, !end_func_id, "Traces are corrupted.");
+    let total_cost = end_counter - start_counter;
+    let cost = total_cost - total_children_cost;
+    let node = InstructionTraceGraphNode {
+        func_id,
+        cost,
+        children,
+    };
+    (node, next_start + 1, total_cost)
 }
 
 fn adjust_traces_for_overhead(traces: Vec<(i32, i64)>, bench_instructions: u64) -> Vec<(i32, i64)> {
@@ -898,48 +973,155 @@ fn adjust_traces_for_overhead(traces: Vec<(i32, i64)>, bench_instructions: u64) 
         .collect()
 }
 
-fn truncate_traces(traces: Vec<(i32, i64)>) -> Vec<(i32, i64)> {
-    if traces.len() <= MAX_NUM_LOG_ENTRIES_IN_RESPONSE {
-        return traces;
-    }
+/// Truncates the traces graph by depth, and depth (above which the nodes get truncated) is the
+/// largest one such that the total number of nodes is less than or equal to
+/// `MAX_NUM_NODES_IN_RESPONSE`.
+fn truncate_traces_graph(root: InstructionTraceGraphNode) -> InstructionTraceGraphNode {
+    let mut num_nodes_by_depth = BTreeMap::new();
+    increase_num_nodes_by_depth(&root, 0, &mut num_nodes_by_depth);
 
-    let mut num_traces_by_depth = BTreeMap::new();
-
-    let mut depth = 0;
-    for (func_id, _) in traces.iter() {
-        if *func_id >= 0 {
-            depth += 1;
-            *num_traces_by_depth.entry(depth).or_insert(0) += 1;
-        } else {
-            depth -= 1;
-        }
-    }
-    assert_eq!(depth, 0, "Traces are not balanced.");
     let mut depth_to_truncate = 0;
-    let mut cumulative_traces = 0;
-    for (depth, num_traces) in num_traces_by_depth.iter() {
-        cumulative_traces += num_traces;
-        if cumulative_traces <= MAX_NUM_LOG_ENTRIES_IN_RESPONSE {
+    let mut cumulative_nodes = 0;
+    for (depth, num_nodes) in num_nodes_by_depth.iter() {
+        cumulative_nodes += num_nodes;
+        if cumulative_nodes <= MAX_NUM_NODES_IN_RESPONSE {
             depth_to_truncate = *depth;
         } else {
             break;
         }
     }
 
-    let truncated: Vec<_> = traces
-        .into_iter()
-        .scan(0, |depth, (func_id, instruction_counter)| {
-            if func_id >= 0 {
-                *depth += 1;
-                Some((*depth, func_id, instruction_counter))
-            } else {
-                *depth -= 1;
-                Some((*depth + 1, func_id, instruction_counter))
-            }
-        })
-        .filter(|(depth, _, _)| *depth <= depth_to_truncate)
-        .map(|(_, func_id, instruction_counter)| (func_id, instruction_counter))
-        .collect();
+    truncate_traces_graph_by_depth(root, depth_to_truncate)
+}
 
-    truncated
+/// A recursive function used to count the number of nodes in the graph by depth.
+fn increase_num_nodes_by_depth(
+    node: &InstructionTraceGraphNode,
+    depth: usize,
+    num_nodes_by_depth: &mut BTreeMap<usize, usize>,
+) {
+    *num_nodes_by_depth.entry(depth).or_insert(0) += 1;
+    for child in &node.children {
+        increase_num_nodes_by_depth(child, depth + 1, num_nodes_by_depth);
+    }
+}
+
+/// A recursive function to truncates the graph by the given depth. When the depth is 0, it means
+/// only the node itself should be kept and its children should be truncated.
+fn truncate_traces_graph_by_depth(
+    node: InstructionTraceGraphNode,
+    depth: usize,
+) -> InstructionTraceGraphNode {
+    let InstructionTraceGraphNode {
+        func_id,
+        cost,
+        children,
+    } = node;
+    let children = if depth == 0 {
+        Vec::new()
+    } else {
+        children
+            .into_iter()
+            .map(|child| truncate_traces_graph_by_depth(child, depth - 1))
+            .collect()
+    };
+    InstructionTraceGraphNode {
+        func_id,
+        cost,
+        children,
+    }
+}
+
+/// An auxiliary struct used to aggregate the traces. Compared to `InstructionTraceGraphNode`, it
+/// has an additional field `total_cost`, which is the total cost of the node, including its
+/// descendants, so that the children can be sorted by the total cost.
+struct AggregatedInstructionTraceGraphNode {
+    func_id: i32,
+    /// The cost of the node, not including its descendants.
+    cost: i64,
+    /// The total cost of the node, including its descendants.
+    total_cost: i64,
+    /// The children of the node. The key is the function id, and the value is the aggregated child.
+    children: HashMap<i32, AggregatedInstructionTraceGraphNode>,
+}
+
+impl AggregatedInstructionTraceGraphNode {
+    /// Aggregates the traces of a function into the aggregated node.
+    fn aggregate(node: InstructionTraceGraphNode) -> Self {
+        let InstructionTraceGraphNode {
+            func_id,
+            cost,
+            children,
+        } = node;
+        let mut aggregated_children = HashMap::new();
+        let mut total_cost = cost;
+        for child in children {
+            let aggregated_child = Self::aggregate(child);
+            total_cost += aggregated_child.total_cost;
+            match aggregated_children.entry(aggregated_child.func_id) {
+                Entry::Occupied(mut entry) => {
+                    *entry.get_mut() += aggregated_child;
+                }
+                Entry::Vacant(entry) => {
+                    entry.insert(aggregated_child);
+                }
+            }
+        }
+        Self {
+            func_id,
+            cost,
+            total_cost,
+            children: aggregated_children,
+        }
+    }
+}
+
+impl AddAssign for AggregatedInstructionTraceGraphNode {
+    fn add_assign(&mut self, other: Self) {
+        assert_eq!(
+            self.func_id, other.func_id,
+            "Cannot aggregate traces with different func_ids."
+        );
+        self.cost += other.cost;
+        self.total_cost += other.total_cost;
+        for (other_func_id, other_child) in other.children {
+            match self.children.entry(other_func_id) {
+                Entry::Occupied(mut entry) => {
+                    *entry.get_mut() += other_child;
+                }
+                Entry::Vacant(entry) => {
+                    entry.insert(other_child);
+                }
+            }
+        }
+    }
+}
+
+impl From<AggregatedInstructionTraceGraphNode> for InstructionTraceGraphNode {
+    /// Converts the aggregated node to the original node.
+    fn from(node: AggregatedInstructionTraceGraphNode) -> Self {
+        let AggregatedInstructionTraceGraphNode {
+            func_id,
+            cost,
+            total_cost: _,
+            children,
+        } = node;
+        let mut children: Vec<_> = children.into_iter().map(|(_, child)| child).collect();
+        children.sort_by_key(|child| -child.total_cost);
+        let children = children
+            .into_iter()
+            .map(InstructionTraceGraphNode::from)
+            .collect();
+        InstructionTraceGraphNode {
+            func_id,
+            cost,
+            children,
+        }
+    }
+}
+
+/// Converts the traces graph from time-based to aggregated (children sorted by total cost).
+fn agggregate_traces(root: InstructionTraceGraphNode) -> InstructionTraceGraphNode {
+    let aggregated = AggregatedInstructionTraceGraphNode::aggregate(root);
+    InstructionTraceGraphNode::from(aggregated)
 }
