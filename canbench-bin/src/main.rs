@@ -62,6 +62,10 @@ struct Args {
     /// A threshold (in percentage), below which a change in benchmark results is considered noise.
     #[clap(long, default_value = "2.0")]
     noise_threshold: f64,
+
+    /// Order of comparison: stored-vs-computed or computed-vs-stored.
+    #[clap(long, value_enum, default_value = "stored-vs-computed")]
+    compare_order: canbench::CompareOrder,
 }
 
 #[derive(Debug, Deserialize)]
@@ -183,5 +187,6 @@ fn main() {
         &args.runtime_path.unwrap_or_else(default_runtime_path),
         stable_memory_path,
         args.noise_threshold,
+        args.compare_order,
     );
 }
