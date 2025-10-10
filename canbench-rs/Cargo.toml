@@ -1,13 +1,13 @@
 [package]
-name = "canbench-rs"
 description = "The rust library for `canbench`, the benchmarking framework for canisters on the Internet Computer."
 edition = "2021"
 keywords = ["benchmark", "canister", "ic", "internet-computer", "perf"]
 license = "Apache-2.0"
+name = "canbench-rs"
 readme = "../README.md"
 repository = "https://github.com/dfinity/canbench"
 # NOTE: Update `canbench-rs-macros` version below when this changes.
-version = "0.2.1"
+version = "0.2.2"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -15,7 +15,7 @@ version = "0.2.1"
 path = "src/lib.rs"
 
 [dependencies]
-canbench-rs-macros = { path = "../canbench-rs-macros", version = "0.2.1" }
+canbench-rs-macros = { path = "../canbench-rs-macros", version = "0.2.2" }
 candid.workspace = true
 ic-cdk.workspace = true
 serde.workspace = true
@@ -24,5 +24,5 @@ serde.workspace = true
 ic-cdk-macros.workspace = true
 
 [features]
-canbench = [] # required for doc tests
 calls = []
+canbench = [] # required for doc tests
