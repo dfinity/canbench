@@ -30,10 +30,10 @@ use wasmparser::Parser as WasmParser;
 // Other queries exposed by the canister are ignored.
 const BENCH_PREFIX: &str = "__canbench__";
 
-const POCKET_IC_SERVER_VERSION: &str = "9.0.1";
+const POCKET_IC_SERVER_VERSION: &str = "10.0.0";
 const POCKET_IC_LINUX_SHA: &str =
-    "327346b681f0c03f1eb12e8da17a1ab8d044f31b2a1cbaad4546db9dbf73caf4";
-const POCKET_IC_MAC_SHA: &str = "27bb9594e498171d2fffadf6e1e144e58ed3f5854d151ff8431d9dc298b7951e";
+    "bfc17d1acad243841121eee5347dd7453e0d8a8f8f6e090c261fae17523c3144";
+const POCKET_IC_MAC_SHA: &str = "fb4a30d3d076411ea9b40f5219d75014ffa05465807c1d32fe86cda481133c65";
 
 /// The maximum number of rows to display in the summary table.
 const MAX_DISPLAYED_ROWS: usize = 50;
