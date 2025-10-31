@@ -265,7 +265,6 @@ dependencies = [
  "canbench-rs-macros",
  "candid",
  "ic-cdk",
- "ic-cdk-macros",
  "serde",
 ]
 
@@ -566,7 +565,6 @@ dependencies = [
  "canbench-rs",
  "candid",
  "ic-cdk",
- "ic-cdk-macros",
 ]
 
 [[package]]
@@ -2133,7 +2131,6 @@ dependencies = [
  "canbench-rs",
  "candid",
  "ic-cdk",
- "ic-cdk-macros",
  "serde",
 ]
 

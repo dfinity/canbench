@@ -15,4 +15,3 @@ path = "btreemap_vs_hashmap/src/main.rs"
 canbench-rs = { path = "../canbench-rs", optional = true }
 candid.workspace = true
 ic-cdk.workspace = true
-ic-cdk-macros.workspace = true

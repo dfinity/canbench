@@ -1,5 +1,5 @@
 use candid::{CandidType, Encode};
-use ic_cdk_macros::pre_upgrade;
+use ic_cdk::pre_upgrade;
 use std::cell::RefCell;
 
 #[derive(CandidType)]

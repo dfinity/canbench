@@ -20,9 +20,6 @@ candid.workspace = true
 ic-cdk.workspace = true
 serde.workspace = true
 
-[dev-dependencies]
-ic-cdk-macros.workspace = true
-
 [features]
 calls = []
 canbench = [] # required for doc tests
