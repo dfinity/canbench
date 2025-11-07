@@ -906,7 +906,7 @@ dependencies = [
 [[package]]
 name = "ic-cdk"
 version = "0.19.0-beta.3"
-source = "git+https://github.com/dfinity/cdk-rs.git?rev=d547693ec4ee03b149f82abe8c8292b166b90054#d547693ec4ee03b149f82abe8c8292b166b90054"
+source = "git+https://github.com/dfinity/cdk-rs.git?rev=c7429aa05bb6b035f1bc8267bbef3316742a8fb1#c7429aa05bb6b035f1bc8267bbef3316742a8fb1"
 dependencies = [
  "candid",
  "ic-cdk-executor",
@@ -924,7 +924,7 @@ dependencies = [
 [[package]]
 name = "ic-cdk-executor"
 version = "2.0.0-beta.1"
-source = "git+https://github.com/dfinity/cdk-rs.git?rev=d547693ec4ee03b149f82abe8c8292b166b90054#d547693ec4ee03b149f82abe8c8292b166b90054"
+source = "git+https://github.com/dfinity/cdk-rs.git?rev=c7429aa05bb6b035f1bc8267bbef3316742a8fb1#c7429aa05bb6b035f1bc8267bbef3316742a8fb1"
 dependencies = [
  "ic0",
  "slotmap",
@@ -934,7 +934,7 @@ dependencies = [
 [[package]]
 name = "ic-cdk-macros"
 version = "0.19.0-beta.3"
-source = "git+https://github.com/dfinity/cdk-rs.git?rev=d547693ec4ee03b149f82abe8c8292b166b90054#d547693ec4ee03b149f82abe8c8292b166b90054"
+source = "git+https://github.com/dfinity/cdk-rs.git?rev=c7429aa05bb6b035f1bc8267bbef3316742a8fb1#c7429aa05bb6b035f1bc8267bbef3316742a8fb1"
 dependencies = [
  "candid",
  "darling",
@@ -980,7 +980,7 @@ dependencies = [
 [[package]]
 name = "ic-management-canister-types"
 version = "0.4.1"
-source = "git+https://github.com/dfinity/cdk-rs.git?rev=d547693ec4ee03b149f82abe8c8292b166b90054#d547693ec4ee03b149f82abe8c8292b166b90054"
+source = "git+https://github.com/dfinity/cdk-rs.git?rev=c7429aa05bb6b035f1bc8267bbef3316742a8fb1#c7429aa05bb6b035f1bc8267bbef3316742a8fb1"
 dependencies = [
  "candid",
  "serde",
@@ -1008,7 +1008,7 @@ dependencies = [
 [[package]]
 name = "ic0"
 version = "1.0.1"
-source = "git+https://github.com/dfinity/cdk-rs.git?rev=d547693ec4ee03b149f82abe8c8292b166b90054#d547693ec4ee03b149f82abe8c8292b166b90054"
+source = "git+https://github.com/dfinity/cdk-rs.git?rev=c7429aa05bb6b035f1bc8267bbef3316742a8fb1#c7429aa05bb6b035f1bc8267bbef3316742a8fb1"
 
 [[package]]
 name = "ic_principal"
