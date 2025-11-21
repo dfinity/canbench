@@ -232,7 +232,7 @@
 //!
 //! ```rust
 //! use candid::{CandidType, Encode};
-//! use ic_cdk_macros::pre_upgrade;
+//! use ic_cdk::pre_upgrade;
 //! use std::cell::RefCell;
 //!
 //! #[derive(CandidType)]
@@ -255,7 +255,7 @@
 //!     let bytes = STATE.with(|s| Encode!(s).unwrap());
 //!
 //!     // Write to stable memory.
-//!     ic_cdk::api::stable::StableWriter::default()
+//!     ic_cdk::stable::StableWriter::default()
 //!         .write(&bytes)
 //!         .unwrap();
 //! }
@@ -341,7 +341,7 @@
 //!
 //! ```rust
 //! # use candid::{Encode, CandidType};
-//! # use ic_cdk_macros::pre_upgrade;
+//! # use ic_cdk::pre_upgrade;
 //! # use std::cell::RefCell;
 //! #
 //! # #[derive(CandidType)]
@@ -370,7 +370,7 @@
 //!     // Write to stable memory.
 //!     #[cfg(feature = "canbench-rs")]
 //!     let _p = canbench_rs::bench_scope("writing_to_stable_memory");
-//!     ic_cdk::api::stable::StableWriter::default()
+//!     ic_cdk::stable::StableWriter::default()
 //!         .write(&bytes)
 //!         .unwrap();
 //! }

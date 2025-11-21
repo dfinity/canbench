@@ -33,5 +33,4 @@ path = "stable_memory_invalid/src/main.rs"
 canbench-rs = { path = "../canbench-rs" }
 candid.workspace = true
 ic-cdk.workspace = true
-ic-cdk-macros.workspace = true
 serde.workspace = true

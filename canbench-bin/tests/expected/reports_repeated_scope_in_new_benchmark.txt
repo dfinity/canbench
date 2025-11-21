@@ -2,14 +2,14 @@
 
 Benchmark: bench_repeated_scope_new (new)
   total:
-    instructions: 16.95 K (new)
-    heap_increase: 1 pages (new)
+    instructions: 16.31 K (new)
+    heap_increase: 0 pages (new)
     stable_memory_increase: 0 pages (new)
 
   scope_1 (scope):
     calls: 10 (new)
-    instructions: 9304 (new)
-    heap_increase: 1 pages (new)
+    instructions: 8669 (new)
+    heap_increase: 0 pages (new)
     stable_memory_increase: 0 pages (new)
 
 ---------------------------------------------------
@@ -38,8 +38,8 @@ Summary:
 Only significant changes:
 | status | name                              | calls |    ins |  ins Δ% | HI |  HI Δ% | SMI |  SMI Δ% |
 |--------|-----------------------------------|-------|--------|---------|----|--------|-----|---------|
-|  new   | bench_repeated_scope_new          |       | 16.95K |         |  1 |        |   0 |         |
-|  new   | bench_repeated_scope_new::scope_1 |    10 |  9.30K |         |  1 |        |   0 |         |
+|  new   | bench_repeated_scope_new          |       | 16.31K |         |  0 |        |   0 |         |
+|  new   | bench_repeated_scope_new::scope_1 |    10 |  8.67K |         |  0 |        |   0 |         |
 
 ins = instructions, HI = heap_increase, SMI = stable_memory_increase, Δ% = percent change
 
