@@ -236,7 +236,7 @@ checksum = "d71b6127be86fdcfddb610f7182ac57211d4b18a3e9c82eb2d17662f2227ad6a"
 
 [[package]]
 name = "canbench"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "canbench-rs",
  "candid",
@@ -260,7 +260,7 @@ dependencies = [
 
 [[package]]
 name = "canbench-rs"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "canbench-rs-macros",
  "candid",
@@ -270,7 +270,7 @@ dependencies = [
 
 [[package]]
 name = "canbench-rs-macros"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "proc-macro2",
  "quote",
