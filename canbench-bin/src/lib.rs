@@ -8,7 +8,7 @@ mod results_file;
 mod summary;
 mod table;
 
-use canbench_rs::{BenchResult, Measurement};
+use canbench_rs::{BenchResult, InstructionTraceGraphNode, Measurement};
 use candid::{Encode, Principal};
 use flate2::read::GzDecoder;
 use instruction_tracing::{prepare_instruction_tracing, write_traces_to_file};
@@ -117,14 +117,17 @@ pub fn run_benchmarks(
         }
 
         if let Some(instruction_tracing_canister_id) = instruction_tracing_canister_id {
-            run_instruction_tracing(
-                &pocket_ic,
-                instruction_tracing_canister_id,
-                bench_fn,
-                function_names_mapping.as_ref().unwrap(),
-                results_file,
-                result.total.instructions,
-            );
+            for aggregate in [true, false] {
+                run_instruction_tracing(
+                    &pocket_ic,
+                    instruction_tracing_canister_id,
+                    bench_fn,
+                    function_names_mapping.as_ref().unwrap(),
+                    results_file,
+                    result.total.instructions,
+                    aggregate,
+                );
+            }
         }
 
         new_results.insert(bench_fn.to_string(), result);
@@ -270,15 +273,16 @@ fn run_instruction_tracing(
     names_mapping: &BTreeMap<i32, String>,
     results_file: &Path,
     bench_instructions: u64,
+    aggregate: bool,
 ) {
-    let traces: Result<Vec<(i32, i64)>, String> = match pocket_ic.query_call(
+    let traces: Result<InstructionTraceGraphNode, String> = match pocket_ic.query_call(
         canister_id,
         Principal::anonymous(),
         &format!("__tracing__{bench_fn}"),
-        Encode!(&bench_instructions).unwrap(),
+        Encode!(&bench_instructions, &aggregate).unwrap(),
     ) {
         Ok(reply) => {
-            let res: Result<Vec<(i32, i64)>, String> =
+            let res: Result<InstructionTraceGraphNode, String> =
                 candid::decode_one(&reply).expect("error decoding tracing result");
             res
         }
@@ -295,7 +299,10 @@ fn run_instruction_tracing(
             traces,
             names_mapping,
             bench_fn,
-            results_file.with_file_name(format!("{bench_fn}.svg")),
+            results_file.with_file_name(format!(
+                "{bench_fn}{}.svg",
+                if aggregate { "_aggregated" } else { "" }
+            )),
         )
         .expect("failed to write tracing results"),
         Err(e) => {
