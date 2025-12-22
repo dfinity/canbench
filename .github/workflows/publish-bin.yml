@@ -1,0 +1,42 @@
+name: Publish canbench to crates.io
+
+on:
+  workflow_run:
+    workflows: [Publish canbench-rs to crates.io]
+    types:
+      - completed
+
+jobs:
+  publish-canbench-bin:
+    runs-on: ubuntu-latest
+
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    permissions:
+      id-token: write # Required for OIDC token exchange
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: rust-lang/crates-io-auth-action@v1
+        id: auth
+
+      - name: Set Cargo.toml version
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ github.ref }}
+        run: |
+          sed -i -e 's/\(^canbench-rs.*"\).* }/\1, version="'"${RELEASE_TAG##*\/v}"'" }/' canbench-bin/Cargo.toml 
+          sed -i -e "s/0\\.0\\.0-git/${RELEASE_TAG##*\/v}/" canbench-bin/Cargo.toml
+
+      - run: cargo publish -p canbench
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
+
+      - name: Post to a Slack channel
+        uses: slackapi/slack-github-action@6c661ce58804a1a20f6dc5fbee7f0381b469e001 # v1.25.0
+        with:
+          channel-id: eng-dsm-alerts
+          slack-message: "New `canbench` crate (version `${{ github.ref_name }}`) has been published to crates.io"
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_API_TOKEN }}
