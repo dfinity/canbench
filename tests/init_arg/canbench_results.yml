@@ -6,4 +6,4 @@ benches:
       heap_increase: 0
       stable_memory_increase: 0
     scopes: {}
-version: 0.1.10
+version: 0.0.0-git
