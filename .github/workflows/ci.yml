@@ -72,7 +72,8 @@ jobs:
       - name: Checkout baseline branch
         uses: actions/checkout@v4
         with:
-          ref: main
+          # TODO switch back to main once this is merged
+          #ref: main
           path: _canbench_baseline_branch
 
       - uses: actions/cache@v3
@@ -143,8 +144,7 @@ jobs:
     needs:
       - build
       - shell-checks
-      # TODO re-enable after merging 
-      #- benchmark
+      - benchmark
     runs-on: ubuntu-latest
     steps:
       - name: check build result
@@ -155,6 +155,6 @@ jobs:
         if: ${{ needs.shell-checks.result != 'success' }}
         run: exit 1
 
-      #- name: check benchmark result
-      #  if: ${{ needs.benchmark.result != 'success' }}
-      #  run: exit 1
+      - name: check benchmark result
+        if: ${{ needs.benchmark.result != 'success' }}
+        run: exit 1
