@@ -24,9 +24,9 @@ jobs:
           RELEASE_TAG: ${{ github.ref }}
         run: |
           sed -i -e "s/0\\.0\\.0-git/${RELEASE_TAG##*\/v}/" canbench-rs-macros/Cargo.toml
-          sed -i -e 's/\(^canbench-rs-macros.*"\).* }/\1, version="'${RELEASE_TAG##*\/v}'" }/' canbench-rs/Cargo.toml 
+          sed -i -e "s/\(^canbench-rs-macros.*\"\).* }/\1, version=\"${RELEASE_TAG##*\/v}\" }/" canbench-rs/Cargo.toml 
           sed -i -e "s/0\\.0\\.0-git/${RELEASE_TAG##*\/v}/" canbench-rs/Cargo.toml
-          sed -i -e 's/\(^canbench-rs.*"\).* }/\1, version="'${RELEASE_TAG##*\/v}'" }/' canbench-bin/Cargo.toml 
+          sed -i -e "s/\(^canbench-rs.*\"\).* }/\1, version=\"${RELEASE_TAG##*\/v}\" }/" canbench-bin/Cargo.toml 
           sed -i -e "s/0\\.0\\.0-git/${RELEASE_TAG##*\/v}/" canbench-bin/Cargo.toml
 
       - run: cargo publish -p canbench-rs-macros --allow-dirty
