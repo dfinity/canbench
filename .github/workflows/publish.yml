@@ -1,10 +1,9 @@
 name: Publish canbench crates to crates.io
 
 on:
-  workflow_run:
-    workflows: [Publish canbench-rs to crates.io]
-    types:
-      - completed
+  push:
+    tags:
+      - "v*"
 
 jobs:
   publish-canbench-bin:
