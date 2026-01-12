@@ -95,4 +95,4 @@ benches:
         calls: 20
         heap_increase: 0
         instructions: 20000000
-version: 0.0.0-git
+version: 0.1.15

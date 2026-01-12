@@ -72,8 +72,7 @@ jobs:
       - name: Checkout baseline branch
         uses: actions/checkout@v4
         with:
-          # TODO switch back to main once this is merged
-          #ref: main
+          ref: main
           path: _canbench_baseline_branch
 
       - uses: actions/cache@v3
