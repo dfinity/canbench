@@ -20,11 +20,6 @@ Here's an example PR bumping the versions: https://github.com/dfinity/canbench/p
 
 ## Steps to Publish the Packages to crates.io
 
-1. Generate an API token to use with crates.io:  
-   Log in to crates.io with your GitHub account, go to **Account Settings**, and generate a new token under **API Tokens**.
-2. Run `cargo login` in the terminal and enter your API key when prompted.
-3. Check out the repo at the tag created for the release, e.g. `git checkout vX.X.X`.
-4. Publish the crates in the following order:
-   - `cargo publish -p canbench-rs-macros`
-   - `cargo publish -p canbench-rs`
-   - `cargo publish -p canbench`
+1. On the repository main page, navigate to the `Actions` tab.
+2. Click on the workflow to publish to crates.io
+3. Click on `run workflow` and select the version tag created above for the workflow to run on.
