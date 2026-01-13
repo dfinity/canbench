@@ -39,6 +39,6 @@ jobs:
         uses: slackapi/slack-github-action@6c661ce58804a1a20f6dc5fbee7f0381b469e001 # v1.25.0
         with:
           channel-id: eng-dsm-alerts
-          slack-message: "${{ inputs.dryRun == true && 'DRY RUN: ' || '' }}New `canbench` crates (version `${{ github.ref_name }}`) has been published to crates.io"
+          slack-message: "${{ inputs.dryRun == true && 'DRY RUN: ' || '' }}Cargo publish attempted for `canbench` crates (ref `${{ github.ref_name }}`). <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|Workflow run>."
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_API_TOKEN }}
