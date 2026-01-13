@@ -5,7 +5,7 @@ on:
     inputs:
       dryRun:
         description: "Run cargo publish with --dry-run"
-        required: true
+        required: false
         type: boolean
 
 jobs:
