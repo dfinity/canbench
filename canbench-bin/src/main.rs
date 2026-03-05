@@ -4,7 +4,7 @@ use clap::Parser;
 use serde::Deserialize;
 use std::{fs::File, io::Read, path::PathBuf, process::Command};
 
-const CFG_FILE_NAME: &str = "canbench.yml";
+const DEFAULT_CFG_FILE_NAME: &str = "canbench.yml";
 const DEFAULT_RESULTS_FILE: &str = "canbench_results.yml";
 const DEFAULT_CSV_RESULTS_FILE: &str = "canbench_results.csv";
 
@@ -114,15 +114,18 @@ fn default_runtime_path() -> PathBuf {
 fn main() {
     let args = Args::parse();
 
+    let cfg_file_name =
+        std::env::var("CANBENCH_CFG_FILE").unwrap_or_else(|_| DEFAULT_CFG_FILE_NAME.to_string());
+
     // Read and parse the configuration file.
-    let mut file = match File::open(CFG_FILE_NAME) {
+    let mut file = match File::open(&cfg_file_name) {
         Ok(file) => file,
         Err(err) => {
             match err.kind() {
                 std::io::ErrorKind::NotFound => {
-                    eprintln!("{} not found in current directory.", CFG_FILE_NAME)
+                    eprintln!("configuration file not found: '{}'", cfg_file_name)
                 }
-                other => println!("Error while opening `{}`: {}", CFG_FILE_NAME, other),
+                other => println!("Error while opening `{}`: {}", cfg_file_name, other),
             }
 
             std::process::exit(1);

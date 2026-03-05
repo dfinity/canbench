@@ -56,7 +56,7 @@ fn load_expected(test_name: &str, output: &Output) -> String {
 #[test]
 fn no_config_prints_error() {
     BenchTest::no_config().run(|output| {
-        assert_err!(output, "canbench.yml not found in current directory.\n");
+        assert_err!(output, "configuration file not found: 'canbench.yml'\n");
     });
 }
 
