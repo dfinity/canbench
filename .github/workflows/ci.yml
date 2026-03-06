@@ -39,12 +39,12 @@ jobs:
         run: cargo fmt --all -- --check
 
       - name: Clippy
-        run: cargo clippy --tests --benches -- -D clippy::all
+        run: cargo clippy --tests --benches --locked -- -D clippy::all
 
       - name: Test
         # Do not use `--all-features` because it enables `overwrite`, which auto-updates expected outputs.
         # This makes tests always pass by overwriting failures, effectively disabling test validation.
-        run: cargo test --features=canbench -- --color always --test-threads=1
+        run: cargo test --features=canbench --locked -- --color always --test-threads=1
         env:
           RUST_BACKTRACE: 1
 
