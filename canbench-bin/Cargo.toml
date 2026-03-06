@@ -7,20 +7,23 @@ name = "canbench"
 readme = "../README.md"
 repository = "https://github.com/dfinity/canbench"
 # NOTE: Update `canbench-rs` version below when this changes.
-version = "0.4.0"
+version = "0.4.1"
 
 [[bin]]
 name = "canbench"
 path = "src/main.rs"
 
 [dependencies]
-canbench-rs = { path = "../canbench-rs", version = "0.4.0" }
+canbench-rs = { path = "../canbench-rs", version = "0.4.1" }
 candid.workspace = true
 clap.workspace = true
 colored.workspace = true
 flate2.workspace = true
 hex.workspace = true
-inferno = { version = "0.11", default-features = false, features = ["multithreaded", "nameattr"] }
+inferno = { version = "0.11", default-features = false, features = [
+    "multithreaded",
+    "nameattr",
+] }
 # `pocket-ic` should be pinned to an exact version so that the PocketIC server binary version
 # `POCKET_IC_SERVER_VERSION` defined in `canbench-bin/src/lib.rs` is compatible.
 pocket-ic = "=10.0.0"
