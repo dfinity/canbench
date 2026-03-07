@@ -55,7 +55,7 @@ pub fn bench(arg_tokens: TokenStream, item: TokenStream) -> TokenStream {
             quote! {
                 #input
 
-                #[ic_cdk::query]
+                #[ic_cdk::query(composite = true)]
                 #[allow(non_snake_case)]
                 fn #renamed_func_name() -> canbench_rs::BenchResult {
                     #func_name()
@@ -81,7 +81,7 @@ pub fn bench(arg_tokens: TokenStream, item: TokenStream) -> TokenStream {
             quote! {
                 #input
 
-                #[ic_cdk::query]
+                #[ic_cdk::query(composite = true)]
                 #[allow(non_snake_case)]
                 fn #renamed_func_name() -> canbench_rs::BenchResult {
                     canbench_rs::bench_fn(|| {
