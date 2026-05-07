@@ -26,7 +26,7 @@ inferno = { version = "0.11", default-features = false, features = [
 ] }
 # `pocket-ic` should be pinned to an exact version so that the PocketIC server binary version
 # `POCKET_IC_SERVER_VERSION` defined in `canbench-bin/src/lib.rs` is compatible.
-pocket-ic = "=10.0.0"
+pocket-ic = "=13.0.0"
 reqwest.workspace = true
 rustc-demangle.workspace = true
 semver.workspace = true

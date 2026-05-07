@@ -2,32 +2,32 @@ benches:
   insert_users:
     total:
       calls: 1
-      instructions: 2558172740
-      heap_increase: 872
+      instructions: 2729624702
+      heap_increase: 871
       stable_memory_increase: 0
     scopes: {}
   pre_upgrade_bench:
     total:
       calls: 1
-      instructions: 486886999
+      instructions: 391740965
       heap_increase: 519
       stable_memory_increase: 184
     scopes:
       serialize_state:
         calls: 1
-        instructions: 423947334
+        instructions: 328801361
         heap_increase: 519
         stable_memory_increase: 0
       writing_to_stable_memory:
         calls: 5
-        instructions: 62932560
+        instructions: 62932531
         heap_increase: 0
         stable_memory_increase: 184
   remove_users:
     total:
       calls: 1
-      instructions: 2109060849
+      instructions: 1564558256
       heap_increase: 0
       stable_memory_increase: 0
     scopes: {}
-version: 0.2.1
+version: 0.4.1

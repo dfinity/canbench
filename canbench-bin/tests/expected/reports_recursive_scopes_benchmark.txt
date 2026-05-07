@@ -2,7 +2,7 @@
 
 Benchmark: bench_recursive_scopes
   total:
-    instructions: 30.09 M (0.31%) (change within noise threshold)
+    instructions: 30.09 M (0.30%) (change within noise threshold)
     heap_increase: 0 pages (no change)
     stable_memory_increase: 0 pages (no change)
 
@@ -24,8 +24,8 @@ Summary:
   instructions:
     status:   No significant changes 👍
     counts:   [total 1 | regressed 0 | improved 0 | new 0 | unchanged 1]
-    change:   [max +91.74K | p75 +91.74K | median +91.74K | p25 +91.74K | min +91.74K]
-    change %: [max +0.31% | p75 +0.31% | median +0.31% | p25 +0.31% | min +0.31%]
+    change:   [max +91.48K | p75 +91.48K | median +91.48K | p25 +91.48K | min +91.48K]
+    change %: [max +0.30% | p75 +0.30% | median +0.30% | p25 +0.30% | min +0.30%]
 
   heap_increase:
     status:   No significant changes 👍

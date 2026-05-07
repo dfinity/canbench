@@ -12,7 +12,7 @@ Summary:
   instructions:
     status:   Improvements detected 🟢
     counts:   [total 1 | regressed 0 | improved 1 | new 0 | unchanged 0]
-    change:   [max -154.23K | p75 -154.23K | median -154.23K | p25 -154.23K | min -154.23K]
+    change:   [max -154.22K | p75 -154.22K | median -154.22K | p25 -154.22K | min -154.22K]
     change %: [max -4.36% | p75 -4.36% | median -4.36% | p25 -4.36% | min -4.36%]
 
   heap_increase:
