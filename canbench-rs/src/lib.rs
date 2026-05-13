@@ -64,9 +64,8 @@
 //! variable, and `value` is the value of the environment variable.
 //!
 //! ```yml
-//! environment_variables:
-//!   file:
-//!     environment_variables.csv
+//! env_vars:
+//!   file: environment_variables.csv
 //! ```
 //!
 //!
