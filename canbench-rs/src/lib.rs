@@ -59,9 +59,10 @@
 //!
 //! #### Environment Variables
 //!
-//! A file can be specified to load environment variables from and into the canister. The file
+//! A file can be specified from which environment variables are loaded into the canister. The file
 //! is a CSV with two columns: `name` and `value`, where `name` is the name of the environment
 //! variable, and `value` is the value of the environment variable.
+//! Leading and trailing whitespaces in `name` and `value` are ignored.
 //!
 //! ```yml
 //! env_vars:
