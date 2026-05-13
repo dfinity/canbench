@@ -432,13 +432,24 @@ fn init_pocket_ic(
 fn parse_env_vars(env_vars_path: Option<PathBuf>) -> Option<Vec<EnvironmentVariable>> {
     let env_vars = env_vars_path.map(|path| match std::fs::read(&path) {
         Ok(bytes) => {
-            let mut env_vars = BTreeMap::new();
-            for line in String::from_utf8(bytes)
-                .expect("Environment variables file must be valid UTF-8")
-                .lines()
-            {
+            let contents = match String::from_utf8(bytes) {
+                Ok(contents) => contents,
+                Err(err) => {
+                    eprintln!(
+                        "Environment variables file {} is not valid UTF-8",
+                        path.display()
+                    );
+                    eprintln!("Error: {}", err);
+                    std::process::exit(1);
+                }
+            };
+            let mut env_vars = Vec::new();
+            for line in contents.lines() {
                 if let Some((key, value)) = line.split_once(',') {
-                    env_vars.insert(key.trim().to_string(), value.trim().to_string());
+                    env_vars.push(EnvironmentVariable {
+                        name: key.trim().to_string(),
+                        value: value.trim().to_string(),
+                    });
                 } else {
                     eprintln!(
                         "Invalid line in environment variables file {}: '{}'",
@@ -460,11 +471,7 @@ fn parse_env_vars(env_vars_path: Option<PathBuf>) -> Option<Vec<EnvironmentVaria
         }
     });
 
-    env_vars.map(|vars| {
-        vars.into_iter()
-            .map(|(name, value)| EnvironmentVariable { name, value })
-            .collect()
-    })
+    env_vars
 }
 
 fn init_canister(

@@ -6,7 +6,7 @@ thread_local! {
     static STATE: RefCell<Vec<String>> = const { RefCell::new(Vec::new()) };
 }
 
-// A benchmark that prints the environment variables.
+// A benchmark that verifies the expected environment variable values were loaded.
 #[bench]
 fn state_check() {
     let state = STATE.with(|s| s.borrow().clone());
