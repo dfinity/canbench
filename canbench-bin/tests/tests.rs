@@ -405,8 +405,7 @@ fn environment_variables_file_does_not_exist_prints_error() {
     BenchTest::canister("environment_variables_file_does_not_exist").run(|output| {
         assert_err!(
             output,
-            "
-Error reading environment variables file environment_variables_file_does_not_exist.csv
+            "Error reading environment variables file environment_variables_file_does_not_exist.csv
 Error: No such file or directory"
         );
     });
