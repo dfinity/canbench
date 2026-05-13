@@ -11,9 +11,10 @@ mod table;
 use canbench_rs::{BenchResult, Measurement};
 use candid::{Encode, Principal};
 use flate2::read::GzDecoder;
+use ic_management_canister_types::EnvironmentVariable;
 use instruction_tracing::{prepare_instruction_tracing, write_traces_to_file};
 use pocket_ic::common::rest::BlobCompression;
-use pocket_ic::{PocketIc, PocketIcBuilder};
+use pocket_ic::{CanisterSettings, PocketIc, PocketIcBuilder};
 use print_benchmark::print_benchmark;
 use results_file::VersionError;
 use std::{
@@ -56,6 +57,7 @@ pub fn run_benchmarks(
     instruction_tracing: bool,
     runtime_path: &PathBuf,
     stable_memory_path: Option<PathBuf>,
+    env_vars_path: Option<PathBuf>,
     noise_threshold: f64,
 ) {
     maybe_download_pocket_ic(runtime_path, verbose, integrity_check);
@@ -90,6 +92,7 @@ pub fn run_benchmarks(
         benchmark_wasm,
         instruction_tracing_wasm,
         stable_memory_path,
+        env_vars_path,
         init_args,
         show_canister_output,
     );
@@ -376,6 +379,7 @@ fn init_pocket_ic(
     benchmark_wasm: Vec<u8>,
     instruction_tracing_wasm: Option<Vec<u8>>,
     stable_memory_path: Option<PathBuf>,
+    env_vars_path: Option<PathBuf>,
     init_args: Vec<u8>,
     show_canister_output: bool,
 ) -> (PocketIc, Principal, Option<Principal>) {
@@ -399,9 +403,24 @@ fn init_pocket_ic(
         }
     });
 
-    let instruction_tracing_canister_id = instruction_tracing_wasm
-        .map(|wasm| init_canister(&pocket_ic, wasm, init_args.clone(), stable_memory.clone()));
-    let benchmark_canister_id = init_canister(&pocket_ic, benchmark_wasm, init_args, stable_memory);
+    let environment_variables = parse_env_vars(env_vars_path);
+
+    let instruction_tracing_canister_id = instruction_tracing_wasm.map(|wasm| {
+        init_canister(
+            &pocket_ic,
+            wasm,
+            init_args.clone(),
+            stable_memory.clone(),
+            environment_variables.clone(),
+        )
+    });
+    let benchmark_canister_id = init_canister(
+        &pocket_ic,
+        benchmark_wasm,
+        init_args,
+        stable_memory,
+        environment_variables,
+    );
 
     (
         pocket_ic,
@@ -410,13 +429,58 @@ fn init_pocket_ic(
     )
 }
 
+fn parse_env_vars(env_vars_path: Option<PathBuf>) -> Option<Vec<EnvironmentVariable>> {
+    let env_vars = env_vars_path.map(|path| match std::fs::read(&path) {
+        Ok(bytes) => {
+            let mut env_vars = BTreeMap::new();
+            for line in String::from_utf8(bytes)
+                .expect("Environment variables file must be valid UTF-8")
+                .lines()
+            {
+                if let Some((key, value)) = line.split_once(',') {
+                    env_vars.insert(key.trim().to_string(), value.trim().to_string());
+                } else {
+                    eprintln!(
+                        "Invalid line in environment variables file {}: '{}'",
+                        path.display(),
+                        line
+                    );
+                    std::process::exit(1);
+                }
+            }
+            env_vars
+        }
+        Err(err) => {
+            eprintln!(
+                "Error reading environment variables file {}",
+                path.display()
+            );
+            eprintln!("Error: {}", err);
+            std::process::exit(1);
+        }
+    });
+
+    env_vars.map(|vars| {
+        vars.into_iter()
+            .map(|(name, value)| EnvironmentVariable { name, value })
+            .collect()
+    })
+}
+
 fn init_canister(
     pocket_ic: &PocketIc,
     wasm: Vec<u8>,
     init_args: Vec<u8>,
     stable_memory: Option<Vec<u8>>,
+    environment_variables: Option<Vec<EnvironmentVariable>>,
 ) -> Principal {
-    let canister_id = pocket_ic.create_canister();
+    let canister_id = pocket_ic.create_canister_with_settings(
+        None,
+        Some(CanisterSettings {
+            environment_variables,
+            ..Default::default()
+        }),
+    );
     pocket_ic.add_cycles(canister_id, 1_000_000_000_000_000);
     pocket_ic.install_canister(canister_id, wasm, init_args, None);
     // Load the canister's stable memory if stable memory is specified.
