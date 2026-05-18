@@ -56,6 +56,20 @@
 //! <div class="warning">Contents of the stable memory file are loaded <i>after</i> the call to the canister's init method.
 //! Therefore, changes made to stable memory in the init method would be overwritten.</div>
 //!
+//!
+//! #### Environment Variables
+//!
+//! A file can be specified from which environment variables are loaded into the canister. The file
+//! is a CSV with two columns: `name` and `value`, where `name` is the name of the environment
+//! variable, and `value` is the value of the environment variable.
+//! Leading and trailing whitespaces in `name` and `value` are ignored.
+//!
+//! ```yml
+//! env_vars:
+//!   file: environment_variables.csv
+//! ```
+//!
+//!
 //! ### 4. Start benching! 🏋🏽
 //!
 //! Let's say we have a canister that exposes a `query` computing the fibonacci sequence of a given number.

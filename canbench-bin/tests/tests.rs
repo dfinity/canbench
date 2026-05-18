@@ -390,3 +390,33 @@ fn reports_recursive_scopes_benchmark() {
             assert_success!(output, expected.as_str());
         });
 }
+
+#[test]
+fn loads_environment_variables_file() {
+    BenchTest::canister("environment_variables").run(|output| {
+        // There are assertions in the code of that canister itself, so
+        // all is needed is to assert that the run succeeded.
+        assert_eq!(output.status.code(), Some(0), "output: {:?}", output);
+    });
+}
+
+#[test]
+fn environment_variables_file_does_not_exist_prints_error() {
+    BenchTest::canister("environment_variables_file_does_not_exist").run(|output| {
+        assert_err!(
+            output,
+            "Error reading environment variables file environment_variables_file_does_not_exist.csv
+Error: No such file or directory"
+        );
+    });
+}
+
+#[test]
+fn environment_variables_invalid_file_prints_error() {
+    BenchTest::canister("environment_variables_invalid").run(|output| {
+        assert_err!(
+            output,
+            "Invalid line in environment variables file environment_variables_invalid.csv: 'name'"
+        );
+    });
+}

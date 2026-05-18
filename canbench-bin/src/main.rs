@@ -77,6 +77,12 @@ struct StableMemory {
 }
 
 #[derive(Debug, Deserialize)]
+struct EnvironmentVariables {
+    // File path to load environment variables from.
+    file: String,
+}
+
+#[derive(Debug, Deserialize)]
 struct Config {
     // If provided, instructs canbench to build the canister
     build_cmd: Option<String>,
@@ -97,6 +103,9 @@ struct Config {
 
     // The stable memory to load into the canister.
     stable_memory: Option<StableMemory>,
+
+    // If provided, the environment variables to set for the canister.
+    env_vars: Option<EnvironmentVariables>,
 }
 
 // Path to the canbench directory where we keep internal data.
@@ -168,6 +177,8 @@ fn main() {
         .map(|args| hex::decode(args.hex).expect("invalid init_args hex value"))
         .unwrap_or_default();
 
+    let env_vars_path = cfg.env_vars.map(|ev| PathBuf::from(ev.file));
+
     // Run the benchmarks.
     canbench::run_benchmarks(
         &wasm_path,
@@ -185,6 +196,7 @@ fn main() {
         args.instruction_tracing,
         &args.runtime_path.unwrap_or_else(default_runtime_path),
         stable_memory_path,
+        env_vars_path,
         args.noise_threshold,
     );
 }

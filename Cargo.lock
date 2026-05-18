@@ -225,6 +225,7 @@ dependencies = [
  "colored",
  "flate2",
  "hex",
+ "ic-management-canister-types",
  "inferno",
  "pocket-ic",
  "pretty_assertions",
