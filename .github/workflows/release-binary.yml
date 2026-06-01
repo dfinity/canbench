@@ -1,0 +1,46 @@
+name: Release canbench binary
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g. v0.6.0)'
+        required: true
+
+env:
+  RUST_VERSION: 1.93.1
+
+jobs:
+  release-binary:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Install Rust
+        run: |
+          rustup update ${RUST_VERSION} --no-self-update
+          rustup default ${RUST_VERSION}
+          rustup target add x86_64-unknown-linux-musl
+
+      - name: Install musl-tools
+        run: sudo apt-get install -y musl-tools
+
+      - name: Build
+        run: cargo build --release --locked --target x86_64-unknown-linux-musl -p canbench
+
+      - name: Strip binary
+        run: strip target/x86_64-unknown-linux-musl/release/canbench
+
+      - name: Upload binary to GitHub release
+        run: |
+          gh release upload "${{ inputs.tag }}" \
+            "target/x86_64-unknown-linux-musl/release/canbench#canbench-x86_64-linux" \
+            --clobber # overwrite existing asset if the workflow is re-run
+        env:
+          GH_TOKEN: ${{ github.token }}
