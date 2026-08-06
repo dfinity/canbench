@@ -1,6 +1,7 @@
 use proc_macro::TokenStream;
 use quote::{quote, ToTokens};
-use syn::{parse_macro_input, AttributeArgs, ItemFn, NestedMeta, ReturnType};
+use syn::punctuated::Punctuated;
+use syn::{parse_macro_input, ItemFn, Meta, ReturnType, Token};
 
 /// A macro for declaring a benchmark where only some part of the function is
 /// benchmarked.
@@ -10,7 +11,7 @@ pub fn bench(arg_tokens: TokenStream, item: TokenStream) -> TokenStream {
     let input = parse_macro_input!(item as ItemFn);
 
     // Parse the attribute arguments
-    let args = parse_macro_input!(arg_tokens as AttributeArgs);
+    let args = parse_macro_input!(arg_tokens with Punctuated::<Meta, Token![,]>::parse_terminated);
 
     // Extract function name, inputs, and output
     let func_name = &input.sig.ident;
@@ -32,8 +33,9 @@ pub fn bench(arg_tokens: TokenStream, item: TokenStream) -> TokenStream {
     let tracing_func_name = syn::Ident::new(&format!("__tracing__{}", func_name), func_name.span());
 
     // Validate the argument and generate code accordingly
+    let args: Vec<Meta> = args.into_iter().collect();
     let expanded = match args.as_slice() {
-        [NestedMeta::Meta(meta)] if meta.path().is_ident("raw") => {
+        [meta] if meta.path().is_ident("raw") => {
             // If the argument is "raw", validate that the function returns BenchResult
             if let ReturnType::Type(_, ty) = output {
                 if ty.to_token_stream().to_string() != quote!(BenchResult).to_string()
