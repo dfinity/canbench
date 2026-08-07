@@ -31,10 +31,10 @@ use wasmparser::Parser as WasmParser;
 // Other queries exposed by the canister are ignored.
 const BENCH_PREFIX: &str = "__canbench__";
 
-const POCKET_IC_SERVER_VERSION: &str = "13.0.0";
+//const POCKET_IC_SERVER_VERSION: &str = "13.0.0";
 const POCKET_IC_LINUX_SHA: &str =
-    "b19a15ba0650a3987e78a8017dee0e99c5518194d1e0c4fd45b53cd32598544e";
-const POCKET_IC_MAC_SHA: &str = "2e38d2266865ae285d612bd533675073d11d0cb77b8365c203431af753ce930e";
+    "9d01d317f813fc8588c3962887a5102a825c6705c1ae24bea7cdc070e6d2dfa7";
+const POCKET_IC_MAC_SHA: &str = "fdb510519ecb8f647ecde6c6e2122542ca4345e53edea218920eedb65bb71de1";
 
 /// The maximum number of rows to display in the summary table.
 const MAX_DISPLAYED_ROWS: usize = 50;
@@ -210,10 +210,12 @@ fn maybe_download_pocket_ic(path: &PathBuf, verbose: bool, integrity_check: bool
 }
 
 fn download_pocket_ic(path: &PathBuf, verbose: bool) {
+    /*
     let pocket_ic_url_prefix: &str = &format!(
         "https://github.com/dfinity/pocketic/releases/download/{}/pocket-ic-x86_64-",
         POCKET_IC_SERVER_VERSION
     );
+    */
     if verbose {
         println!("Downloading runtime (will be cached for future uses)...");
     }
@@ -229,7 +231,7 @@ fn download_pocket_ic(path: &PathBuf, verbose: bool) {
         panic!("Unsupported operating system");
     };
 
-    let url = format!("{}{}.gz", pocket_ic_url_prefix, os);
+    let url = format!("https://download.dfinity.systems/ic/c0126e95b74ee154caf4c3ebd7f3c91dcdd51301/binaries/x86_64-{}/pocket-ic.gz", os);
     let pocket_ic_compressed = reqwest::blocking::get(url)
         .unwrap()
         .bytes()
